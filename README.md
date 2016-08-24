@@ -11,9 +11,11 @@
 
 vinnie is a lightweight Java library that reads and writes "vobject" data (vCard and iCalendar).  It is used by the [ez-vcard](https://github.com/mangstadt/ez-vcard) and [biweekly](https://github.com/mangstadt/biweekly) projects.
 
+<!--
 <p align="center"><strong><a href="https://github.com/mangstadt/vinnie/wiki/Downloads">Downloads</a> |
 <a href="http://mangstadt.github.io/vinnie/javadocs/latest/index.html">Javadocs</a> |
 <a href="#mavengradle">Maven/Gradle</a> | <a href="https://github.com/mangstadt/vinnie/wiki">Documentation</a></strong></p>
+-->
 
 # Examples
 
@@ -103,6 +105,10 @@ END:VCARD
 
 # Maven/Gradle
 
+Not yet released to Maven Central.
+
+<!--
+
 **Maven**
 
 ```xml
@@ -119,6 +125,8 @@ END:VCARD
 compile 'com.github.mangstadt.vinnie:vinnie:1.0.0'
 ```
 
+-->
+
 # Build Instructions
 
 vinnie uses [Maven](http://maven.apache.org/) as its build tool, and adheres to its conventions.
@@ -131,7 +139,7 @@ To build a JAR: `mvn package`
 
 You have some options:
 
- * Post an [issue]((https://github.com/mangstadt/vinnie/issues)
+ * Post an [issue](https://github.com/mangstadt/vinnie/issues)
  * [Gitter chat room](https://gitter.im/mangstadt/vinnie)
  * [codewake Q&A forum](https://www.codewake.com/p/vinnie)
  * Email me directly: [mike.angstadt@gmail.com](mailto:mike.angstadt@gmail.com)
