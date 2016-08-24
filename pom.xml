@@ -1,0 +1,281 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.github.mangstadt.vinnie</groupId>
+	<artifactId>vinnie</artifactId>
+	<packaging>jar</packaging>
+	<version>1.0.0-SNAPSHOT</version>
+	<name>vinnie</name>
+	<url>http://github.com/mangstadt/vinnie</url>
+	<inceptionYear>2016</inceptionYear>
+	<organization>
+		<name>Michael Angstadt</name>
+	</organization>
+	<description>A lightweight Java library that reads and writes "vobject" data (vCard and iCalendar).</description>
+
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
+
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>https://opensource.org/licenses/MIT</url>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>Michael Angstadt</name>
+			<email>mike.angstadt@gmail.com</email>
+		</developer>
+	</developers>
+
+	<issueManagement>
+		<system>Github Issue Tracker</system>
+		<url>https://github.com/mangstadt/vinnie/issues</url>
+	</issueManagement>
+
+	<scm>
+		<connection>scm:git:https://github.com/mangstadt/vinnie.git</connection>
+		<developerConnection>scm:git:https://github.com/mangstadt/vinnie.git</developerConnection>
+		<url>https://github.com/mangstadt/vinnie/commits/master</url>
+	</scm>
+
+	<properties>
+		<java.version>1.5</java.version>
+	</properties>
+
+	<dependencies>
+		<!--
+		Quoted-printable encoding functionality has been extracted from the commons-codec library and incorporated into this project's code base.
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.10</version>
+		</dependency>
+		-->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.10.19</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.4.3</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+
+			<!-- Create a source code JAR -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.1.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Create a Javadoc JAR -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.8.1</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+					<linksource>true</linksource>
+					<quiet>true</quiet>
+
+					<!-- exclude commons-codec source -->
+					<excludePackageNames>com.github.mangstadt.vinnie.codec</excludePackageNames>
+
+					<!-- Add Javascript syntax highlighter -->
+					<top><![CDATA[
+						<script src="doc-files/shCore.js" type="text/javascript"></script>
+						<script src="doc-files/shBrushJava.js" type="text/javascript"></script>
+					]]></top>
+					<footer><![CDATA[
+						<script type="text/javascript">
+							SyntaxHighlighter.defaults["auto-links"] = false;
+							SyntaxHighlighter.defaults["gutter"] = false;
+							SyntaxHighlighter.defaults["tab-size"] = 2;
+							SyntaxHighlighter.defaults["toolbar"] = false;
+							SyntaxHighlighter.all();
+						</script>
+					]]></footer>
+					<docfilessubdirs>true</docfilessubdirs>
+					<stylesheetfile>src/main/javadoc/syntaxhighlighter.css</stylesheetfile>
+					
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<!--
+			FindBugs plugin
+			To run: mvn findbugs:findbugs
+			To view the results: mvn findbugs:gui
+			-->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>3.0.4</version>
+			</plugin>
+
+			<!--
+			PMD plugin
+			To run: mvn pmd:pmd
+			Code duplication report: mvn pmd:cpd
+			-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<version>3.6</version>
+				<configuration>
+					<targetJdk>${java.version}</targetJdk>
+				</configuration>
+			</plugin>
+
+			<!-- 
+			Mutation Testing
+			To run: mvn pitest:mutationCoverage
+			-->
+			<plugin>
+				<groupId>org.pitest</groupId>
+				<artifactId>pitest-maven</artifactId>
+				<version>1.1.10</version>
+				<configuration>
+					<targetClasses>
+						<param>com.github.mangstadt.vinnie.*</param>
+					</targetClasses>
+					<excludedClasses>
+						<!-- exclude commons-codec -->
+						<param>com.github.mangstadt.vinnie.codec.*</param>
+					</excludedClasses>
+					<targetTests>
+						<param>com.github.mangstadt.vinnie.*</param>
+					</targetTests>
+				</configuration>
+			</plugin>
+			
+			<!-- 
+			For codecov.io.
+			-->
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.7.5.201505241946</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<!--
+		This profile will sign the JAR file, sources file, and javadocs file using the GPG key on the local machine.
+		See: https://docs.sonatype.org/display/Repository/How+To+Generate+PGP+Signatures+With+Maven
+		-->
+		<profile>
+			<id>release-sign-artifacts</id>
+			<activation>
+				<property>
+					<name>release</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.4</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>package</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!--
+		Disables DocLint, a Java 8 feature that fails the build if it detects errors in the javadocs.
+		See: http://stackoverflow.com/a/22296107/13379
+		-->
+		<profile>
+			<id>doclint-java8-disable</id>
+			<activation>
+				<jdk>[1.8,)</jdk>
+			</activation>
+	
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<configuration>
+							<additionalparam>-Xdoclint:none</additionalparam>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>
