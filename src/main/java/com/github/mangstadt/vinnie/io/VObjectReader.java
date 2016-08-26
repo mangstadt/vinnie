@@ -359,10 +359,10 @@ public class VObjectReader implements Closeable {
 		String curParamName = null;
 
 		/*
-		 * The character that used to escape the current character (for
+		 * The character that was used to escape the current character (for
 		 * parameter values).
 		 */
-		char escapeChar = 0;
+		char paramValueEscapeChar = 0;
 
 		/*
 		 * Are we currently inside a parameter value that is surrounded with
@@ -478,62 +478,84 @@ public class VObjectReader implements Closeable {
 				continue;
 			}
 
-			if (escapeChar != 0) {
-				//this character was escaped
-				if (escapeChar == '\\') {
-					if (ch == '\\') {
+			//decode escaped parameter value character
+			if (paramValueEscapeChar != 0) {
+				char escapeChar = paramValueEscapeChar;
+				paramValueEscapeChar = 0;
+
+				switch (escapeChar) {
+				case '\\':
+					switch (ch) {
+					case '\\':
 						buffer.append(ch);
-					} else if (ch == 'n' || ch == 'N') {
-						//newlines appear as "\n" or "\N" (see RFC 2426 p.7)
-						buffer.append(NEWLINE);
-					} else if (ch == '"' && syntax != SyntaxStyle.OLD) {
-						//double quotes don't need to be escaped in 2.1 parameter values because they have no special meaning
+						continue;
+					case ';':
+						/*
+						 * Semicolons can only be escaped in old style parameter
+						 * values. If a new style parameter value has
+						 * semicolons, the value should be surrounded in double
+						 * quotes.
+						 */
 						buffer.append(ch);
-					} else if (ch == ';' && syntax == SyntaxStyle.OLD) {
-						//semi-colons can only be escaped in 2.1 parameter values (see section 2 of specs)
-						//if a 3.0/4.0 param value has semi-colons, the value should be surrounded in double quotes
-						buffer.append(ch);
-					} else {
-						//treat the escape character as a normal character because it's not a valid escape sequence
-						buffer.append(escapeChar).append(ch);
+						continue;
 					}
-				} else if (escapeChar == '^') {
-					if (ch == '^') {
+					break;
+				case '^':
+					switch (ch) {
+					case '^':
 						buffer.append(ch);
-					} else if (ch == 'n') {
+						continue;
+					case 'n':
 						buffer.append(NEWLINE);
-					} else if (ch == '\'') {
+						continue;
+					case '\'':
 						buffer.append('"');
-					} else {
-						//treat the escape character as a normal character because it's not a valid escape sequence
-						buffer.append(escapeChar).append(ch);
+						continue;
 					}
+					break;
 				}
-				escapeChar = 0;
+
+				/*
+				 * Treat the escape character as a normal character because it's
+				 * not a valid escape sequence.
+				 */
+				buffer.append(escapeChar).append(ch);
 				continue;
 			}
 
-			if (ch == '\\' || (ch == '^' && syntax != SyntaxStyle.OLD && caretDecodingEnabled)) {
-				//an escape character was read
-				escapeChar = ch;
-				continue;
+			//check for a parameter value escape character
+			if (curParamName != null) {
+				switch (syntax) {
+				case OLD:
+					if (ch == '\\') {
+						paramValueEscapeChar = ch;
+						continue;
+					}
+					break;
+				case NEW:
+					if (ch == '^' && caretDecodingEnabled) {
+						paramValueEscapeChar = ch;
+						continue;
+					}
+					break;
+				}
 			}
 
+			//set the group
 			if (ch == '.' && property.getGroup() == null && property.getName() == null) {
-				//set the group
 				property.setGroup(buffer.getAndClear());
 				continue;
 			}
 
 			if ((ch == ';' || ch == ':') && !inQuotes) {
 				if (property.getName() == null) {
-					//property name
+					//set the property name
 					property.setName(buffer.getAndClear());
 				} else {
-					//parameter value
+					//set a parameter value
 					String paramValue = buffer.getAndClear();
 					if (syntax == SyntaxStyle.OLD) {
-						//2.1 allows whitespace to surround the "=", so remove it
+						//old style allows whitespace to surround the "=", so remove it
 						paramValue = ltrim(paramValue);
 					}
 					property.getParameters().put(curParamName, paramValue);
@@ -548,26 +570,26 @@ public class VObjectReader implements Closeable {
 			}
 
 			if (property.getName() != null) {
+				//it's a multi-valued parameter
 				if (ch == ',' && curParamName != null && !inQuotes && syntax != SyntaxStyle.OLD) {
-					//multi-valued parameter
 					String paramValue = buffer.getAndClear();
 					property.getParameters().put(curParamName, paramValue);
 					continue;
 				}
 
+				//set the parameter name
 				if (ch == '=' && curParamName == null) {
-					//parameter name
 					String paramName = buffer.getAndClear().toUpperCase();
 					if (syntax == SyntaxStyle.OLD) {
-						//2.1 allows whitespace to surround the "=", so remove it
+						//old style allows whitespace to surround the "=", so remove it
 						paramName = rtrim(paramName);
 					}
 					curParamName = paramName;
 					continue;
 				}
 
+				//entering/leaving a double-quoted parameter value (new style only)
 				if (ch == '"' && curParamName != null && syntax != SyntaxStyle.OLD) {
-					//2.1 doesn't use the quoting mechanism
 					inQuotes = !inQuotes;
 					continue;
 				}

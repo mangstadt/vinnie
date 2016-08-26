@@ -33,7 +33,11 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.StringReader;
+import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
@@ -50,6 +54,7 @@ import com.github.mangstadt.vinnie.DebugDataListener;
 import com.github.mangstadt.vinnie.SyntaxStyle;
 import com.github.mangstadt.vinnie.VObjectProperty;
 import com.github.mangstadt.vinnie.codec.DecoderException;
+import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
 
 /**
  * @author Michael Angstadt
@@ -57,6 +62,8 @@ import com.github.mangstadt.vinnie.codec.DecoderException;
 //"resource": No need to call VObjectReader.close()
 @SuppressWarnings({ "resource" })
 public class VObjectReaderTest {
+	private final String NEWLINE = System.getProperty("line.separator");
+
 	/**
 	 * Asserts that the component hierarchy is correctly parsed.
 	 */
@@ -520,6 +527,38 @@ public class VObjectReaderTest {
 	}
 
 	/**
+	 * Escape sequences for parameter values should not be applied to groups,
+	 * property names, or parameter names.
+	 */
+	@Test
+	public void parameter_value_escape_sequences_in_other_places() throws Exception {
+		//@formatter:off
+		String string =
+		"one\\\\two^^three.four\\\\five^^six;seven\\\\eight^^nine=ten:";
+		//@formatter:on
+
+		for (SyntaxStyle style : SyntaxStyle.values()) {
+			for (boolean caretDecodingEnabled : new boolean[] { false, true }) {
+				VObjectReader reader = reader(string, style);
+				reader.setCaretDecodingEnabled(caretDecodingEnabled);
+				VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
+				reader.parse(listener);
+
+				InOrder inorder = inOrder(listener);
+				inorder.verify(listener).onProperty(eq(property().group("one\\\\two^^three").name("four\\\\five^^six").param("seven\\\\eight^^nine", "ten").value("").build()), any(Context.class));
+
+				//@formatter:off
+				String lines[] = string.split("\r\n");
+				int line = 0;
+				assertContexts(listener,
+					context(lines[line], ++line)
+				);
+				//@formatter:on
+			}
+		}
+	}
+
+	/**
 	 * When there are special characters in the group and property name.
 	 */
 	@Test
@@ -774,17 +813,14 @@ public class VObjectReaderTest {
 			//2: caret-escaped caret
 			//3: caret-escaped newline (lowercase n)
 			//4: caret-escaped newline (uppercase N)
-			//5: backslash-escaped semi-colon (must be escaped in 2.1)
-			//6: backslash-escaped newline (lowercase n)
-			//7: backslash-escaped newline (uppercase N)
-			//8: caret-escaped double quote
-			//9: un-escaped double quote (no special meaning in 2.1)
-			//a: caret that doesn't escape anything
-			//b: backslash-escaped backslash
-
+			//5: caret-escaped double quote
+			//6: caret that doesn't escape anything
+			//7: backslash-escaped semi-colon (must be escaped in 2.1)
+			//8: un-escaped double quote (no special meaning in 2.1)
+			//9: backslash-escaped backslash
 			//@formatter:off
 			String string =
-			"PROP;PARAM=1\\ 2^^ 3^n 4^N 5\\; 6\\n 7\\N 8^' 9\" a^ b\\\\:";
+			"PROP;PARAM=1\\ 2^^ 3^n 4^N 5^' 6^ 7\\; 8\" 9\\\\:";
 			//@formatter:on
 
 			for (boolean caretDecodingEnabled : new boolean[] { false, true }) { //caret decoding has no effect in old style
@@ -794,7 +830,7 @@ public class VObjectReaderTest {
 				reader.parse(listener);
 
 				InOrder inorder = inOrder(listener);
-				inorder.verify(listener).onProperty(eq(property().name("PROP").param("PARAM", "1\\ 2^^ 3^n 4^N 5; 6\n 7\n 8^' 9\" a^ b\\").value("").build()), any(Context.class));
+				inorder.verify(listener).onProperty(eq(property().name("PROP").param("PARAM", "1\\ 2^^ 3^n 4^N 5^' 6^ 7; 8\" 9\\").value("").build()), any(Context.class));
 
 				//@formatter:off
 				String lines[] = string.split("\r\n");
@@ -813,20 +849,18 @@ public class VObjectReaderTest {
 			//3: caret-escaped newline (lowercase n)
 			//4: caret-escaped newline (uppercase N)
 			//5: backslash-escaped newline (lowercase n)
-			//6: backslash-escaped newline (uppercase N)
 			//7: caret-escaped double quote
-			//8: backslash-escaped double quote (not part of the standard, included for interoperability)
-			//9: backslash-escaped backslash
-			//a: caret that doesn't escape anything
+			//8: backslash-escaped backslash
+			//9: caret that doesn't escape anything
 
 			//@formatter:off
 			String string =
-			"PROP;PARAM=1\\ 2^^ 3^n 4^N 5\\n 6\\N 7^' 8\\\" 9\\\\ a^ :";
+			"PROP;PARAM=1\\ 2^^ 3^n 4^N 5\\n 7^' 8\\\\ 9^ :";
 			//@formatter:on
 
 			Map<Boolean, String> expectedParamValues = new HashMap<Boolean, String>();
-			expectedParamValues.put(false, "1\\ 2^^ 3^n 4^N 5\n 6\n 7^' 8\" 9\\ a^ ");
-			expectedParamValues.put(true, "1\\ 2^ 3\n 4^N 5\n 6\n 7\" 8\" 9\\ a^ ");
+			expectedParamValues.put(false, "1\\ 2^^ 3^n 4^N 5\\n 7^' 8\\\\ 9^ ");
+			expectedParamValues.put(true, "1\\ 2^ 3" + NEWLINE + " 4^N 5\\n 7\" 8\\\\ 9^ ");
 
 			for (Boolean caretDecodingEnabled : expectedParamValues.keySet()) {
 				String expectedParamValue = expectedParamValues.get(caretDecodingEnabled);
@@ -1005,6 +1039,114 @@ public class VObjectReaderTest {
 				context(lines[line], ++line)
 			);
 			//@formatter:on
+		}
+	}
+
+	/**
+	 * Verify the logic for choosing a character set to decode a
+	 * quoted-printable value in when the property does not specify a character
+	 * set.
+	 */
+	@Test
+	public void quoted_printable_choose_default_encoding() throws Exception {
+		String decoded = "one=two";
+
+		//no default encoding set
+		//writer doesn't have encoding
+		//-> use system default
+		{
+			Charset charset = Charset.defaultCharset();
+			QuotedPrintableCodec codec = new QuotedPrintableCodec(charset.name());
+			String encoded = codec.encode(decoded);
+
+			//@formatter:off
+			String string =
+			"PROP;QUOTED-PRINTABLE:" + encoded + "\r\n";
+			//@formatter:on
+
+			for (SyntaxStyle style : SyntaxStyle.values()) {
+				VObjectReader reader = reader(string, style);
+				VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
+				reader.parse(listener);
+
+				InOrder inorder = inOrder(listener);
+				VObjectProperty invalidCharset = property().name("PROP").param(null, "QUOTED-PRINTABLE").value(decoded).build();
+				inorder.verify(listener).onProperty(eq(invalidCharset), any(Context.class));
+
+				//@formatter:off
+				String lines[] = string.split("\r\n");
+				int line = 0;
+				assertContexts(listener,
+					context(lines[line], ++line)
+				);
+				//@formatter:on
+			}
+		}
+
+		//no default encoding set
+		//writer has encoding
+		//-> user writer encoding
+		{
+			Charset charset = Charset.forName("UTF-16");
+			QuotedPrintableCodec codec = new QuotedPrintableCodec(charset.name());
+			String encoded = codec.encode(decoded);
+
+			//@formatter:off
+			String string =
+			"PROP;QUOTED-PRINTABLE:" + encoded + "\r\n";
+			//@formatter:on
+
+			for (SyntaxStyle style : SyntaxStyle.values()) {
+				Reader r = new InputStreamReader(new ByteArrayInputStream(string.getBytes(charset)), charset);
+				VObjectReader reader = new VObjectReader(r, new SyntaxRules(style));
+				VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
+				reader.parse(listener);
+
+				InOrder inorder = inOrder(listener);
+				VObjectProperty invalidCharset = property().name("PROP").param(null, "QUOTED-PRINTABLE").value(decoded).build();
+				inorder.verify(listener).onProperty(eq(invalidCharset), any(Context.class));
+
+				//@formatter:off
+				String lines[] = string.split("\r\n");
+				int line = 0;
+				assertContexts(listener,
+					context(lines[line], ++line)
+				);
+				//@formatter:on
+			}
+		}
+
+		//default encoding set
+		//-> use it
+		{
+			Charset charset = Charset.forName("UTF-16");
+			QuotedPrintableCodec codec = new QuotedPrintableCodec(charset.name());
+			String encoded = codec.encode(decoded);
+
+			//@formatter:off
+			String string =
+			"PROP;QUOTED-PRINTABLE:" + encoded + "\r\n";
+			//@formatter:on
+
+			for (SyntaxStyle style : SyntaxStyle.values()) {
+				Reader r = new StringReader(string);
+				VObjectReader reader = new VObjectReader(r, new SyntaxRules(style));
+				reader.setDefaultQuotedPrintableCharset(charset);
+				VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
+				reader.parse(listener);
+
+				InOrder inorder = inOrder(listener);
+				VObjectProperty invalidCharset = property().name("PROP").param(null, "QUOTED-PRINTABLE").value(decoded).build();
+				inorder.verify(listener).onProperty(eq(invalidCharset), any(Context.class));
+
+				//@formatter:off
+				String lines[] = string.split("\r\n");
+				int line = 0;
+				assertContexts(listener,
+					context(lines[line], ++line)
+				);
+				//@formatter:on
+			}
 		}
 	}
 
