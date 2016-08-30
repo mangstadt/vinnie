@@ -4,7 +4,7 @@
 | --- | --- |
 | Continuous Integration: | [![](https://travis-ci.org/mangstadt/vinnie.svg?branch=master)](https://travis-ci.org/mangstadt/vinnie) |
 | Code Coverage: | [![codecov.io](http://codecov.io/github/mangstadt/vinnie/coverage.svg?branch=master)](http://codecov.io/github/mangstadt/vinnie?branch=master) |
-| Maven Central: | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.mangstadt.vinnie/vinnie/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.mangstadt.vinnie/vinnie) |
+| Maven Central: | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.mangstadt/vinnie/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.mangstadt/vinnie) |
 | Chat Room: | [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mangstadt/vinnie?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) |
 | Q & A: | [![Codewake](https://www.codewake.com/badges/ask_question.svg)](https://www.codewake.com/p/vinnie) |
 | License: | [![MIT License](https://img.shields.io/badge/License-MIT-red.svg)](https://github.com/mangstadt/vinnie/blob/master/LICENSES) |
@@ -113,7 +113,7 @@ Not yet released to Maven Central.
 
 ```xml
 <dependency>
-   <groupId>com.github.mangstadt.vinnie</groupId>
+   <groupId>com.github.mangstadt</groupId>
    <artifactId>vinnie</artifactId>
    <version>1.0.0</version>
 </dependency>
@@ -122,7 +122,7 @@ Not yet released to Maven Central.
 **Gradle**
 
 ```
-compile 'com.github.mangstadt.vinnie:vinnie:1.0.0'
+compile 'com.github.mangstadt:vinnie:1.0.0'
 ```
 
 -->
