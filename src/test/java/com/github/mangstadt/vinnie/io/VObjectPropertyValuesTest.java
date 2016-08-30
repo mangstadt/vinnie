@@ -241,7 +241,7 @@ public class VObjectPropertyValuesTest {
 			assertEquals("one", it.next());
 
 			assertTrue(it.hasNext());
-			assertEquals("", it.next());
+			assertNull(it.next());
 
 			assertTrue(it.hasNext());
 			assertEquals("two", it.next());

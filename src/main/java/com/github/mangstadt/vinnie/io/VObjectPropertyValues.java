@@ -259,7 +259,8 @@ public final class VObjectPropertyValues {
 	 * </p>
 	 * <p>
 	 * Semi-structured values contain multiple values separate by semicolons.
-	 * The order that the values are in matters.
+	 * Unlike structured values, each value cannot have their own comma
+	 * separated list of sub-values. The order that the values are in matters.
 	 * </p>
 	 * </p>
 	 * <p>
@@ -283,7 +284,8 @@ public final class VObjectPropertyValues {
 	 * </p>
 	 * <p>
 	 * Semi-structured values contain multiple values separate by semicolons.
-	 * The order that the values are in matters.
+	 * Unlike structured values, each value cannot have their own comma
+	 * separated list of sub-values. The order that the values are in matters.
 	 * </p>
 	 * </p>
 	 * <p>
@@ -308,7 +310,8 @@ public final class VObjectPropertyValues {
 	 * </p>
 	 * <p>
 	 * Semi-structured values contain multiple values separate by semicolons.
-	 * The order that the values are in matters.
+	 * Unlike structured values, each value cannot have their own comma
+	 * separated list of sub-values. The order that the values are in matters.
 	 * </p>
 	 * <p>
 	 * <b>Example:</b>
@@ -767,11 +770,16 @@ public final class VObjectPropertyValues {
 
 		/**
 		 * Gets the next value.
-		 * @return the next value or empty string if the value is empty or null
-		 * if there are no more values
+		 * @return the next value or null if the value is empty or null if there
+		 * are no more values
 		 */
 		public String next() {
-			return hasNext() ? it.next() : null;
+			if (!hasNext()) {
+				return null;
+			}
+
+			String next = it.next();
+			return (next.length() == 0) ? null : next;
 		}
 
 		/**
