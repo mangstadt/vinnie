@@ -262,7 +262,6 @@ public final class VObjectPropertyValues {
 	 * Unlike structured values, each value cannot have their own comma
 	 * separated list of sub-values. The order that the values are in matters.
 	 * </p>
-	 * </p>
 	 * <p>
 	 * <b>Example:</b>
 	 * </p>
@@ -286,7 +285,6 @@ public final class VObjectPropertyValues {
 	 * Semi-structured values contain multiple values separate by semicolons.
 	 * Unlike structured values, each value cannot have their own comma
 	 * separated list of sub-values. The order that the values are in matters.
-	 * </p>
 	 * </p>
 	 * <p>
 	 * <b>Example:</b>
@@ -312,7 +310,6 @@ public final class VObjectPropertyValues {
 	 * Semi-structured values contain multiple values separate by semicolons.
 	 * Unlike structured values, each value cannot have their own comma
 	 * separated list of sub-values. The order that the values are in matters.
-	 * </p>
 	 * <p>
 	 * <b>Example:</b>
 	 * </p>
@@ -361,7 +358,6 @@ public final class VObjectPropertyValues {
 	 * values separated by commas. The order that the components are in matters,
 	 * but the order that each component's list of values are in usually doesn't
 	 * matter.
-	 * </p>
 	 * </p>
 	 * <p>
 	 * <b>Example:</b>
@@ -512,7 +508,6 @@ public final class VObjectPropertyValues {
 	 * multi-valued. Key/value pairs are separated by semicolons. Values are
 	 * separated by commas. Keys are converted to uppercase.
 	 * </p>
-	 * </p>
 	 * <p>
 	 * <b>Example:</b>
 	 * </p>
@@ -616,7 +611,6 @@ public final class VObjectPropertyValues {
 	 * Multimap values are collections of key/value pairs whose keys can be
 	 * multi-valued. Key/value pairs are separated by semicolons. Values are
 	 * separated by commas. Keys are converted to uppercase.
-	 * </p>
 	 * </p>
 	 * <p>
 	 * <b>Example:</b>
@@ -862,7 +856,7 @@ public final class VObjectPropertyValues {
 
 		/**
 		 * Constructs a new structured value iterator.
-		 * @param component the components to iterator over
+		 * @param components the components to iterator over
 		 */
 		public StructuredValueIterator(List<List<String>> components) {
 			it = components.iterator();
