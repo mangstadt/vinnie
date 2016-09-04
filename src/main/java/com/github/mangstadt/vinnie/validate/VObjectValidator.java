@@ -229,6 +229,7 @@ public class VObjectValidator {
 					//@formatter:off
 					map2.put(strict, new AllowedCharacters.Builder()
 						.allowPrintable()
+						.allowNonAscii()
 						.allow('\t')
 						.except('"')
 					.build());
@@ -255,6 +256,7 @@ public class VObjectValidator {
 					//@formatter:off
 					map2.put(strict, new AllowedCharacters.Builder()
 						.allowPrintable()
+						.allowNonAscii()
 						.allow("\r\n\t")
 					.build());
 					//@formatter:on

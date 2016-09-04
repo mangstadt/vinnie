@@ -230,6 +230,15 @@ public class AllowedCharacters {
 		}
 
 		/**
+		 * Allows all characters outside the range of 7-bit ASCII.
+		 * @return this
+		 */
+		public Builder allowNonAscii() {
+			allowNonAscii = true;
+			return this;
+		}
+
+		/**
 		 * Reject all the characters in the given string.
 		 * @param characters the string containing the illegal characters
 		 * @return this
