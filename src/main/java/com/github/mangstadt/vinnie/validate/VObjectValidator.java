@@ -65,7 +65,6 @@ public class VObjectValidator {
 				//@formatter:off
 				map.put(strict, new AllowedCharacters.Builder()
 					.allowPrintable()
-					.allow('\t')
 					.except("[]=:.,")
 				
 					/*
