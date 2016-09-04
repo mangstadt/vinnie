@@ -95,9 +95,9 @@ public class SyntaxRules {
 	 * @param component the name of the component that contains the VERSION
 	 * property (e.g. "VCARD"), or null if the VERSION property will not be
 	 * inside of any components
-	 * @param version the value of the component's VERSION property
+	 * @param version the value of the VERSION property
 	 * @param syntaxStyle the syntax style to use when a VERSION property with
-	 * the given name, under the given component, is encountered
+	 * the given value, under the given component, is encountered
 	 */
 	public void addRule(String component, String version, SyntaxStyle syntaxStyle) {
 		component = (component == null) ? null : component.toUpperCase();
