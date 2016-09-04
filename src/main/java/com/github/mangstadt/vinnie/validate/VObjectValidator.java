@@ -64,7 +64,7 @@ public class VObjectValidator {
 			{
 				//@formatter:off
 				map.put(strict, new AllowedCharacters.Builder()
-					.allow(32, 126)
+					.allowPrintable()
 					.allow('\t')
 					.except("[]=:.,")
 				
@@ -229,7 +229,7 @@ public class VObjectValidator {
 				{
 					//@formatter:off
 					map2.put(strict, new AllowedCharacters.Builder()
-						.allow(32, 126)
+						.allowPrintable()
 						.allow('\t')
 						.except('"')
 					.build());
@@ -255,7 +255,7 @@ public class VObjectValidator {
 				{
 					//@formatter:off
 					map2.put(strict, new AllowedCharacters.Builder()
-						.allow(32, 126)
+						.allowPrintable()
 						.allow("\r\n\t")
 					.build());
 					//@formatter:on

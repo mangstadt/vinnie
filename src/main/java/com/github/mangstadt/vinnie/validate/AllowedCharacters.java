@@ -220,6 +220,16 @@ public class AllowedCharacters {
 		}
 
 		/**
+		 * Allows all characters that are considered "printable characters"
+		 * (32-126 inclusive). This does NOT include tabs, carriage returns, or
+		 * line feeds. This DOES include spaces.
+		 * @return this
+		 */
+		public Builder allowPrintable() {
+			return allow(32, 126);
+		}
+
+		/**
 		 * Reject all the characters in the given string.
 		 * @param characters the string containing the illegal characters
 		 * @return this
