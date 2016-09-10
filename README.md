@@ -94,16 +94,14 @@ END:VCARD
 
 # Features
 
- * Full ABNF compliance with vCard (version 2.1, 3.0, and 4.0) and iCalendar (versions 1.0 and 2.0) specifications.
+ * Full ABNF compliance with vCard (versions 2.1, 3.0, and 4.0) and iCalendar (versions 1.0 and 2.0) specifications.
+ * Automatic decoding/encoding of quoted-printable data.
  * Extensive unit test coverage.
  * Low Java version requirement (1.5 or above).
  * No dependencies on external libraries.
 
 # Maven/Gradle
 
-Not yet released to Maven Central.
-
-<!--
 
 **Maven**
 
@@ -120,8 +118,6 @@ Not yet released to Maven Central.
 ```
 compile 'com.github.mangstadt:vinnie:1.0.0'
 ```
-
--->
 
 # Build Instructions
 
