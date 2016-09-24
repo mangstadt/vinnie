@@ -97,7 +97,7 @@ public class VObjectProperty {
 	}
 
 	/**
-	 * Gets the property name (e.g. "FN" or "DTSTART")
+	 * Gets the property name.
 	 * @return the property name
 	 */
 	public String getName() {
@@ -105,7 +105,7 @@ public class VObjectProperty {
 	}
 
 	/**
-	 * Sets the property name (e.g. "FN" or "DTSTART")
+	 * Sets the property name.
 	 * @param name the property name (should contain only letters, numbers, and
 	 * dashes; letters should be uppercase by convention; cannot be null)
 	 */

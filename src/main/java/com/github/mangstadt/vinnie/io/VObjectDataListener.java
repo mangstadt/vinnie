@@ -34,7 +34,7 @@ import com.github.mangstadt.vinnie.VObjectProperty;
  */
 public interface VObjectDataListener {
 	/**
-	 * Called when a component begins (i.e. when a BEGIN property is
+	 * Called when a component begins (in other words, when a BEGIN property is
 	 * encountered).
 	 * @param name the component name (in uppercase)
 	 * @param context the parse context
@@ -43,7 +43,8 @@ public interface VObjectDataListener {
 
 	/**
 	 * <p>
-	 * Called when a component ends (i.e. when an END property is encountered).
+	 * Called when a component ends (in other words, when an END property is
+	 * encountered).
 	 * </p>
 	 * <p>
 	 * If a component ends before any of its subcomponents end, then the parser

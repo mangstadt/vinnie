@@ -88,7 +88,7 @@ public class AllowedCharacters {
 
 	/**
 	 * Returns an allowed character list that is the opposite of this allowed
-	 * character list (i.e. characters that are NOT allowed).
+	 * character list (in other words, characters that are NOT allowed).
 	 * @return the reverse list
 	 */
 	public AllowedCharacters flip() {
