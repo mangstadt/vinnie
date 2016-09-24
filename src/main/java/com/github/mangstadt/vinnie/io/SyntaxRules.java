@@ -97,7 +97,7 @@ public class SyntaxRules {
 	 * inside of any components
 	 * @param version the value of the VERSION property
 	 * @param syntaxStyle the syntax style to use when a VERSION property with
-	 * the given value, under the given component, is encountered
+	 * the given value, and under the given component, is encountered
 	 */
 	public void addRule(String component, String version, SyntaxStyle syntaxStyle) {
 		component = (component == null) ? null : component.toUpperCase();

@@ -44,8 +44,9 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * <p>
  * Writes data to a vobject data stream.
  * </p>
- * 
+ * <p>
  * <b>Example:</b>
+ * </p>
  * 
  * <pre class="brush:java">
  * Writer writer = ...
@@ -56,7 +57,103 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * vobjectWriter.writeEndComponent("VCARD");
  * vobjectWriter.close();
  * </pre>
+ * <p>
+ * <b>Invalid characters</b>
+ * </p>
+ * <p>
+ * If property data contains any invalid characters, an
+ * {@link IllegalArgumentException} is thrown and the property is not written. A
+ * character is considered to be invalid if it cannot be encoded or escaped, and
+ * would break the vobject syntax if written. The rules regarding which
+ * characters are considered invalid is fairly complex. Here are some general
+ * guidelines:
+ * </p>
+ * <ul>
+ * <li>Try to limit group names, property names, and parameter names to
+ * alphanumerics and hyphens.</li>
+ * <li>Avoid the use of newlines, double quotes, and colons inside of parameter
+ * values. They can be used in some contexts, but not others.</li>
+ * </ul>
+ * <p>
+ * <b>Quoted-printable Encoding</b>
+ * </p>
+ * <p>
+ * If a property has a parameter named ENCODING that has a value of
+ * QUOTED-PRINTABLE (case-insensitive), then the property's value will
+ * automatically be written in quoted-printable encoding.
+ * </p>
  * 
+ * <pre class="brush:java">
+ * StringWriter sw = new StringWriter();
+ * VObjectWriter vobjectWriter = new VObjectWriter(sw, ...);
+ * 
+ * VObjectProperty note = new VObjectProperty("NOTE", "¡Hola, mundo!");
+ * note.getParameters().put("ENCODING", "QUOTED-PRINTABLE");
+ * vobjectWriter.writeProperty(note);
+ * vobjectWriter.close();
+ * 
+ * assertEquals("NOTE;ENCODING=QUOTED-PRINTABLE;CHARSET=UTF-8:=C2=A1Hola, mundo!\r\n", sw.toString());
+ * </pre>
+ * 
+ * <p>
+ * A nameless parameter may also be used for backwards compatibility with
+ * old-style syntax.
+ * </p>
+ * 
+ * <pre class="brush:java">
+ * VObjectProperty note = new VObjectProperty(&quot;NOTE&quot;, &quot;¡Hola, mundo!&quot;);
+ * note.getParameters().put(null, &quot;QUOTED-PRINTABLE&quot;);
+ * vobjectWriter.writeProperty(note);
+ * </pre>
+ * 
+ * <p>
+ * By default, the property value is encoded under the UTF-8 character set when
+ * encoded in quoted-printable encoding. This can be changed by specifying a
+ * CHARSET parameter. If the character set is not recognized by the local JVM,
+ * then UTF-8 will be used.
+ * </p>
+ * 
+ * <pre class="brush:java">
+ * StringWriter sw = new StringWriter();
+ * VObjectWriter vobjectWriter = new VObjectWriter(sw, ...);
+ * 
+ * VObjectProperty note = new VObjectProperty("NOTE", "¡Hola, mundo!");
+ * note.getParameters().put("ENCODING", "QUOTED-PRINTABLE");
+ * note.getParameters().put("CHARSET", "Windows-1252");
+ * vobjectWriter.writeProperty(note);
+ * vobjectWriter.close();
+ * 
+ * assertEquals("NOTE;ENCODING=QUOTED-PRINTABLE;CHARSET=Windows-1252:=A1Hola, mundo!\r\n", sw.toString());
+ * </pre>
+ * 
+ * <p>
+ * <b>Circumflex Accent Encoding</b>
+ * </p>
+ * 
+ * <p>
+ * Newlines and double quote characters are not permitted inside of parameter
+ * values unless circumflex accent encoding is enabled. It is turned off by
+ * default.
+ * </p>
+ * 
+ * <p>
+ * Note that this encoding mechanism is defined in a separate specification and
+ * may not be supported by the consumer of the vobject data. Also note that it
+ * can only be used with new-style syntax.
+ * </p>
+ * 
+ * <pre class="brush:java">
+ * StringWriter sw = new StringWriter();
+ * VObjectWriter vobjectWriter = new VObjectWriter(sw, SyntaxStyle.NEW);
+ * vobjectWriter.setCaretEncodingEnabled(true);
+ * 
+ * VObjectProperty note = new VObjectProperty(&quot;NOTE&quot;, &quot;The truth is out there.&quot;);
+ * note.getParameters().put(&quot;X-AUTHOR&quot;, &quot;Fox \&quot;Spooky\&quot; Mulder&quot;);
+ * vobjectWriter.writeProperty(note);
+ * vobjectWriter.close();
+ * 
+ * assertEquals(&quot;NOTE;X-AUTHOR=Fox &circ;'Spooky&circ;' Mulder:The truth is out there.\r\n&quot;, sw.toString());
+ * </pre>
  * @author Michael Angstadt
  */
 public class VObjectWriter implements Closeable, Flushable {

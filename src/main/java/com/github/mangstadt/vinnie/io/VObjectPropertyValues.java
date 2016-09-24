@@ -812,7 +812,8 @@ public final class VObjectPropertyValues {
 		}
 
 		/**
-		 * Builds the semi-structured value string.
+		 * Builds the semi-structured value string. Trailing semicolon
+		 * delimiters will not be trimmed.
 		 * @return the semi-structured value string
 		 */
 		public String build() {
@@ -931,7 +932,8 @@ public final class VObjectPropertyValues {
 		}
 
 		/**
-		 * Builds the structured value string.
+		 * Builds the structured value string. Trailing semicolon delimiters
+		 * will not be trimmed.
 		 * @return the structured value string
 		 */
 		public String build() {

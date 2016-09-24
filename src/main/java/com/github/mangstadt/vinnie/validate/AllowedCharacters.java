@@ -27,7 +27,7 @@ package com.github.mangstadt.vinnie.validate;
 import java.util.BitSet;
 
 /**
- * Validates whether or not string exclusively contains certain characters.
+ * Validates whether or not strings contain only certain characters.
  * @author Michael Angstadt
  */
 public class AllowedCharacters {

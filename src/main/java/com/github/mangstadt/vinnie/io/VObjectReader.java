@@ -252,7 +252,7 @@ public class VObjectReader implements Closeable {
 	 * <ol>
 	 * <li>The end of the input stream has been reached or</li>
 	 * <li>One of the methods in the given {@link VObjectDataListener}
-	 * implementation invoked {@link Context#stop()}.</li>
+	 * implementation has invoked {@link Context#stop()}.</li>
 	 * </ol>
 	 * @param listener callback interface for handling data as it is read off
 	 * the input stream

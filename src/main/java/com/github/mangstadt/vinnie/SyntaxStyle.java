@@ -25,7 +25,8 @@
 package com.github.mangstadt.vinnie;
 
 /**
- * Defines the various syntax styles a vobject data stream can have.
+ * Defines the various syntax styles a vobject data stream can have. They are
+ * similar to each other, but not identical.
  * @author Michael Angstadt
  */
 public enum SyntaxStyle {

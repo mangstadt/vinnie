@@ -68,7 +68,7 @@ public class VObjectProperty {
 	 * @param group the group name (should contain only letters, numbers, and
 	 * dashes; can be null)
 	 * @param name the property name (should contain only letters, numbers, and
-	 * dashes; letters should in uppercase by convention; cannot be null)
+	 * dashes; letters should be uppercase by convention; cannot be null)
 	 * @param parameters the property parameters (cannot be null)
 	 * @param value the property value
 	 */
@@ -80,7 +80,7 @@ public class VObjectProperty {
 	}
 
 	/**
-	 * Gets the group name (note: iCalendar objects do not use group names).
+	 * Gets the group name (note: iCalendar properties do not use group names).
 	 * @return the group name or null if the property doesn't have one
 	 */
 	public String getGroup() {
