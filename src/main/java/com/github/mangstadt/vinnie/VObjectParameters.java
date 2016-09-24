@@ -131,7 +131,7 @@ public class VObjectParameters implements Iterable<Map.Entry<String, List<String
 	 * @param key assumed to already be in uppercase
 	 * @param values the values to add
 	 */
-	public void _putAll(String key, String... values) {
+	private void _putAll(String key, String... values) {
 		List<String> list = _get(key);
 		if (list == null) {
 			list = new ArrayList<String>();
