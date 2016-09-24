@@ -96,6 +96,7 @@ END:VCARD
 
  * Full ABNF compliance with vCard (versions 2.1, 3.0, and 4.0) and iCalendar (versions 1.0 and 2.0) specifications.
  * Automatic decoding/encoding of quoted-printable data.
+ * Streaming API.
  * Extensive unit test coverage.
  * Low Java version requirement (1.5 or above).
  * No dependencies on external libraries.
