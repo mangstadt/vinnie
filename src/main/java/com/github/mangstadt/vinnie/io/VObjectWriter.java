@@ -164,6 +164,57 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * 
  * assertEquals(&quot;NOTE;X-AUTHOR=Fox &circ;'Spooky&circ;' Mulder:The truth is out there.\r\n&quot;, sw.toString());
  * </pre>
+ * 
+ * <p>
+ * <b>Line Folding</b>
+ * </p>
+ * <p>
+ * Lines longer than 75 characters are automatically folded, as per the
+ * recommendation in the vCard and iCalendar specifications.
+ * </p>
+ * 
+ * <pre class="brush:java">
+ * StringWriter sw = new StringWriter();
+ * VObjectWriter vobjectWriter = new VObjectWriter(sw, ...);
+ * 
+ * vobjectWriter.writeProperty("NOTE", "Lorem ipsum dolor sit amet\, consectetur adipiscing elit. Vestibulum ultricies tempor orci ac dignissim.");
+ * vobjectWriter.close();
+ * 
+ * assertEquals(&quot;NOTE:Lorem ipsum dolor sit amet\\, consectetur adipiscing elit. Vestibulum u\r\n ltricies tempor orci ac dignissim.\r\n&quot;, sw.toString());
+ * </pre>
+ * <p>
+ * The line folding length can be adjusted. Passing in a "null" line length will
+ * disable line folding.
+ * </p>
+ * 
+ * <pre class="brush:java">
+ * StringWriter sw = new StringWriter();
+ * VObjectWriter vobjectWriter = new VObjectWriter(sw, ...);
+ * vobjectWriter.getFoldedLineWriter().setLineLength(null);
+ * 
+ * vobjectWriter.writeProperty("NOTE", "Lorem ipsum dolor sit amet\, consectetur adipiscing elit. Vestibulum ultricies tempor orci ac dignissim.");
+ * vobjectWriter.close();
+ * 
+ * assertEquals(&quot;NOTE:Lorem ipsum dolor sit amet\\, consectetur adipiscing elit. Vestibulum ultricies tempor orci ac dignissim.\r\n&quot;, sw.toString());
+ * </pre>
+ * 
+ * <p>
+ * You may also specify what kind of folding whitespace to use. The default is a
+ * single space character, but this can be changed to any combination of tabs
+ * and spaces. Note that new-style syntax requires the folding whitespace to be
+ * exactly ONE character long.
+ * </p>
+ * 
+ * <pre class="brush:java">
+ * StringWriter sw = new StringWriter();
+ * VObjectWriter vobjectWriter = new VObjectWriter(sw, ...);
+ * vobjectWriter.getFoldedLineWriter().setIndent("\t");
+ * 
+ * vobjectWriter.writeProperty("NOTE", "Lorem ipsum dolor sit amet\, consectetur adipiscing elit. Vestibulum ultricies tempor orci ac dignissim.");
+ * vobjectWriter.close();
+ * 
+ * assertEquals(&quot;NOTE:Lorem ipsum dolor sit amet\\, consectetur adipiscing elit. Vestibulum u\r\n\tltricies tempor orci ac dignissim.\r\n&quot;, sw.toString());
+ * </pre>
  * @author Michael Angstadt
  */
 public class VObjectWriter implements Closeable, Flushable {

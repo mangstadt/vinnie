@@ -127,7 +127,7 @@ import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
  * VObjectReader vobjectReader = new VObjectReader(reader, new SyntaxRules(SyntaxStyle.NEW));
  * vobjectReader.parse(new VObjectDataAdapter() {
  * 	public void onProperty(VObjectProperty property, Context context) {
- * 	  assertEquals(&quot;Fox \&quot;Spooky\&quot; Mulder&quot;, property.getParameters().first(&quot;X-AUTHOR&quot;));
+ * 		assertEquals(&quot;Fox \&quot;Spooky\&quot; Mulder&quot;, property.getParameters().first(&quot;X-AUTHOR&quot;));
  * 	}
  * });
  * vobjectReader.close();
@@ -145,7 +145,25 @@ import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
  * vobjectReader.setCaretDecodingEnabled(false);
  * vobjectReader.parse(new VObjectDataAdapter() {
  * 	public void onProperty(VObjectProperty property, Context context) {
- * 	  assertEquals(&quot;Fox &circ;'Spooky&circ;' Mulder&quot;, property.getParameters().first(&quot;X-AUTHOR&quot;));
+ * 		assertEquals(&quot;Fox &circ;'Spooky&circ;' Mulder&quot;, property.getParameters().first(&quot;X-AUTHOR&quot;));
+ * 	}
+ * });
+ * vobjectReader.close();
+ * </pre>
+ * 
+ * <p>
+ * <b>Line Folding</b>
+ * </p>
+ * <p>
+ * Folded lines are automatically unfolded when read.
+ * </p>
+ * 
+ * <pre class="brush:java">
+ * Reader reader = new StringReader(&quot;NOTE:Lorem ipsum dolor sit amet\\, consectetur adipiscing elit. Vestibulum u\r\n ltricies tempor orci ac dignissim.&quot;);
+ * VObjectReader vobjectReader = new VObjectReader(reader, ...);
+ * vobjectReader.parse(new VObjectDataAdapter() {
+ * 	public void onProperty(VObjectProperty property, Context context) {
+ * 		assertEquals(&quot;Lorem ipsum dolor sit amet\\, consectetur adipiscing elit. Vestibulum ultricies tempor orci ac dignissim.&quot;, property.getValue());
  * 	}
  * });
  * vobjectReader.close();
