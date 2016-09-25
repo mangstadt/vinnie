@@ -57,6 +57,7 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * vobjectWriter.writeEndComponent("VCARD");
  * vobjectWriter.close();
  * </pre>
+ * 
  * <p>
  * <b>Invalid characters</b>
  * </p>
@@ -74,6 +75,19 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * <li>Avoid the use of newlines, double quotes, and colons inside of parameter
  * values. They can be used in some contexts, but not others.</li>
  * </ul>
+ * 
+ * <p>
+ * <b>Newlines in property values</b>
+ * </p>
+ * <p>
+ * All newline characters ("\r" or "\n") within property values are
+ * automatically escaped. In old-style syntax, the property value will be
+ * encoded in quoted-printable encoding. In new-style syntax, the newline
+ * characters will be replaced with the "\n" escape sequence (Windows newline
+ * sequences are replaced with a single "\n" even though they consist of two
+ * characters).
+ * </p>
+ * 
  * <p>
  * <b>Quoted-printable Encoding</b>
  * </p>
@@ -94,7 +108,6 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * 
  * assertEquals("NOTE;ENCODING=QUOTED-PRINTABLE;CHARSET=UTF-8:=C2=A1Hola, mundo!\r\n", sw.toString());
  * </pre>
- * 
  * <p>
  * A nameless parameter may also be used for backwards compatibility with
  * old-style syntax.
@@ -105,7 +118,6 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * note.getParameters().put(null, &quot;QUOTED-PRINTABLE&quot;);
  * vobjectWriter.writeProperty(note);
  * </pre>
- * 
  * <p>
  * By default, the property value is encoded under the UTF-8 character set when
  * encoded in quoted-printable encoding. This can be changed by specifying a
@@ -129,13 +141,11 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * <p>
  * <b>Circumflex Accent Encoding</b>
  * </p>
- * 
  * <p>
  * Newlines and double quote characters are not permitted inside of parameter
  * values unless circumflex accent encoding is enabled. It is turned off by
  * default.
  * </p>
- * 
  * <p>
  * Note that this encoding mechanism is defined in a separate specification and
  * may not be supported by the consumer of the vobject data. Also note that it

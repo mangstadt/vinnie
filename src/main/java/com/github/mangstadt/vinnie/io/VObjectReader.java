@@ -46,14 +46,108 @@ import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
  * <p>
  * Parses a vobject data stream.
  * </p>
- * 
+ * <p>
  * <b>Example:</b>
+ * </p>
  * 
  * <pre class="brush:java">
  * Reader reader = ...
  * SyntaxRules rules = SyntaxRules.vcard();
  * VObjectReader vobjectReader = new VObjectReader(reader, rules);
  * vobjectReader.parse(new VObjectDataListener(){ ... });
+ * vobjectReader.close();
+ * </pre>
+ * 
+ * <p>
+ * <b>Quoted-printable Encoding</b>
+ * </p>
+ * <p>
+ * Property values encoded in quoted-printable encoding are automatically
+ * decoded. A property value is considered to be encoded in quoted-printable
+ * encoding if it has a "ENCODING=QUOTED-PRINTABLE" parameter. Even though the
+ * property value is automatically decoded, the ENCODING and CHARSET parameters
+ * are not removed from the parsed property object.
+ * </p>
+ * 
+ * <pre class="brush:java">
+ * Reader reader = new StringReader("NOTE;ENCODING=QUOTED-PRINTABLE;CHARSET=UTF-8:=C2=A1Hola, mundo!");
+ * VObjectReader vobjectReader = new VObjectReader(reader, ...);
+ * vobjectReader.parse(new VObjectDataAdapter(){
+ *   public void onProperty(VObjectProperty property, Context context) {
+ *     assertEquals("¡Hola, mundo!", property.getValue());
+ *     assertEquals("QUOTED-PRINTABLE", property.getParameters().first("ENCODING"));
+ *     assertEquals("UTF-8", property.getParameters().first("CHARSET"));
+ *   }
+ * });
+ * vobjectReader.close();
+ * </pre>
+ * 
+ * <p>
+ * If a CHARSET parameter is not present in the quoted-printable property, then
+ * the character set of the input stream will be used to decode the value. If
+ * this cannot be determined, then the local JVM's default character set will be
+ * used. However, this behavior can be overridden by supplying your own
+ * character set to use in the event that a CHARSET parameter is not present.
+ * </p>
+ * 
+ * <pre class="brush:java">
+ * Reader reader = new StringReader("NOTE;ENCODING=QUOTED-PRINTABLE:=A1Hola, mundo!");
+ * VObjectReader vobjectReader = new VObjectReader(reader, ...);
+ * vobjectReader.setDefaultQuotedPrintableCharset(Charset.forName("Windows-1252"));
+ * vobjectReader.parse(new VObjectDataAdapter(){
+ *   public void onProperty(VObjectProperty property, Context context) {
+ *     assertEquals("¡Hola, mundo!", property.getValue());
+ *     assertEquals("QUOTED-PRINTABLE", property.getParameters().first("ENCODING"));
+ *     assertNull(property.getParameters().first("CHARSET"));
+ *   }
+ * });
+ * vobjectReader.close();
+ * </pre>
+ * <p>
+ * Nameless ENCODING parameters are also recognized for backwards compatibility
+ * with old-style syntax.
+ * </p>
+ * 
+ * <pre>
+ * NOTE;QUOTED-PRINTABLE;CHARSET=UTF-8:=C2=A1Hola, mundo!
+ * </pre>
+ * 
+ * <p>
+ * <b>Circumflex Accent Encoding</b>
+ * </p>
+ * <p>
+ * Circumflex accent encoding allows newlines and double quote characters to be
+ * included inside of parameter values. Parameter values that are encoded using
+ * this encoding scheme are automatically decoded. Note that this encoding
+ * mechanism is only supported by new-style syntax.
+ * </p>
+ * 
+ * <pre class="brush:java">
+ * Reader reader = new StringReader(&quot;NOTE;X-AUTHOR=Fox &circ;'Spooky&circ;' Mulder:The truth is out there.&quot;);
+ * VObjectReader vobjectReader = new VObjectReader(reader, new SyntaxRules(SyntaxStyle.NEW));
+ * vobjectReader.parse(new VObjectDataAdapter() {
+ * 	public void onProperty(VObjectProperty property, Context context) {
+ * 	  assertEquals(&quot;Fox \&quot;Spooky\&quot; Mulder&quot;, property.getParameters().first(&quot;X-AUTHOR&quot;));
+ * 	}
+ * });
+ * vobjectReader.close();
+ * </pre>
+ * 
+ * <p>
+ * In the rare event that your vobject data has raw "^" characters in its
+ * parameter values, and it does not use this encoding scheme, circumflex accent
+ * decoding can be turned off.
+ * </p>
+ * 
+ * <pre class="brush:java">
+ * Reader reader = new StringReader(&quot;NOTE;X-AUTHOR=Fox &circ;'Spooky&circ;' Mulder:The truth is out there.&quot;);
+ * VObjectReader vobjectReader = new VObjectReader(reader, new SyntaxRules(SyntaxStyle.NEW));
+ * vobjectReader.setCaretDecodingEnabled(false);
+ * vobjectReader.parse(new VObjectDataAdapter() {
+ * 	public void onProperty(VObjectProperty property, Context context) {
+ * 	  assertEquals(&quot;Fox &circ;'Spooky&circ;' Mulder&quot;, property.getParameters().first(&quot;X-AUTHOR&quot;));
+ * 	}
+ * });
  * vobjectReader.close();
  * </pre>
  * 
