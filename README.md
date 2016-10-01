@@ -11,7 +11,9 @@
 
 vinnie is a lightweight Java library that reads and writes "vobject" data (vCard and iCalendar).  It is used by the [ez-vcard](https://github.com/mangstadt/ez-vcard) and [biweekly](https://github.com/mangstadt/biweekly) projects.
 
-<p align="center"><strong><a href="http://mangstadt.github.io/vinnie/javadocs/latest/">Javadocs</a></strong></p>
+<p align="center"><strong><a href="https://github.com/mangstadt/vinnie/wiki/Downloads">Downloads</a> |
+<a href="http://mangstadt.github.io/vinnie/javadocs/latest/index.html">Javadocs</a> |
+<a href="#mavengradle">Maven/Gradle</a> | <a href="https://github.com/mangstadt/vinnie/wiki">Documentation</a></strong></p>
 
 # Examples
 
