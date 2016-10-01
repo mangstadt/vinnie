@@ -66,7 +66,8 @@ import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
  * decoded. A property value is considered to be encoded in quoted-printable
  * encoding if it has a "ENCODING=QUOTED-PRINTABLE" parameter. Even though the
  * property value is automatically decoded, the ENCODING and CHARSET parameters
- * are not removed from the parsed property object.
+ * are not removed from the parsed property object so that the caller can
+ * determine its original encoding.
  * </p>
  * 
  * <pre class="brush:java">
@@ -113,6 +114,25 @@ import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
  * </pre>
  * 
  * <p>
+ * If there is an error decoding a quoted-printable value, then a warning will
+ * be emitted and the value will be treated as plain-text.
+ * </p>
+ * 
+ * <pre class="brush:java">
+ * Reader reader = new StringReader("NOTE;ENCODING=QUOTED-PRINTABLE;CHARSET=UTF-8:=ZZ invalid");
+ * VObjectReader vobjectReader = new VObjectReader(reader, ...);
+ * vobjectReader.parse(new VObjectDataAdapter(){
+ *   public void onProperty(VObjectProperty property, Context context) {
+ *     assertEquals("=ZZ invalid", property.getValue());
+ *   }
+ *   public void onWarning(Warning warning, VObjectProperty property, Exception thrown, Context context) {
+ *     assertEquals(Warning.QUOTED_PRINTABLE_ERROR, warning);
+ *   }
+ * });
+ * vobjectReader.close();
+ * </pre>
+ * 
+ * <p>
  * <b>Circumflex Accent Encoding</b>
  * </p>
  * <p>
@@ -123,12 +143,12 @@ import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
  * </p>
  * 
  * <pre class="brush:java">
- * Reader reader = new StringReader(&quot;NOTE;X-AUTHOR=Fox &circ;'Spooky&circ;' Mulder:The truth is out there.&quot;);
+ * Reader reader = new StringReader("NOTE;X-AUTHOR=Fox &circ;'Spooky&circ;' Mulder:The truth is out there.");
  * VObjectReader vobjectReader = new VObjectReader(reader, new SyntaxRules(SyntaxStyle.NEW));
  * vobjectReader.parse(new VObjectDataAdapter() {
- * 	public void onProperty(VObjectProperty property, Context context) {
- * 		assertEquals(&quot;Fox \&quot;Spooky\&quot; Mulder&quot;, property.getParameters().first(&quot;X-AUTHOR&quot;));
- * 	}
+ *   public void onProperty(VObjectProperty property, Context context) {
+ *     assertEquals("Fox \"Spooky\" Mulder", property.getParameters().first("X-AUTHOR"));
+ *   }
  * });
  * vobjectReader.close();
  * </pre>
@@ -140,13 +160,13 @@ import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
  * </p>
  * 
  * <pre class="brush:java">
- * Reader reader = new StringReader(&quot;NOTE;X-AUTHOR=Fox &circ;'Spooky&circ;' Mulder:The truth is out there.&quot;);
+ * Reader reader = new StringReader("NOTE;X-EMOTE=^_^:Good morning!");
  * VObjectReader vobjectReader = new VObjectReader(reader, new SyntaxRules(SyntaxStyle.NEW));
  * vobjectReader.setCaretDecodingEnabled(false);
  * vobjectReader.parse(new VObjectDataAdapter() {
- * 	public void onProperty(VObjectProperty property, Context context) {
- * 		assertEquals(&quot;Fox &circ;'Spooky&circ;' Mulder&quot;, property.getParameters().first(&quot;X-AUTHOR&quot;));
- * 	}
+ *   public void onProperty(VObjectProperty property, Context context) {
+ *     assertEquals("^_^", property.getParameters().first("X-EMOTE"));
+ *   }
  * });
  * vobjectReader.close();
  * </pre>
@@ -159,12 +179,15 @@ import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
  * </p>
  * 
  * <pre class="brush:java">
- * Reader reader = new StringReader(&quot;NOTE:Lorem ipsum dolor sit amet\\, consectetur adipiscing elit. Vestibulum u\r\n ltricies tempor orci ac dignissim.&quot;);
+ * String string = 
+ * "NOTE:Lorem ipsum dolor sit amet\\, consectetur adipiscing elit. Vestibulum u\r\n" +
+ * " ltricies tempor orci ac dignissim.";
+ * Reader reader = new StringReader(string);
  * VObjectReader vobjectReader = new VObjectReader(reader, ...);
  * vobjectReader.parse(new VObjectDataAdapter() {
- * 	public void onProperty(VObjectProperty property, Context context) {
- * 		assertEquals(&quot;Lorem ipsum dolor sit amet\\, consectetur adipiscing elit. Vestibulum ultricies tempor orci ac dignissim.&quot;, property.getValue());
- * 	}
+ *   public void onProperty(VObjectProperty property, Context context) {
+ *     assertEquals("Lorem ipsum dolor sit amet\\, consectetur adipiscing elit. Vestibulum ultricies tempor orci ac dignissim.", property.getValue());
+ *   }
  * });
  * vobjectReader.close();
  * </pre>

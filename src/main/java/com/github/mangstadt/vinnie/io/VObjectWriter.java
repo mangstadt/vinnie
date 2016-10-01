@@ -62,12 +62,12 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * <b>Invalid characters</b>
  * </p>
  * <p>
- * If property data contains any invalid characters, an
- * {@link IllegalArgumentException} is thrown and the property is not written. A
- * character is considered to be invalid if it cannot be encoded or escaped, and
- * would break the vobject syntax if written. The rules regarding which
- * characters are considered invalid is fairly complex. Here are some general
- * guidelines:
+ * If property data contains any invalid characters, the {@code writeProperty}
+ * method throws an {@link IllegalArgumentException} and the property is not
+ * written. A character is considered to be invalid if it cannot be encoded or
+ * escaped, and would break the vobject syntax if written. The rules regarding
+ * which characters are considered invalid is fairly complex. Here are some
+ * general guidelines:
  * </p>
  * <ul>
  * <li>Try to limit group names, property names, and parameter names to
@@ -81,12 +81,36 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * </p>
  * <p>
  * All newline characters ("\r" or "\n") within property values are
- * automatically escaped. In old-style syntax, the property value will be
- * encoded in quoted-printable encoding. In new-style syntax, the newline
- * characters will be replaced with the "\n" escape sequence (Windows newline
- * sequences are replaced with a single "\n" even though they consist of two
- * characters).
+ * automatically escaped.
  * </p>
+ * <p>
+ * In old-style syntax, the property value will be encoded in quoted-printable
+ * encoding.
+ * </p>
+ * 
+ * <pre class="brush:java">
+ * StringWriter sw = new StringWriter();
+ * VObjectWriter vobjectWriter = new VObjectWriter(sw, SyntaxStyle.OLD);
+ * vobjectWriter.writeProperty("NOTE", "one\r\ntwo");
+ * vobjectWriter.close();
+ * 
+ * assertEquals("NOTE;ENCODING=QUOTED-PRINTABLE;CHARSET=UTF-8:one=0D=0Atwo\r\n", sw.toString());
+ * </pre>
+ * 
+ * <p>
+ * In new-style syntax, the newline characters will be replaced with the "\n"
+ * escape sequence (Windows newline sequences are replaced with a single "\n"
+ * even though they consist of two characters).
+ * </p>
+ * 
+ * <pre class="brush:java">
+ * StringWriter sw = new StringWriter();
+ * VObjectWriter vobjectWriter = new VObjectWriter(sw, SyntaxStyle.NEW);
+ * vobjectWriter.writeProperty("NOTE", "one\r\ntwo");
+ * vobjectWriter.close();
+ * 
+ * assertEquals("NOTE:one\\ntwo\r\n", sw.toString());
+ * </pre>
  * 
  * <p>
  * <b>Quoted-printable Encoding</b>
@@ -114,8 +138,8 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * </p>
  * 
  * <pre class="brush:java">
- * VObjectProperty note = new VObjectProperty(&quot;NOTE&quot;, &quot;¡Hola, mundo!&quot;);
- * note.getParameters().put(null, &quot;QUOTED-PRINTABLE&quot;);
+ * VObjectProperty note = new VObjectProperty("NOTE", "¡Hola, mundo!");
+ * note.getParameters().put(null, "QUOTED-PRINTABLE");
  * vobjectWriter.writeProperty(note);
  * </pre>
  * <p>
@@ -157,12 +181,12 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * VObjectWriter vobjectWriter = new VObjectWriter(sw, SyntaxStyle.NEW);
  * vobjectWriter.setCaretEncodingEnabled(true);
  * 
- * VObjectProperty note = new VObjectProperty(&quot;NOTE&quot;, &quot;The truth is out there.&quot;);
- * note.getParameters().put(&quot;X-AUTHOR&quot;, &quot;Fox \&quot;Spooky\&quot; Mulder&quot;);
+ * VObjectProperty note = new VObjectProperty("NOTE", "The truth is out there.");
+ * note.getParameters().put("X-AUTHOR", "Fox \"Spooky\" Mulder");
  * vobjectWriter.writeProperty(note);
  * vobjectWriter.close();
  * 
- * assertEquals(&quot;NOTE;X-AUTHOR=Fox &circ;'Spooky&circ;' Mulder:The truth is out there.\r\n&quot;, sw.toString());
+ * assertEquals("NOTE;X-AUTHOR=Fox &circ;'Spooky&circ;' Mulder:The truth is out there.\r\n", sw.toString());
  * </pre>
  * 
  * <p>
@@ -170,7 +194,7 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * </p>
  * <p>
  * Lines longer than 75 characters are automatically folded, as per the
- * recommendation in the vCard and iCalendar specifications.
+ * vCard/iCalendar recommendation.
  * </p>
  * 
  * <pre class="brush:java">
@@ -180,11 +204,14 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * vobjectWriter.writeProperty("NOTE", "Lorem ipsum dolor sit amet\, consectetur adipiscing elit. Vestibulum ultricies tempor orci ac dignissim.");
  * vobjectWriter.close();
  * 
- * assertEquals(&quot;NOTE:Lorem ipsum dolor sit amet\\, consectetur adipiscing elit. Vestibulum u\r\n ltricies tempor orci ac dignissim.\r\n&quot;, sw.toString());
+ * assertEquals(
+ * "NOTE:Lorem ipsum dolor sit amet\\, consectetur adipiscing elit. Vestibulum u\r\n" +
+ * " ltricies tempor orci ac dignissim.\r\n"
+ * , sw.toString());
  * </pre>
  * <p>
- * The line folding length can be adjusted. Passing in a "null" line length will
- * disable line folding.
+ * The line folding length can be adjusted to a length of your choosing. In
+ * addition, passing in a "null" line length will disable line folding.
  * </p>
  * 
  * <pre class="brush:java">
@@ -195,14 +222,14 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * vobjectWriter.writeProperty("NOTE", "Lorem ipsum dolor sit amet\, consectetur adipiscing elit. Vestibulum ultricies tempor orci ac dignissim.");
  * vobjectWriter.close();
  * 
- * assertEquals(&quot;NOTE:Lorem ipsum dolor sit amet\\, consectetur adipiscing elit. Vestibulum ultricies tempor orci ac dignissim.\r\n&quot;, sw.toString());
+ * assertEquals("NOTE:Lorem ipsum dolor sit amet\\, consectetur adipiscing elit. Vestibulum ultricies tempor orci ac dignissim.\r\n", sw.toString());
  * </pre>
  * 
  * <p>
  * You may also specify what kind of folding whitespace to use. The default is a
  * single space character, but this can be changed to any combination of tabs
  * and spaces. Note that new-style syntax requires the folding whitespace to be
- * exactly ONE character long.
+ * EXACTLY ONE character long.
  * </p>
  * 
  * <pre class="brush:java">
@@ -213,7 +240,10 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * vobjectWriter.writeProperty("NOTE", "Lorem ipsum dolor sit amet\, consectetur adipiscing elit. Vestibulum ultricies tempor orci ac dignissim.");
  * vobjectWriter.close();
  * 
- * assertEquals(&quot;NOTE:Lorem ipsum dolor sit amet\\, consectetur adipiscing elit. Vestibulum u\r\n\tltricies tempor orci ac dignissim.\r\n&quot;, sw.toString());
+ * assertEquals(
+ * "NOTE:Lorem ipsum dolor sit amet\\, consectetur adipiscing elit. Vestibulum u\r\n" +
+ * "\tltricies tempor orci ac dignissim.\r\n"
+ * , sw.toString());
  * </pre>
  * @author Michael Angstadt
  */

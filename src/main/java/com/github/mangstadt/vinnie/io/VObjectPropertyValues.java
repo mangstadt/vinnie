@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Contains utility methods for parsing and writing vobject property values.
+ * Contains utility methods for parsing and writing property values.
  * @author Michael Angstadt
  */
 public final class VObjectPropertyValues {
@@ -53,9 +53,11 @@ public final class VObjectPropertyValues {
 	 * </p>
 	 * 
 	 * <pre class="brush:java">
-	 * String value = VObjectPropertyValues.unescape(&quot;one\\,two\\;three\\nfour&quot;);
-	 * assertEquals(&quot;one,two;three\nfour&quot;, value);
+	 * String value = "one\\,two\\;three\\nfour";
+	 * String unescaped = VObjectPropertyValues.unescape(value);
+	 * assertEquals("one,two;three\nfour", unescaped);
 	 * </pre>
+	 * 
 	 * @param value the value to unescape
 	 * @return the unescaped value
 	 */
@@ -133,17 +135,19 @@ public final class VObjectPropertyValues {
 	 * <li>semi-colons ({@code ;})</li>
 	 * </ul>
 	 * <p>
-	 * Note: Newlines are not escaped by this method. They are escaped by
-	 * {@link VObjectWriter} when the data is serialized.
+	 * Newlines are not escaped by this method. They are automatically escaped
+	 * by {@link VObjectWriter} when the data is serialized.
 	 * </p>
 	 * <p>
 	 * <b>Example:</b>
 	 * </p>
 	 * 
 	 * <pre class="brush:java">
-	 * String value = VObjectPropertyValues.escape(&quot;one,two;three\nfour&quot;);
-	 * assertEquals(&quot;one\\,two\\;three\nfour&quot;, value);
+	 * String value = "one,two;three\nfour";
+	 * String escaped = VObjectPropertyValues.escape(value);
+	 * assertEquals("one\\,two\\;three\nfour", escaped);
 	 * </pre>
+	 * 
 	 * @param value the value to escape
 	 * @return the escaped value
 	 */
@@ -202,14 +206,16 @@ public final class VObjectPropertyValues {
 	 * </p>
 	 * 
 	 * <pre class="brush:java">
-	 * List&lt;String&gt; list = VObjectPropertyValues.parseList(&quot;one,two\\,three&quot;);
-	 * assertEquals(Arrays.asList(&quot;one&quot;, &quot;two,three&quot;), list);
+	 * String value = "one,two\\,three";
+	 * List&lt;String&gt; list = VObjectPropertyValues.parseList(value);
+	 * assertEquals(Arrays.asList("one", "two,three"), list);
 	 * </pre>
+	 * 
 	 * @param value the value to parse
 	 * @return the parsed list
 	 */
 	public static List<String> parseList(String value) {
-		return split(value, ',', true, -1);
+		return split(value, ',', -1);
 	}
 
 	/**
@@ -221,15 +227,21 @@ public final class VObjectPropertyValues {
 	 * the values are in usually doesn't matter.
 	 * </p>
 	 * <p>
+	 * Each list item's {@code toString()} method is called to generate its
+	 * string representation. If a list item is null, then "null" will be
+	 * outputted.
+	 * </p>
+	 * <p>
 	 * <b>Example:</b>
 	 * </p>
 	 * 
 	 * <pre class="brush:java">
-	 * String value = VObjectPropertyValues.writeList(Arrays.asList("one", null, 2, "three,four");
-	 * assertEquals("one,null,2,three\\,four", value);
+	 * List&lt;String&gt; list = Arrays.asList("one", "two", null, "three,four");
+	 * String value = VObjectPropertyValues.writeList(list);
+	 * assertEquals("one,two,null,three\\,four", value);
 	 * </pre>
-	 * @param values the values to write (the {@code toString()} method is
-	 * invoked on each object)
+	 * 
+	 * @param values the values to write
 	 * @return the list value string
 	 */
 	public static String writeList(Collection<?> values) {
@@ -259,17 +271,20 @@ public final class VObjectPropertyValues {
 	 * </p>
 	 * <p>
 	 * Semi-structured values contain multiple values separate by semicolons.
-	 * Unlike structured values, each value cannot have their own comma
-	 * separated list of sub-values. The order that the values are in matters.
+	 * Unlike structured values, each value cannot have their own
+	 * comma-delimited list of sub-values. The order that the values are in
+	 * usually matters.
 	 * </p>
 	 * <p>
 	 * <b>Example:</b>
 	 * </p>
 	 * 
 	 * <pre class="brush:java">
-	 * List&lt;String&gt; values = VObjectPropertyValues.parseSemiStructured(&quot;one;two\\;three,four&quot;);
-	 * assertEquals(Arrays.asList(&quot;one&quot;, &quot;two;three,four&quot;), values);
+	 * String value = "one;two\\;three,four";
+	 * List&lt;String&gt; values = VObjectPropertyValues.parseSemiStructured(value);
+	 * assertEquals(Arrays.asList("one", "two;three,four"), values);
 	 * </pre>
+	 * 
 	 * @param value the value to parse
 	 * @return the parsed values
 	 */
@@ -283,23 +298,26 @@ public final class VObjectPropertyValues {
 	 * </p>
 	 * <p>
 	 * Semi-structured values contain multiple values separate by semicolons.
-	 * Unlike structured values, each value cannot have their own comma
-	 * separated list of sub-values. The order that the values are in matters.
+	 * Unlike structured values, each value cannot have their own
+	 * comma-delimited list of sub-values. The order that the values are in
+	 * usually matters.
 	 * </p>
 	 * <p>
 	 * <b>Example:</b>
 	 * </p>
 	 * 
 	 * <pre class="brush:java">
-	 * List&lt;String&gt; values = VObjectPropertyValues.parseSemiStructured(&quot;one;two;three&quot;, 2);
-	 * assertEquals(Arrays.asList(&quot;one&quot;, &quot;two;three&quot;), values);
+	 * String value = "one;two;three";
+	 * List&lt;String&gt; values = VObjectPropertyValues.parseSemiStructured(value, 2);
+	 * assertEquals(Arrays.asList("one", "two;three"), values);
 	 * </pre>
+	 * 
 	 * @param value the value to parse
 	 * @param limit the max number of items to parse
 	 * @return the parsed values
 	 */
 	public static List<String> parseSemiStructured(String value, int limit) {
-		return split(value, ';', true, limit);
+		return split(value, ';', limit);
 	}
 
 	/**
@@ -308,16 +326,23 @@ public final class VObjectPropertyValues {
 	 * </p>
 	 * <p>
 	 * Semi-structured values contain multiple values separate by semicolons.
-	 * Unlike structured values, each value cannot have their own comma
-	 * separated list of sub-values. The order that the values are in matters.
+	 * Unlike structured values, each value cannot have their own
+	 * comma-delimited list of sub-values. The order that the values are in
+	 * usually matters.
 	 * <p>
 	 * <b>Example:</b>
 	 * </p>
 	 * 
 	 * <pre class="brush:java">
-	 * String value = VObjectPropertyValues.writeSemiStructured(Arrays.asList(&quot;one&quot;, null, 2, &quot;three;four,five&quot;, &quot;&quot;), false);
-	 * assertEquals(&quot;one;null;2;three\\;four\\,five&quot;, value);
+	 * List&lt;String&gt; list = Arrays.asList("one", null, "two;three", "");
+	 * 
+	 * String value = VObjectPropertyValues.writeSemiStructured(list, false);
+	 * assertEquals("one;null;two\\;three", value);
+	 * 
+	 * value = VObjectPropertyValues.writeSemiStructured(list, true);
+	 * assertEquals("one;null;two\\;three;", value);
 	 * </pre>
+	 * 
 	 * @param values the values to write
 	 * @param includeTrailingSemicolons true to include the semicolon delimiters
 	 * for empty values at the end of the values list, false to trim them
@@ -348,10 +373,10 @@ public final class VObjectPropertyValues {
 		return sb.toString();
 	}
 
-	//@formatter:off
 	/**
 	 * <p>
-	 * Parses a "structured" property value.</p>
+	 * Parses a "structured" property value.
+	 * </p>
 	 * <p>
 	 * Structured values are essentially 2-D arrays. They contain multiple
 	 * components separated by semicolons, and each component can have multiple
@@ -364,7 +389,8 @@ public final class VObjectPropertyValues {
 	 * </p>
 	 * 
 	 * <pre class="brush:java">
-	 * List&lt;List&lt;String&gt;&gt; values = VObjectPropertyValues.parseStructured("one;two,three;four\\,five\\;six");
+	 * String value = "one;two,three;four\\,five\\;six";
+	 * List&lt;List&lt;String&gt;&gt; values = VObjectPropertyValues.parseStructured(value);
 	 * assertEquals(Arrays.asList(
 	 *   Arrays.asList("one"),
 	 *   Arrays.asList("two", "three"),
@@ -374,7 +400,6 @@ public final class VObjectPropertyValues {
 	 * @param value the value to parse
 	 * @return the parsed values
 	 */
-	//@formatter:on
 	public static List<List<String>> parseStructured(String value) {
 		if (value.length() == 0) {
 			return new ArrayList<List<String>>(0); //return a mutable list
@@ -433,7 +458,6 @@ public final class VObjectPropertyValues {
 		return components;
 	}
 
-	//@formatter:off
 	/**
 	 * <p>
 	 * Writes a "structured" property value.
@@ -446,26 +470,33 @@ public final class VObjectPropertyValues {
 	 * matter.
 	 * </p>
 	 * <p>
+	 * The {@code toString()} method of each component value is called to
+	 * generate its string representation. If a value is null, then "null" will
+	 * be outputted.
+	 * </p>
+	 * <p>
 	 * <b>Example:</b>
 	 * </p>
 	 * 
 	 * <pre class="brush:java">
-	 * String value = VObjectPropertyValues.writeStructured(Arrays.asList(
+	 * List&lt;List&lt;?&gt;&gt; values = Arrays.asList(
 	 *   Arrays.asList("one"),
-	 *   Arrays.asList("two", 3),
-	 *   Arrays.asList(null),
+	 *   Arrays.asList("two", "three", null),
 	 *   Arrays.asList("four,five;six"),
 	 *   Arrays.asList()
-	 * ), false);
-	 * assertEquals("one;two,3;null;four\\,five\\;six", value);
+	 * );
+	 * 
+	 * String value = VObjectPropertyValues.writeStructured(values, false);
+	 * assertEquals("one;two,three,null;four\\,five\\;six", value);
+	 * 
+	 * value = VObjectPropertyValues.writeStructured(values, true);
+	 * assertEquals("one;two,three,null;four\\,five\\;six;", value);
 	 * </pre>
-	 * @param components the components to write (each value's {@code toString()}
-	 * method will be called)
+	 * @param components the components to write
 	 * @param includeTrailingSemicolons true to include the semicolon delimiters
 	 * for empty components at the end of the written value, false to trim them
 	 * @return the structured value string
 	 */
-	//@formatter:on
 	public static String writeStructured(List<? extends List<?>> components, boolean includeTrailingSemicolons) {
 		StringBuilder sb = new StringBuilder();
 		boolean firstComponent = true;
@@ -513,13 +544,14 @@ public final class VObjectPropertyValues {
 	 * </p>
 	 * 
 	 * <pre class="brush:java">
-	 * Map&lt;String, List&lt;String&gt;&gt; multimap = VObjectPropertyValues.parseMultimap(&quot;one=two;THREE;FOUR=five,six\\,seven\\;eight&quot;);
+	 * String value = "one=two;THREE=four,five\\,six\\;seven";
+	 * Map&lt;String, List&lt;String&gt;&gt; multimap = VObjectPropertyValues.parseMultimap(value);
 	 * Map&lt;String, List&lt;String&gt;&gt; expected = new HashMap&lt;String, List&lt;String&gt;&gt;();
-	 * expected.put(&quot;ONE&quot;, Arrays.asList(&quot;two&quot;));
-	 * expected.put(&quot;THREE&quot;, Arrays.&lt;String&gt; asList());
-	 * expected.put(&quot;FOUR&quot;, Arrays.asList(&quot;five&quot;, &quot;six,seven;eight&quot;));
+	 * expected.put("ONE", Arrays.asList("two"));
+	 * expected.put("THREE", Arrays.asList("four", "five,six;seven"));
 	 * assertEquals(expected, multimap);
 	 * </pre>
+	 * 
 	 * @param value the value to parse
 	 * @return the parsed values
 	 */
@@ -613,20 +645,23 @@ public final class VObjectPropertyValues {
 	 * separated by commas. Keys are converted to uppercase.
 	 * </p>
 	 * <p>
+	 * Each value's {@code toString()} method is called to generate its string
+	 * representation. If a value is null, then "null" will be outputted.
+	 * </p>
+	 * <p>
 	 * <b>Example:</b>
 	 * </p>
 	 * 
 	 * <pre class="brush:java">
-	 * Map&lt;String, List&lt;Object&gt;&gt; input = new LinkedHashMap&lt;String, List&lt;Object&gt;&gt;();
-	 * input.put(&quot;one&quot;, Arrays.asList(&quot;two&quot;));
-	 * input.put(&quot;THREE&quot;, Arrays.&lt;String&gt; asList());
-	 * input.put(&quot;FOUR&quot;, Arrays.asList(5, &quot;six,seven;eight&quot;));
+	 * Map&lt;String, List&lt;?&gt;&gt; input = new LinkedHashMap&lt;String, List&lt;?&gt;&gt;();
+	 * input.put("one", Arrays.asList("two"));
+	 * input.put("THREE", Arrays.asList("four", "five,six;seven"));
 	 * 
 	 * String value = VObjectPropertyValues.writeMultimap(input);
-	 * assertEquals(&quot;ONE=two;THREE;FOUR=5,six\\,seven\\;eight&quot;, value);
+	 * assertEquals("ONE=two;THREE=four,five\\,six\\;seven", value);
 	 * </pre>
-	 * @param multimap the multimap to write (each value's {@code toString()}
-	 * method will be called)
+	 * 
+	 * @param multimap the multimap to write
 	 * @return the multimap value string
 	 */
 	public static String writeMultimap(Map<String, ? extends List<?>> multimap) {
@@ -687,12 +722,11 @@ public final class VObjectPropertyValues {
 	/**
 	 * Splits a string.
 	 * @param string the string to split
-	 * @param delimiter the delimiter to escape by
-	 * @param unescape true to unescape each split value, false not to
+	 * @param delimiter the delimiter to split by
 	 * @param limit the number of split values to parse or -1 to parse them all
 	 * @return the split values
 	 */
-	private static List<String> split(String string, char delimiter, boolean unescape, int limit) {
+	private static List<String> split(String string, char delimiter, int limit) {
 		if (string.length() == 0) {
 			return new ArrayList<String>(0); //return a mutable list
 		}
@@ -709,7 +743,7 @@ public final class VObjectPropertyValues {
 			}
 
 			if (ch == delimiter) {
-				String value = unescape ? unescape(string, cursor, i) : string.substring(cursor, i);
+				String value = unescape(string, cursor, i);
 				list.add(value);
 
 				cursor = i + 1;
@@ -727,7 +761,7 @@ public final class VObjectPropertyValues {
 			}
 		}
 
-		String value = unescape ? unescape(string, cursor, string.length()) : string.substring(cursor);
+		String value = unescape(string, cursor, string.length());
 		list.add(value);
 
 		return list;
@@ -735,12 +769,34 @@ public final class VObjectPropertyValues {
 
 	/**
 	 * <p>
-	 * Iterates over the values in a "semi-structured" property value.
+	 * Helper class for iterating over the values in a "semi-structured"
+	 * property value.
 	 * </p>
 	 * <p>
 	 * Semi-structured values contain multiple values separate by semicolons.
-	 * The order that the values are in matters.
+	 * Unlike structured values, each value cannot have their own
+	 * comma-delimited list of sub-values. The order that the values are in
+	 * usually matters.
 	 * </p>
+	 * <p>
+	 * <b>Example:</b>
+	 * </p>
+	 * 
+	 * <pre class="brush:java">
+	 * String value = "one;two;;three";
+	 * 
+	 * SemiStructuredValueIterator it = new SemiStructuredValueIterator(value);
+	 * assertEquals("one", it.next());
+	 * assertEquals("two", it.next());
+	 * assertNull(it.next());
+	 * assertEquals("three", it.next());
+	 * assertFalse(it.hasNext());
+	 * 
+	 * it = new SemiStructuredValueIterator(value, 2);
+	 * assertEquals("one", it.next());
+	 * assertEquals("two;;three", it.next());
+	 * assertFalse(it.hasNext());
+	 * </pre>
 	 */
 	public static class SemiStructuredValueIterator {
 		private final Iterator<String> it;
@@ -787,18 +843,32 @@ public final class VObjectPropertyValues {
 
 	/**
 	 * <p>
-	 * Builds a "semi-structured" property value.
+	 * Helper class for building "semi-structured" property values.
 	 * </p>
 	 * <p>
 	 * Semi-structured values contain multiple values separate by semicolons.
-	 * The order that the values are in matters.
+	 * Unlike structured values, each value cannot have their own
+	 * comma-delimited list of sub-values. The order that the values are in
+	 * usually matters.
 	 * </p>
+	 * <p>
+	 * <b>Example:</b>
+	 * </p>
+	 * 
+	 * <pre class="brush:java">
+	 * SemiStructuredValueBuilder b = new SemiStructuredValueBuilder();
+	 * b.append("one").append(null).append("two").append("");
+	 * assertEquals("one;;two;", b.build());
+	 * assertEquals("one;;two", b.build(false));
+	 * </pre>
 	 */
 	public static class SemiStructuredValueBuilder {
 		private final List<Object> values = new ArrayList<Object>();
 
 		/**
-		 * Appends a value. If the value is null, an empty value will be
+		 * Appends a value to the semi-structured value. The value's
+		 * {@code toString()} method will be called to generate its string
+		 * representation. If the value is null, then an empty string will be
 		 * appended.
 		 * @param value the value
 		 * @return this
@@ -834,7 +904,8 @@ public final class VObjectPropertyValues {
 
 	/**
 	 * <p>
-	 * Iterates over the values in a "structured" property value.
+	 * Helper class for iterating over the values in a "structured" property
+	 * value.
 	 * </p>
 	 * <p>
 	 * Structured values are essentially 2-D arrays. They contain multiple
@@ -843,6 +914,21 @@ public final class VObjectPropertyValues {
 	 * but the order that each component's list of values are in usually doesn't
 	 * matter.
 	 * </p>
+	 * <p>
+	 * <b>Example:</b>
+	 * </p>
+	 * 
+	 * <pre class="brush:java">
+	 * String value = "one;two,three;;;four";
+	 * StructuredValueIterator it = new StructuredValueIterator(value);
+	 * 
+	 * assertEquals(Arrays.asList("one"), it.nextComponent());
+	 * assertEquals(Arrays.asList("two", "three"), it.nextComponent());
+	 * assertEquals(Arrays.asList(), it.nextComponent());
+	 * assertNull(it.nextValue());
+	 * assertEquals("four", it.nextValue());
+	 * assertFalse(it.hasNext());
+	 * </pre>
 	 */
 	public static class StructuredValueIterator {
 		private final Iterator<List<String>> it;
@@ -879,7 +965,7 @@ public final class VObjectPropertyValues {
 
 		/**
 		 * Gets the next component.
-		 * @return the next component or an empty list of there are no more
+		 * @return the next component or an empty list if there are no more
 		 * components
 		 */
 		public List<String> nextComponent() {
@@ -897,7 +983,7 @@ public final class VObjectPropertyValues {
 
 	/**
 	 * <p>
-	 * Builds "structured" property values.
+	 * Helper class for building "structured" property values.
 	 * </p>
 	 * <p>
 	 * Structured values are essentially 2-D arrays. They contain multiple
@@ -906,13 +992,24 @@ public final class VObjectPropertyValues {
 	 * but the order that each component's list of values are in usually doesn't
 	 * matter.
 	 * </p>
+	 * <p>
+	 * <b>Example:</b>
+	 * </p>
+	 * 
+	 * <pre class="brush:java">
+	 * StructuredValueBuilder b = new StructuredValueBuilder();
+	 * b.append("one").append(Arrays.asList("two", "three")).append("");
+	 * assertEquals("one;two,three;", b.build());
+	 * assertEquals("one;two,three", b.build(false));
+	 * </pre>
 	 */
 	public static class StructuredValueBuilder {
 		private final List<List<?>> components = new ArrayList<List<?>>();
 
 		/**
-		 * Appends a single-valued component if the value is non-null, and
-		 * appends an empty component if the value is null.
+		 * Appends a single-valued component. The value's {@code toString()}
+		 * method will be called to generate its string representation. If the
+		 * value is null, then an empty component will be appended.
 		 * @param value the value
 		 * @return this
 		 */
@@ -922,11 +1019,16 @@ public final class VObjectPropertyValues {
 		}
 
 		/**
-		 * Appends a component.
+		 * Appends a component. The {@code toString()} method of each component
+		 * value will be called to generate its string representation. If a
+		 * value is null, then "null" will be outputted.
 		 * @param component the component
 		 * @return this
 		 */
-		public StructuredValueBuilder append(List<? extends Object> component) {
+		public StructuredValueBuilder append(List<?> component) {
+			if (component == null) {
+				component = Arrays.<Object> asList();
+			}
 			components.add(component);
 			return this;
 		}
