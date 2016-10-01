@@ -186,7 +186,7 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * vobjectWriter.writeProperty(note);
  * vobjectWriter.close();
  * 
- * assertEquals("NOTE;X-AUTHOR=Fox &circ;'Spooky&circ;' Mulder:The truth is out there.\r\n", sw.toString());
+ * assertEquals("NOTE;X-AUTHOR=Fox ^'Spooky^' Mulder:The truth is out there.\r\n", sw.toString());
  * </pre>
  * 
  * <p>

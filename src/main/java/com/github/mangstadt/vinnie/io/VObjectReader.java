@@ -73,7 +73,7 @@ import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
  * <pre class="brush:java">
  * Reader reader = new StringReader("NOTE;ENCODING=QUOTED-PRINTABLE;CHARSET=UTF-8:=C2=A1Hola, mundo!");
  * VObjectReader vobjectReader = new VObjectReader(reader, ...);
- * vobjectReader.parse(new VObjectDataAdapter(){
+ * vobjectReader.parse(new VObjectDataAdapter() {
  *   public void onProperty(VObjectProperty property, Context context) {
  *     assertEquals("¡Hola, mundo!", property.getValue());
  *     assertEquals("QUOTED-PRINTABLE", property.getParameters().first("ENCODING"));
@@ -95,7 +95,7 @@ import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
  * Reader reader = new StringReader("NOTE;ENCODING=QUOTED-PRINTABLE:=A1Hola, mundo!");
  * VObjectReader vobjectReader = new VObjectReader(reader, ...);
  * vobjectReader.setDefaultQuotedPrintableCharset(Charset.forName("Windows-1252"));
- * vobjectReader.parse(new VObjectDataAdapter(){
+ * vobjectReader.parse(new VObjectDataAdapter() {
  *   public void onProperty(VObjectProperty property, Context context) {
  *     assertEquals("¡Hola, mundo!", property.getValue());
  *     assertEquals("QUOTED-PRINTABLE", property.getParameters().first("ENCODING"));
@@ -121,7 +121,7 @@ import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
  * <pre class="brush:java">
  * Reader reader = new StringReader("NOTE;ENCODING=QUOTED-PRINTABLE;CHARSET=UTF-8:=ZZ invalid");
  * VObjectReader vobjectReader = new VObjectReader(reader, ...);
- * vobjectReader.parse(new VObjectDataAdapter(){
+ * vobjectReader.parse(new VObjectDataAdapter() {
  *   public void onProperty(VObjectProperty property, Context context) {
  *     assertEquals("=ZZ invalid", property.getValue());
  *   }
@@ -143,7 +143,7 @@ import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
  * </p>
  * 
  * <pre class="brush:java">
- * Reader reader = new StringReader("NOTE;X-AUTHOR=Fox &circ;'Spooky&circ;' Mulder:The truth is out there.");
+ * Reader reader = new StringReader("NOTE;X-AUTHOR=Fox ^'Spooky^' Mulder:The truth is out there.");
  * VObjectReader vobjectReader = new VObjectReader(reader, new SyntaxRules(SyntaxStyle.NEW));
  * vobjectReader.parse(new VObjectDataAdapter() {
  *   public void onProperty(VObjectProperty property, Context context) {
