@@ -39,6 +39,20 @@ import com.github.mangstadt.vinnie.SyntaxStyle;
  * that the data adhere to the specifications. Non-strict allows all characters
  * to be used, as long as they do not break the syntax.
  * </p>
+ * <p>
+ * <b>Example:</b>
+ * </p>
+ * 
+ * <pre class="brush:java">
+ * SyntaxStyle style = SyntaxStyle.NEW;
+ * String name = "NOTE #2";
+ * 
+ * boolean strict = false;
+ * assertTrue(VObjectValidator.validatePropertyName(name, style, strict));
+ * 
+ * strict = true;
+ * assertFalse(VObjectValidator.validatePropertyName(name, style, strict));
+ * </pre>
  * @author Michael Angstadt
  */
 public class VObjectValidator {
@@ -361,5 +375,9 @@ public class VObjectValidator {
 	 */
 	public static AllowedCharacters allowedCharactersParameterValue(SyntaxStyle syntax, boolean caretEncoding, boolean strict) {
 		return parameterValue.get(syntax).get(caretEncoding).get(strict);
+	}
+
+	private VObjectValidator() {
+		//hide
 	}
 }

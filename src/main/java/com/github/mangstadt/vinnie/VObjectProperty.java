@@ -44,7 +44,7 @@ public class VObjectProperty {
 	/**
 	 * Create a new property.
 	 * @param name the property name (should contain only letters, numbers, and
-	 * dashes; letters should be uppercase by convention; cannot be null)
+	 * dashes; letters should be uppercase by convention)
 	 * @param value the property value
 	 */
 	public VObjectProperty(String name, String value) {
@@ -56,7 +56,7 @@ public class VObjectProperty {
 	 * @param group the group name (should contain only letters, numbers, and
 	 * dashes; can be null)
 	 * @param name the property name (should contain only letters, numbers, and
-	 * dashes; letters should be uppercase by convention; cannot be null)
+	 * dashes; letters should be uppercase by convention)
 	 * @param value the property value
 	 */
 	public VObjectProperty(String group, String name, String value) {
@@ -68,7 +68,7 @@ public class VObjectProperty {
 	 * @param group the group name (should contain only letters, numbers, and
 	 * dashes; can be null)
 	 * @param name the property name (should contain only letters, numbers, and
-	 * dashes; letters should be uppercase by convention; cannot be null)
+	 * dashes; letters should be uppercase by convention)
 	 * @param parameters the property parameters (cannot be null)
 	 * @param value the property value
 	 */
@@ -88,7 +88,7 @@ public class VObjectProperty {
 	}
 
 	/**
-	 * Sets the group name (note: iCalendar objects do not use group names).
+	 * Sets the group name (note: iCalendar properties do not use group names).
 	 * @param group the group name or null to remove (should contain only
 	 * letters, numbers, and dashes)
 	 */
@@ -107,7 +107,7 @@ public class VObjectProperty {
 	/**
 	 * Sets the property name.
 	 * @param name the property name (should contain only letters, numbers, and
-	 * dashes; letters should be uppercase by convention; cannot be null)
+	 * dashes; letters should be uppercase by convention)
 	 */
 	public void setName(String name) {
 		this.name = name;

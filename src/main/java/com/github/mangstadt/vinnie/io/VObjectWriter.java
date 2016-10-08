@@ -65,9 +65,11 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * If property data contains any invalid characters, the {@code writeProperty}
  * method throws an {@link IllegalArgumentException} and the property is not
  * written. A character is considered to be invalid if it cannot be encoded or
- * escaped, and would break the vobject syntax if written. The rules regarding
- * which characters are considered invalid is fairly complex. Here are some
- * general guidelines:
+ * escaped, and would break the vobject syntax if written.
+ * </p>
+ * <p>
+ * The rules regarding which characters are considered invalid is fairly
+ * complex. Here are some general guidelines:
  * </p>
  * <ul>
  * <li>Try to limit group names, property names, and parameter names to

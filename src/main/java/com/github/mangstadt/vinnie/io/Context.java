@@ -29,7 +29,7 @@ import java.util.List;
 
 /**
  * Contains information related to the status of a parse operation, such as the
- * parent component hierarchy.
+ * parent component hierarchy and line number.
  * @author Michael Angstadt
  * @see VObjectDataListener
  */

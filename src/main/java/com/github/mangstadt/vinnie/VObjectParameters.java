@@ -52,9 +52,14 @@ public class VObjectParameters implements Iterable<Map.Entry<String, List<String
 	}
 
 	/**
+	 * <p>
 	 * Creates a list of parameters backed by the given map. Any changes made to
-	 * the given map will effect the parameter list and vice versa. Care should
-	 * be taken to ensure that all the given map's keys are in uppercase.
+	 * the given map will effect the parameter list and vice versa.
+	 * </p>
+	 * <p>
+	 * If the given map is not empty, care should be taken to ensure that all of
+	 * its keys are in uppercase before passing it into this constructor.
+	 * </p>
 	 * @param map the map
 	 */
 	public VObjectParameters(Map<String, List<String>> map) {

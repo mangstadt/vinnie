@@ -555,9 +555,9 @@ public class VObjectReader implements Closeable {
 				foldedQuotedPrintableLine = (inValue && prevChar == '=' && property.getParameters().isQuotedPrintable());
 				if (foldedQuotedPrintableLine) {
 					/*
-					 * Remove the "=" character that some vCards put at the end
-					 * of quoted-printable lines that are followed by a folded
-					 * line.
+					 * Remove the "=" character that sometimes appears at the
+					 * end of quoted-printable lines that are followed by a
+					 * folded line.
 					 */
 					buffer.chop();
 					context.unfoldedLine.chop();

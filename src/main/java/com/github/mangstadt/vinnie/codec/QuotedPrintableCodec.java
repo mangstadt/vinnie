@@ -59,7 +59,7 @@ import java.util.BitSet;
  * href="http://commons.apache.org/proper/commons-codec/">Apache Commons
  * Codec</a> project (version 1.10). Defining this library as a project
  * dependency causes an issue with Android devices, which is why parts of its
- * source code have been directly incorporated into the ez-vcard code base.
+ * source code have been directly incorporated into the vinnie code base.
  * </p>
  * @author Apache Software Foundation
  * @author Michael Angstadt

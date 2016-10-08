@@ -97,6 +97,11 @@ public class AllowedCharacters {
 		return new AllowedCharacters(bitSet, !allowNonAscii);
 	}
 
+	/**
+	 * Generates a string representation of this allowed character list.
+	 * Non-printable characters are represented by their character codes.
+	 * @return the string
+	 */
 	@Override
 	public String toString() {
 		return toString(false);
@@ -220,9 +225,9 @@ public class AllowedCharacters {
 		}
 
 		/**
-		 * Allows all characters that are considered "printable characters"
-		 * (32-126 inclusive). This does NOT include tabs, carriage returns, or
-		 * line feeds. This DOES include spaces.
+		 * Allows all characters that are considered "printable" (32-126
+		 * inclusive). This does NOT include tabs, carriage returns, or line
+		 * feeds. This DOES include spaces.
 		 * @return this
 		 */
 		public Builder allowPrintable() {

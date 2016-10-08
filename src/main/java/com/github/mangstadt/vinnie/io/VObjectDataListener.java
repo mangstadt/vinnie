@@ -36,7 +36,7 @@ public interface VObjectDataListener {
 	/**
 	 * Called when a component begins (in other words, when a BEGIN property is
 	 * encountered).
-	 * @param name the component name (in uppercase)
+	 * @param name the component name (will always be in uppercase)
 	 * @param context the parse context
 	 */
 	void onComponentBegin(String name, Context context);
@@ -53,8 +53,8 @@ public interface VObjectDataListener {
 	 * 
 	 * <p>
 	 * For example, the following data will cause the following sequence of
-	 * events to occur (notice that the outer component, A, ends before its
-	 * subcomponents):
+	 * events to occur. Notice that the outer component, A, ends before its
+	 * subcomponents.
 	 * </p>
 	 * 
 	 * <p>
@@ -73,16 +73,16 @@ public interface VObjectDataListener {
 	 * <b>Sequence of events:</b>
 	 * </p>
 	 * <ol>
-	 * <li>onComponentBegin("A", [])</li>
-	 * <li>onComponentBegin("B", ["A"])</li>
-	 * <li>onComponentBegin("C", ["A", "B"])</li>
-	 * <li>onComponentEnd("C", ["A", "B"])</li>
-	 * <li>onComponentEnd("B", ["A"])</li>
-	 * <li>onComponentEnd("A", [])</li>
-	 * <li>onWarning(UNMATCHED_END)</li>
-	 * <li>onWarning(UNMATCHED_END)</li>
+	 * <li>onComponentBegin(): name="A", parentComponents=[]</li>
+	 * <li>onComponentBegin(): name="B", parentComponents=["A"]</li>
+	 * <li>onComponentBegin(): name="C", parentComponents=["A", "B"]</li>
+	 * <li>onComponentEnd(): name="C", parentComponents=["A", "B"]</li>
+	 * <li>onComponentEnd(): name="B", parentComponents=["A"]</li>
+	 * <li>onComponentEnd(): name="A", parentComponents=[]</li>
+	 * <li>onWarning(): UNMATCHED_END</li>
+	 * <li>onWarning(): UNMATCHED_END</li>
 	 * </ol>
-	 * @param name the component name (in uppercase)
+	 * @param name the component name (will always be in uppercase)
 	 * @param context the parse context
 	 */
 	void onComponentEnd(String name, Context context);
