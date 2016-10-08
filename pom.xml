@@ -3,7 +3,7 @@
 	<groupId>com.github.mangstadt</groupId>
 	<artifactId>vinnie</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0.1</version>
+	<version>1.0.2-SNAPSHOT</version>
 	<name>vinnie</name>
 	<url>http://github.com/mangstadt/vinnie</url>
 	<inceptionYear>2016</inceptionYear>
