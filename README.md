@@ -112,14 +112,14 @@ END:VCARD
 <dependency>
    <groupId>com.github.mangstadt</groupId>
    <artifactId>vinnie</artifactId>
-   <version>1.0.0</version>
+   <version>1.0.1</version>
 </dependency>
 ```
 
 **Gradle**
 
 ```
-compile 'com.github.mangstadt:vinnie:1.0.0'
+compile 'com.github.mangstadt:vinnie:1.0.1'
 ```
 
 # Build Instructions
