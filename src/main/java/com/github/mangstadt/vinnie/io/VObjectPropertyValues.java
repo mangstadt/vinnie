@@ -178,15 +178,15 @@ public final class VObjectPropertyValues {
 	/**
 	 * Escapes all special characters within the given string.
 	 * @param string the string to escape
+	 * @param escapeCommas true to escape comma characters, false not to.
+	 * Old-style syntax does not expect commas to be escaped in semi-structured
+	 * values.
 	 * @param sb the buffer on which to append the escaped string
 	 */
-	private static void escape(String string, StringBuilder sb) {
+	private static void escape(String string, boolean escapeCommas, StringBuilder sb) {
 		for (int i = 0; i < string.length(); i++) {
 			char c = string.charAt(i);
-			switch (c) {
-			case '\\':
-			case ',':
-			case ';':
+			if (c == '\\' || c == ';' || (escapeCommas && c == ',')) {
 				sb.append('\\');
 			}
 			sb.append(c);
@@ -256,7 +256,7 @@ public final class VObjectPropertyValues {
 			if (value == null) {
 				sb.append("null");
 			} else {
-				escape(value.toString(), sb);
+				escape(value.toString(), true, sb);
 			}
 
 			first = false;
@@ -344,11 +344,14 @@ public final class VObjectPropertyValues {
 	 * </pre>
 	 * 
 	 * @param values the values to write
+	 * @param escapeCommas true to escape comma characters, false not to.
+	 * Old-style syntax does not expect commas to be escaped in semi-structured
+	 * values.
 	 * @param includeTrailingSemicolons true to include the semicolon delimiters
 	 * for empty values at the end of the values list, false to trim them
 	 * @return the semi-structured value string
 	 */
-	public static String writeSemiStructured(List<?> values, boolean includeTrailingSemicolons) {
+	public static String writeSemiStructured(List<?> values, boolean escapeCommas, boolean includeTrailingSemicolons) {
 		StringBuilder sb = new StringBuilder();
 
 		boolean first = true;
@@ -360,7 +363,7 @@ public final class VObjectPropertyValues {
 			if (value == null) {
 				sb.append("null");
 			} else {
-				escape(value.toString(), sb);
+				escape(value.toString(), escapeCommas, sb);
 			}
 
 			first = false;
@@ -514,7 +517,7 @@ public final class VObjectPropertyValues {
 				if (value == null) {
 					sb.append("null");
 				} else {
-					escape(value.toString(), sb);
+					escape(value.toString(), true, sb);
 				}
 
 				firstValue = false;
@@ -673,7 +676,7 @@ public final class VObjectPropertyValues {
 			}
 
 			String key = entry.getKey().toUpperCase();
-			escape(key, sb);
+			escape(key, true, sb);
 
 			List<?> values = entry.getValue();
 			if (values.isEmpty()) {
@@ -691,7 +694,7 @@ public final class VObjectPropertyValues {
 				if (value == null) {
 					sb.append("null");
 				} else {
-					escape(value.toString(), sb);
+					escape(value.toString(), true, sb);
 				}
 
 				firstValue = false;
@@ -882,23 +885,17 @@ public final class VObjectPropertyValues {
 		}
 
 		/**
-		 * Builds the semi-structured value string. Trailing semicolon
-		 * delimiters will not be trimmed.
-		 * @return the semi-structured value string
-		 */
-		public String build() {
-			return build(true);
-		}
-
-		/**
 		 * Builds the semi-structured value string.
+		 * @param escapeCommas true to escape comma characters, false not to.
+		 * Old-style syntax does not expect commas to be escaped in
+		 * semi-structured values.
 		 * @param includeTrailingSemicolons true to include the semicolon
 		 * delimiters of empty values at the end of the value string, false to
 		 * trim them
 		 * @return the semi-structured value string
 		 */
-		public String build(boolean includeTrailingSemicolons) {
-			return writeSemiStructured(values, includeTrailingSemicolons);
+		public String build(boolean escapeCommas, boolean includeTrailingSemicolons) {
+			return writeSemiStructured(values, escapeCommas, includeTrailingSemicolons);
 		}
 	}
 

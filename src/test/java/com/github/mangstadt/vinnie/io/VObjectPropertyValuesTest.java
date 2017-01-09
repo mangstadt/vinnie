@@ -119,23 +119,29 @@ public class VObjectPropertyValuesTest {
 		String actual, expected;
 
 		for (boolean includeTrailingSemicolons : new boolean[] { false, true }) {
-			actual = VObjectPropertyValues.writeSemiStructured(Arrays.<Object> asList("one", null, "", 2, "three;four,five"), includeTrailingSemicolons);
+			actual = VObjectPropertyValues.writeSemiStructured(Arrays.<Object> asList("one", null, "", 2, "three;four,five"), false, includeTrailingSemicolons);
+			expected = "one;null;;2;three\\;four,five";
+			assertEquals(expected, actual);
+
+			actual = VObjectPropertyValues.writeSemiStructured(Arrays.<Object> asList("one", null, "", 2, "three;four,five"), true, includeTrailingSemicolons);
 			expected = "one;null;;2;three\\;four\\,five";
 			assertEquals(expected, actual);
 
-			actual = VObjectPropertyValues.writeSemiStructured(asList(), includeTrailingSemicolons);
-			expected = "";
-			assertEquals(expected, actual);
+			for (boolean escapeCommas : new boolean[] { false, true }) {
+				actual = VObjectPropertyValues.writeSemiStructured(asList(), escapeCommas, includeTrailingSemicolons);
+				expected = "";
+				assertEquals(expected, actual);
+			}
 		}
 
 		{
 			List<Object> input = Arrays.<Object> asList("one", "", "two", "", "");
 
-			actual = VObjectPropertyValues.writeSemiStructured(input, false);
+			actual = VObjectPropertyValues.writeSemiStructured(input, false, false);
 			expected = "one;;two";
 			assertEquals(expected, actual);
 
-			actual = VObjectPropertyValues.writeSemiStructured(input, true);
+			actual = VObjectPropertyValues.writeSemiStructured(input, false, true);
 			expected = "one;;two;;";
 			assertEquals(expected, actual);
 		}
@@ -266,19 +272,14 @@ public class VObjectPropertyValuesTest {
 	@Test
 	public void SemiStructuredValueBuilder() {
 		SemiStructuredValueBuilder builder = new SemiStructuredValueBuilder();
-		builder.append("one");
+		builder.append("one,two");
 		builder.append(null);
-		assertEquals("one;", builder.build());
+		assertEquals("one,two", builder.build(false, false));
 
 		builder = new SemiStructuredValueBuilder();
-		builder.append("one");
+		builder.append("one,two");
 		builder.append(null);
-		assertEquals("one", builder.build(false));
-
-		builder = new SemiStructuredValueBuilder();
-		builder.append("one");
-		builder.append(null);
-		assertEquals("one;", builder.build(true));
+		assertEquals("one\\,two;", builder.build(true, true));
 	}
 
 	@Test
