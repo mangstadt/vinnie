@@ -36,7 +36,6 @@ import java.nio.charset.Charset;
 import org.junit.Test;
 
 import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
-import com.github.mangstadt.vinnie.io.FoldedLineWriter;
 
 /**
  * @author Michael Angstadt
@@ -247,29 +246,35 @@ public class FoldedLineWriterTest {
 	 * When a quoted-printable encoded value is folded:
 	 * </p>
 	 * <ol>
-	 * <li>All folded lines should end with a "=" (except for the last line).</li>
-	 * <li>Max line length may be temporarily increased in order to fit all
-	 * encoded character sequences on the same line.</li>
+	 * <li>Each line should end with a "=", except for the last line.</li>
+	 * <li>No indent whitespace should be added to the folded lines.</li>
+	 * <li>Max line length may be exceeded to ensure that no encoded character
+	 * sequence spans multiple lines.</li>
 	 * </ol>
 	 */
 	@Test
 	public void quoted_printable_folded() throws Exception {
-		String input = "test \n\u00e4\u00f6\u00fc\u00df\n test";
+		String input = "test \n\u00e4\u00f6\u00fc\u00df\n testing";
 
 		StringWriter sw = new StringWriter();
 		FoldedLineWriter writer = new FoldedLineWriter(sw);
 		writer.setLineLength(10);
 
 		writer.write(input, true, Charset.forName("ISO-8859-1"));
+		writer.write("\r\nthis line should be indented");
 		writer.close();
 
 		String actual = sw.toString();
 
 		//@formatter:off
 		String expected =
-		"test =0A=E4=\r\n" + //exceed max line length so encoded characters are not on multiple lines
-		" =F6=FC=DF=\r\n" +
-		" =0A test";
+		"test =0A=E4=\r\n" + //exceed max line length so encoded character does not span multiple lines
+		"=F6=FC=DF=\r\n" +
+		"=0A testi=\r\n" +
+		"ng\r\n" +
+		"this line \r\n" +
+		" should be \r\n" +
+		" indented";
 		//@formatter:on
 
 		assertEquals(expected, actual);

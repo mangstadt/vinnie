@@ -239,8 +239,17 @@ public class FoldedLineWriter extends Writer {
 					writer.write('=');
 				}
 				writer.write(CRLF);
-				writer.write(indent);
-				curLineLength = indent.length() + 1;
+
+				/*
+				 * Do not include indentation whitespace if the value is
+				 * quoted-printable.
+				 */
+				curLineLength = 1;
+				if (!quotedPrintable) {
+					writer.write(indent);
+					curLineLength += indent.length();
+				}
+
 				start = i;
 
 				continue;
