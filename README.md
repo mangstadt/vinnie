@@ -135,7 +135,6 @@ You have some options:
 
  * Post an [issue](https://github.com/mangstadt/vinnie/issues)
  * [Gitter chat room](https://gitter.im/mangstadt/vinnie)
- * [codewake Q&A forum](https://www.codewake.com/p/vinnie)
  * Email me directly: [mike.angstadt@gmail.com](mailto:mike.angstadt@gmail.com)
 
 [![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=8CEN7MPKRBKU6&lc=US&item_name=Michael%20Angstadt&item_number=vinnie&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
