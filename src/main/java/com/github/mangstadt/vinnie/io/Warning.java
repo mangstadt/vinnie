@@ -75,7 +75,7 @@ public enum Warning {
 		this.message = message;
 	}
 
-	private String message;
+	private final String message;
 
 	/**
 	 * Gets a message describing the warning.
