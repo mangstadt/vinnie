@@ -25,8 +25,8 @@
 package com.github.mangstadt.vinnie.io;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -1011,7 +1011,7 @@ public final class VObjectPropertyValues {
 		 * @return this
 		 */
 		public StructuredValueBuilder append(Object value) {
-			List<Object> component = (value == null) ? Arrays.<Object> asList() : Arrays.asList(value);
+			List<Object> component = (value == null) ? Collections.emptyList() : Collections.singletonList(value);
 			return append(component);
 		}
 
@@ -1024,7 +1024,7 @@ public final class VObjectPropertyValues {
 		 */
 		public StructuredValueBuilder append(List<?> component) {
 			if (component == null) {
-				component = Arrays.<Object> asList();
+				component = Collections.emptyList();
 			}
 			components.add(component);
 			return this;
