@@ -1,7 +1,4 @@
 language: java
-
-#sudo: false # faster builds
-sudo: required
-
+sudo: false # faster builds
 after_success:
   - bash <(curl -s https://codecov.io/bash)
