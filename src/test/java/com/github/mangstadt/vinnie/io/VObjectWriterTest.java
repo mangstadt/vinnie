@@ -45,7 +45,6 @@ import com.github.mangstadt.vinnie.VObjectProperty;
 /**
  * @author Michael Angstadt
  */
-@SuppressWarnings("resource")
 public class VObjectWriterTest {
 	@Test
 	public void writeBeginComponent() throws Exception {

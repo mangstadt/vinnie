@@ -59,8 +59,6 @@ import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
 /**
  * @author Michael Angstadt
  */
-//"resource": No need to call VObjectReader.close()
-@SuppressWarnings({ "resource" })
 public class VObjectReaderTest {
 	private final String NEWLINE = System.getProperty("line.separator");
 
