@@ -83,7 +83,7 @@ public final class VObjectPropertyValues {
 
 				if (sb == null) {
 					sb = new StringBuilder(end - start);
-					sb.append(string.substring(start, i - 1));
+					sb.append(string, start, i - 1);
 				}
 
 				switch (c) {
@@ -161,7 +161,7 @@ public final class VObjectPropertyValues {
 			case ';':
 				if (sb == null) {
 					sb = new StringBuilder(value.length() * 2);
-					sb.append(value.substring(0, i));
+					sb.append(value, 0, i);
 				}
 				sb.append('\\').append(c);
 				break;
