@@ -422,7 +422,7 @@ public class VObjectReader implements Closeable {
 
 			if ("BEGIN".equalsIgnoreCase(property.getName().trim())) {
 				String componentName = property.getValue().trim().toUpperCase();
-				if (componentName.length() == 0) {
+				if (componentName.isEmpty()) {
 					listener.onWarning(Warning.EMPTY_BEGIN, null, null, context);
 					continue;
 				}
@@ -435,7 +435,7 @@ public class VObjectReader implements Closeable {
 
 			if ("END".equalsIgnoreCase(property.getName().trim())) {
 				String componentName = property.getValue().trim().toUpperCase();
-				if (componentName.length() == 0) {
+				if (componentName.isEmpty()) {
 					listener.onWarning(Warning.EMPTY_END, null, null, context);
 					continue;
 				}

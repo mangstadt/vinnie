@@ -404,7 +404,7 @@ public final class VObjectPropertyValues {
 	 * @return the parsed values
 	 */
 	public static List<List<String>> parseStructured(String value) {
-		if (value.length() == 0) {
+		if (value.isEmpty()) {
 			return new ArrayList<List<String>>(0); //return a mutable list
 		}
 
@@ -424,7 +424,7 @@ public final class VObjectPropertyValues {
 			switch (c) {
 			case ';':
 				String v = unescape(value, cursor, i);
-				if (curComponent.isEmpty() && v.length() == 0) {
+				if (curComponent.isEmpty() && v.isEmpty()) {
 					/*
 					 * If the component is empty, do not add an empty string to
 					 * the list.
@@ -449,7 +449,7 @@ public final class VObjectPropertyValues {
 		}
 
 		String v = unescape(value, cursor, value.length());
-		if (curComponent.isEmpty() && v.length() == 0) {
+		if (curComponent.isEmpty() && v.isEmpty()) {
 			/*
 			 * If the component is empty, do not add an empty string to the
 			 * list.
@@ -559,7 +559,7 @@ public final class VObjectPropertyValues {
 	 * @return the parsed values
 	 */
 	public static Map<String, List<String>> parseMultimap(String value) {
-		if (value.length() == 0) {
+		if (value.isEmpty()) {
 			return new HashMap<String, List<String>>(0); //return a mutable map
 		}
 
@@ -730,7 +730,7 @@ public final class VObjectPropertyValues {
 	 * @return the split values
 	 */
 	private static List<String> split(String string, char delimiter, int limit) {
-		if (string.length() == 0) {
+		if (string.isEmpty()) {
 			return new ArrayList<String>(0); //return a mutable list
 		}
 
@@ -832,7 +832,7 @@ public final class VObjectPropertyValues {
 			}
 
 			String next = it.next();
-			return (next.length() == 0) ? null : next;
+			return next.isEmpty() ? null : next;
 		}
 
 		/**

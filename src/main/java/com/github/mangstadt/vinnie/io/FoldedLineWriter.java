@@ -310,7 +310,7 @@ public class FoldedLineWriter extends Writer {
 	 * indent string contains illegal characters
 	 */
 	public void setIndent(String indent) {
-		if (indent.length() == 0) {
+		if (indent.isEmpty()) {
 			throw new IllegalArgumentException("Indent string cannot be empty.");
 		}
 

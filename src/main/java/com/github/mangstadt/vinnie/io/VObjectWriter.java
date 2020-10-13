@@ -392,7 +392,7 @@ public class VObjectWriter implements Closeable, Flushable {
 	 * @throws IOException if there's a problem writing to the data stream
 	 */
 	public void writeBeginComponent(String componentName) throws IOException {
-		if (componentName == null || componentName.length() == 0) {
+		if (componentName == null || componentName.isEmpty()) {
 			throw new IllegalArgumentException("Component name cannot be null or empty.");
 		}
 		writeProperty("BEGIN", componentName);
@@ -405,7 +405,7 @@ public class VObjectWriter implements Closeable, Flushable {
 	 * @throws IOException if there's a problem writing to the data stream
 	 */
 	public void writeEndComponent(String componentName) throws IOException {
-		if (componentName == null || componentName.length() == 0) {
+		if (componentName == null || componentName.isEmpty()) {
 			throw new IllegalArgumentException("Component name cannot be null or empty.");
 		}
 		writeProperty("END", componentName);
@@ -418,7 +418,7 @@ public class VObjectWriter implements Closeable, Flushable {
 	 * @throws IOException if there's a problem writing to the data stream
 	 */
 	public void writeVersion(String version) throws IOException {
-		if (version == null || version.length() == 0) {
+		if (version == null || version.isEmpty()) {
 			throw new IllegalArgumentException("Version string cannot be null or empty.");
 		}
 		writeProperty("VERSION", version);
@@ -661,7 +661,7 @@ public class VObjectWriter implements Closeable, Flushable {
 	 * @return true if it starts with whitespace, false if not
 	 */
 	private boolean beginsWithWhitespace(String string) {
-		if (string.length() == 0) {
+		if (string.isEmpty()) {
 			return false;
 		}
 		char first = string.charAt(0);
