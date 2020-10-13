@@ -71,7 +71,7 @@ public enum Warning {
 	 */
 	QUOTED_PRINTABLE_ERROR("Unable to decode the property's quoted-printable value.  Value will be treated as plain-text.");
 
-	private Warning(String message) {
+	Warning(String message) {
 		this.message = message;
 	}
 
