@@ -578,17 +578,25 @@ public class VObjectWriter implements Closeable, Flushable {
 	 * @throws IllegalArgumentException if there is a validation error
 	 */
 	private void validate(String group, String name, VObjectParameters parameters) {
-		//validate the group name
-		if (group != null) {
-			if (!allowedGroupChars.check(group)) {
-				throw new IllegalArgumentException("Property \"" + name + "\" has its group set to \"" + group + "\".  This group name contains one or more invalid characters.  The following characters are not permitted: " + allowedGroupChars.flip());
-			}
-			if (beginsWithWhitespace(group)) {
-				throw new IllegalArgumentException("Property \"" + name + "\" has its group set to \"" + group + "\".  This group name begins with one or more whitespace characters, which is not permitted.");
-			}
+		validateGroup(group, name);
+		validateName(name);
+		validateParameters(name, parameters);
+	}
+	
+	private void validateGroup(String group, String name) {
+		if (group == null) {
+			return;
 		}
-
-		//validate the property name
+		
+		if (!allowedGroupChars.check(group)) {
+			throw new IllegalArgumentException("Property \"" + name + "\" has its group set to \"" + group + "\".  This group name contains one or more invalid characters.  The following characters are not permitted: " + allowedGroupChars.flip());
+		}
+		if (beginsWithWhitespace(group)) {
+			throw new IllegalArgumentException("Property \"" + name + "\" has its group set to \"" + group + "\".  This group name begins with one or more whitespace characters, which is not permitted.");
+		}
+	}
+	
+	private void validateName(String name) {
 		if (name.isEmpty()) {
 			throw new IllegalArgumentException("Property name cannot be empty.");
 		}
@@ -598,8 +606,9 @@ public class VObjectWriter implements Closeable, Flushable {
 		if (beginsWithWhitespace(name)) {
 			throw new IllegalArgumentException("Property name \"" + name + "\" begins with one or more whitespace characters, which is not permitted.");
 		}
-
-		//validate the parameter names and values
+	}
+	
+	private void validateParameters(String name, VObjectParameters parameters) {
 		for (Map.Entry<String, List<String>> parameter : parameters) {
 			//validate the parameter name
 			String parameterName = parameter.getKey();
