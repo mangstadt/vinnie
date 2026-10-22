@@ -34,13 +34,13 @@ VObjectReader vobjectReader = new VObjectReader(reader, rules);
 vobjectReader.parse(new VObjectDataAdapter() {
 	private boolean inVCard = false;
 
-	public void onComponentBegin(String name, Context context) {
-		if (context.getParentComponents().isEmpty() && "VCARD".equals(name)){
+	public void onComponentBegin(LaciToken name, Context context) {
+		if (context.getParentComponents().isEmpty() && name.equalsIgnoreCase("VCARD")){
 			inVCard = true;
 		}
 	}
 
-	public void onComponentEnd(String name, Context context) {
+	public void onComponentEnd(LaciToken name, Context context) {
 		if (context.getParentComponents().isEmpty()) {
 			//end of vCard, stop parsing
 			context.stop();
@@ -76,7 +76,7 @@ vobjectWriter.writeVersion("2.1");
 vobjectWriter.writeProperty("FN", "John Doe");
 
 VObjectProperty note = new VObjectProperty("NOTE", "¡Hola, mundo!");
-note.getParameters().put(null, "QUOTED-PRINTABLE");
+note.getParameters().put((String) null, "QUOTED-PRINTABLE");
 vobjectWriter.writeProperty(note);
 
 vobjectWriter.writeEndComponent("VCARD");

@@ -37,6 +37,7 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.mangstadt.vinnie.LaciToken;
 import com.github.mangstadt.vinnie.SyntaxStyle;
 import com.github.mangstadt.vinnie.VObjectProperty;
 import com.github.mangstadt.vinnie.codec.DecoderException;
@@ -195,10 +196,10 @@ import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
  * @author Michael Angstadt
  */
 public class VObjectReader implements Closeable {
-	/**
-	 * The local computer's newline character sequence.
-	 */
-	private final String NEWLINE = System.getProperty("line.separator");
+	private static final String NEWLINE = System.getProperty("line.separator");
+	private static final LaciToken BEGIN = new LaciToken("BEGIN");
+	private static final LaciToken END = new LaciToken("END");
+	private static final LaciToken VERSION = new LaciToken("VERSION");
 
 	private final Reader reader;
 	private final SyntaxRules syntaxRules;
@@ -419,9 +420,10 @@ public class VObjectReader implements Closeable {
 			 * around the colon character for these two properties. Component
 			 * names are trimmed for the same reason.
 			 */
+			LaciToken propertyNameTrimmed = new LaciToken(property.getName().trim());
 
-			if ("BEGIN".equalsIgnoreCase(property.getName().trim())) {
-				String componentName = property.getValue().trim().toUpperCase();
+			if (BEGIN.equals(propertyNameTrimmed)) {
+				LaciToken componentName = new LaciToken(property.getValue().trim());
 				if (componentName.isEmpty()) {
 					listener.onWarning(Warning.EMPTY_BEGIN, null, null, context);
 					continue;
@@ -433,8 +435,8 @@ public class VObjectReader implements Closeable {
 				continue;
 			}
 
-			if ("END".equalsIgnoreCase(property.getName().trim())) {
-				String componentName = property.getValue().trim().toUpperCase();
+			if (END.equals(propertyNameTrimmed)) {
+				LaciToken componentName = new LaciToken(property.getValue().trim());
 				if (componentName.isEmpty()) {
 					listener.onWarning(Warning.EMPTY_END, null, null, context);
 					continue;
@@ -449,15 +451,15 @@ public class VObjectReader implements Closeable {
 				}
 
 				while (popCount > 0) {
-					String poppedName = stack.pop();
+					LaciToken poppedName = stack.pop();
 					listener.onComponentEnd(poppedName, context);
 					popCount--;
 				}
 				continue;
 			}
 
-			if ("VERSION".equalsIgnoreCase(property.getName())) {
-				String parentComponent = stack.peekName();
+			if (VERSION.equalsIgnoreCase(property.getName())) {
+				LaciToken parentComponent = stack.peekName();
 				if (syntaxRules.hasSyntaxRules(parentComponent)) {
 					SyntaxStyle style = syntaxRules.getSyntaxStyle(parentComponent, property.getValue());
 					if (style == null) {
@@ -491,7 +493,7 @@ public class VObjectReader implements Closeable {
 		/*
 		 * The name of the parameter we're currently inside of.
 		 */
-		String curParamName = null;
+		LaciToken curParamName = null;
 
 		/*
 		 * The character that was used to escape the current character (for
@@ -714,12 +716,12 @@ public class VObjectReader implements Closeable {
 
 				//set the parameter name
 				if (ch == '=' && curParamName == null) {
-					String paramName = buffer.getAndClear().toUpperCase();
+					String paramName = buffer.getAndClear();
 					if (syntax == SyntaxStyle.OLD) {
 						//old style allows whitespace to surround the "=", so remove it
 						paramName = rtrim(paramName);
 					}
-					curParamName = paramName;
+					curParamName = new LaciToken(paramName);
 					continue;
 				}
 
@@ -840,7 +842,7 @@ public class VObjectReader implements Closeable {
 		/**
 		 * The hierarchy of components the parser is currently inside of.
 		 */
-		private final List<String> names = new ArrayList<String>();
+		private final List<LaciToken> names = new ArrayList<LaciToken>();
 
 		/**
 		 * <p>
@@ -867,7 +869,7 @@ public class VObjectReader implements Closeable {
 		 * Pushes a component onto the stack.
 		 * @param component the component name
 		 */
-		public void push(String component) {
+		public void push(LaciToken component) {
 			names.add(component);
 			syntax.add(peekSyntax());
 		}
@@ -876,7 +878,7 @@ public class VObjectReader implements Closeable {
 		 * Removes the top component from the stack.
 		 * @return the name of the component that was removed
 		 */
-		public String pop() {
+		public LaciToken pop() {
 			syntax.remove(syntax.size() - 1);
 			return names.remove(names.size() - 1);
 		}
@@ -887,7 +889,7 @@ public class VObjectReader implements Closeable {
 		 * @param name the component name
 		 * @return the number of pops or 0 if the name was not found
 		 */
-		public int popCount(String name) {
+		public int popCount(LaciToken name) {
 			int index = names.lastIndexOf(name);
 			return (index < 0) ? 0 : names.size() - index;
 		}
@@ -896,7 +898,7 @@ public class VObjectReader implements Closeable {
 		 * Gets the top component name.
 		 * @return the top component name or null if the name stack is empty
 		 */
-		public String peekName() {
+		public LaciToken peekName() {
 			return names.isEmpty() ? null : names.get(names.size() - 1);
 		}
 

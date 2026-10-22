@@ -38,6 +38,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.github.mangstadt.vinnie.LaciToken;
 import com.github.mangstadt.vinnie.SyntaxStyle;
 import com.github.mangstadt.vinnie.VObjectParameters;
 import com.github.mangstadt.vinnie.VObjectProperty;
@@ -388,7 +389,7 @@ public class VObjectWriterTest {
 				writer.setCaretEncodingEnabled(caretEncoding);
 
 				VObjectParameters parameters = new VObjectParameters();
-				parameters.getMap().put("PARAM", new ArrayList<String>());
+				parameters.getMap().put(new LaciToken("PARAM"), new ArrayList<String>());
 				writer.writeProperty(null, "PROP", parameters, "");
 
 				String actual = sw.toString();
@@ -474,12 +475,12 @@ public class VObjectWriterTest {
 		List<VObjectParameters> list = new ArrayList<VObjectParameters>();
 
 		VObjectParameters parameters = new VObjectParameters();
-		parameters.put(null, "one");
+		parameters.put((String) null, "one");
 		list.add(parameters);
 
 		parameters = new VObjectParameters();
-		parameters.put(null, "one");
-		parameters.put(null, "two");
+		parameters.put((String) null, "one");
+		parameters.put((String) null, "two");
 		list.add(parameters);
 
 		SyntaxStyle style = SyntaxStyle.OLD;
@@ -775,7 +776,7 @@ public class VObjectWriterTest {
 			assertEquals(expectedParams, parameters);
 
 			parameters = new VObjectParameters();
-			parameters.put(null, "QUOTED-PRINTABLE");
+			parameters.put((String) null, "QUOTED-PRINTABLE");
 			expectedParams = new VObjectParameters(parameters);
 			writer.writeProperty(null, "PROP", parameters, "one\r\ntwo");
 			assertEquals(expectedParams, parameters);

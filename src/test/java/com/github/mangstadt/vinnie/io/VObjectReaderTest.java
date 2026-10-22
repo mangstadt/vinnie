@@ -51,6 +51,7 @@ import org.junit.Test;
 import org.mockito.InOrder;
 
 import com.github.mangstadt.vinnie.DebugDataListener;
+import com.github.mangstadt.vinnie.LaciToken;
 import com.github.mangstadt.vinnie.SyntaxStyle;
 import com.github.mangstadt.vinnie.VObjectProperty;
 import com.github.mangstadt.vinnie.codec.DecoderException;
@@ -86,13 +87,13 @@ public class VObjectReaderTest {
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener).onProperty(eq(property().name("PROP1").value("value1").build()), any(Context.class));
-			inorder.verify(listener).onComponentBegin(eq("COMP1"), any(Context.class));
+			inorder.verify(listener).onComponentBegin(eq(component("COMP1")), any(Context.class));
 			inorder.verify(listener).onProperty(eq(property().name("PROP2").value("value2").build()), any(Context.class));
-			inorder.verify(listener).onComponentBegin(eq("COMP2"), any(Context.class));
+			inorder.verify(listener).onComponentBegin(eq(component("COMP2")), any(Context.class));
 			inorder.verify(listener).onProperty(eq(property().name("PROP3").value("value3").build()), any(Context.class));
-			inorder.verify(listener).onComponentEnd(eq("COMP2"), any(Context.class));
+			inorder.verify(listener).onComponentEnd(eq(new LaciToken("COMP2")), any(Context.class));
 			inorder.verify(listener).onProperty(eq(property().name("PROP4").value("value4").build()), any(Context.class));
-			inorder.verify(listener).onComponentEnd(eq("COMP1"), any(Context.class));
+			inorder.verify(listener).onComponentEnd(eq(component("COMP1")), any(Context.class));
 
 			//@formatter:off
 			String lines[] = string.split("\r\n");
@@ -131,10 +132,10 @@ public class VObjectReaderTest {
 			reader.parse(listener);
 
 			InOrder inorder = inOrder(listener);
-			inorder.verify(listener).onComponentBegin(eq("COMP1"), any(Context.class));
+			inorder.verify(listener).onComponentBegin(eq(component("COMP1")), any(Context.class));
 			inorder.verify(listener).onProperty(eq(property().name("PROP").value("value").build()), any(Context.class));
 			inorder.verify(listener).onWarning(eq(Warning.UNMATCHED_END), isNull(VObjectProperty.class), isNull(Exception.class), any(Context.class));
-			inorder.verify(listener).onComponentEnd(eq("COMP1"), any(Context.class));
+			inorder.verify(listener).onComponentEnd(eq(component("COMP1")), any(Context.class));
 
 			//@formatter:off
 			String lines[] = string.split("\r\n");
@@ -171,18 +172,18 @@ public class VObjectReaderTest {
 			reader.parse(listener);
 
 			InOrder inorder = inOrder(listener);
-			inorder.verify(listener).onComponentBegin(eq("COMP1"), any(Context.class));
+			inorder.verify(listener).onComponentBegin(eq(component("COMP1")), any(Context.class));
 			inorder.verify(listener).onProperty(eq(property().name("PROP1").value("value1").build()), any(Context.class));
-			inorder.verify(listener).onComponentBegin(eq("COMP2"), any(Context.class));
+			inorder.verify(listener).onComponentBegin(eq(component("COMP2")), any(Context.class));
 			inorder.verify(listener).onProperty(eq(property().name("PROP2").value("value2").build()), any(Context.class));
 
 			/*
 			 * COMP2 is ended even though its END property wasn't reached
 			 * because COMP1 ended and COMP2 is nested inside of COMP1.
 			 */
-			inorder.verify(listener).onComponentEnd(eq("COMP2"), any(Context.class));
+			inorder.verify(listener).onComponentEnd(eq(component("COMP2")), any(Context.class));
 
-			inorder.verify(listener).onComponentEnd(eq("COMP1"), any(Context.class));
+			inorder.verify(listener).onComponentEnd(eq(component("COMP1")), any(Context.class));
 			inorder.verify(listener).onProperty(eq(property().name("PROP3").value("value3").build()), any(Context.class));
 			inorder.verify(listener).onWarning(eq(Warning.UNMATCHED_END), isNull(VObjectProperty.class), isNull(Exception.class), any(Context.class));
 
@@ -222,9 +223,9 @@ public class VObjectReaderTest {
 			reader.parse(listener);
 
 			InOrder inorder = inOrder(listener);
-			inorder.verify(listener).onComponentBegin(eq("COMP1"), any(Context.class));
+			inorder.verify(listener).onComponentBegin(eq(component("COMP1")), any(Context.class));
 			inorder.verify(listener).onProperty(eq(property().name("PROP1").value("value1").build()), any(Context.class));
-			inorder.verify(listener).onComponentBegin(eq("COMP2"), any(Context.class));
+			inorder.verify(listener).onComponentBegin(eq(component("COMP2")), any(Context.class));
 			inorder.verify(listener).onProperty(eq(property().name("PROP2").value("value2").build()), any(Context.class));
 
 			//@formatter:off
@@ -298,11 +299,11 @@ public class VObjectReaderTest {
 			reader.parse(listener);
 
 			InOrder inorder = inOrder(listener);
-			inorder.verify(listener).onComponentBegin(eq("COMP1"), any(Context.class));
+			inorder.verify(listener).onComponentBegin(eq(component("COMP1")), any(Context.class));
 			inorder.verify(listener).onProperty(eq(property().group("group").name("prop").param("PARAM", "param_value").value("prop_value").build()), any(Context.class));
-			inorder.verify(listener).onComponentEnd(eq("COMP1"), any(Context.class));
-			inorder.verify(listener).onComponentBegin(eq("COMP2"), any(Context.class));
-			inorder.verify(listener).onComponentEnd(eq("COMP2"), any(Context.class));
+			inorder.verify(listener).onComponentEnd(eq(component("COMP1")), any(Context.class));
+			inorder.verify(listener).onComponentBegin(eq(component("COMP2")), any(Context.class));
+			inorder.verify(listener).onComponentEnd(eq(component("COMP2")), any(Context.class));
 
 			//@formatter:off
 			String lines[] = string.split("\r\n");
@@ -340,10 +341,10 @@ public class VObjectReaderTest {
 			reader.parse(listener);
 
 			InOrder inorder = inOrder(listener);
-			inorder.verify(listener).onComponentBegin(eq("COMP1"), any(Context.class));
-			inorder.verify(listener).onComponentBegin(eq("COMP2"), any(Context.class));
-			inorder.verify(listener).onComponentEnd(eq("COMP2"), any(Context.class));
-			inorder.verify(listener).onComponentEnd(eq("COMP1"), any(Context.class));
+			inorder.verify(listener).onComponentBegin(eq(component("COMP1")), any(Context.class));
+			inorder.verify(listener).onComponentBegin(eq(component("COMP2")), any(Context.class));
+			inorder.verify(listener).onComponentEnd(eq(component("COMP2")), any(Context.class));
+			inorder.verify(listener).onComponentEnd(eq(component("COMP1")), any(Context.class));
 
 			//@formatter:off
 			String lines[] = string.split("\r\n");
@@ -1182,8 +1183,8 @@ public class VObjectReaderTest {
 		//@formatter:on
 
 		SyntaxRules rules = new SyntaxRules(SyntaxStyle.OLD);
-		rules.addRule("COMP2", "1", SyntaxStyle.OLD);
-		rules.addRule("COMP2", "2", SyntaxStyle.NEW);
+		rules.addRule(new LaciToken("COMP2"), "1", SyntaxStyle.OLD);
+		rules.addRule(new LaciToken("COMP2"), "2", SyntaxStyle.NEW);
 
 		VObjectReader reader = new VObjectReader(new StringReader(string), rules);
 		VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
@@ -1196,33 +1197,33 @@ public class VObjectReaderTest {
 
 		//@formatter:off
 		inorder.verify(listener).onProperty(eq(property().name("VERSION").value("1").build()), any(Context.class));
-		inorder.verify(listener).onComponentBegin(eq("COMP1"), any(Context.class));
+		inorder.verify(listener).onComponentBegin(eq(component("COMP1")), any(Context.class));
 			inorder.verify(listener).onProperty(eq(oldStyleProp), any(Context.class));
-		inorder.verify(listener).onComponentEnd(eq("COMP1"), any(Context.class));
+		inorder.verify(listener).onComponentEnd(eq(component("COMP1")), any(Context.class));
 		
-		inorder.verify(listener).onComponentBegin(eq("COMP1"), any(Context.class));
+		inorder.verify(listener).onComponentBegin(eq(component("COMP1")), any(Context.class));
 			inorder.verify(listener).onProperty(eq(property().name("VERSION").value("2").build()), any(Context.class));
 			inorder.verify(listener).onProperty(eq(oldStyleProp), any(Context.class));
-		inorder.verify(listener).onComponentEnd(eq("COMP1"), any(Context.class));
+		inorder.verify(listener).onComponentEnd(eq(component("COMP1")), any(Context.class));
 		
-		inorder.verify(listener).onComponentBegin(eq("COMP2"), any(Context.class));
+		inorder.verify(listener).onComponentBegin(eq(component("COMP2")), any(Context.class));
 			inorder.verify(listener).onWarning(eq(Warning.UNKNOWN_VERSION), eq(property().name("VERSION").value("3").build()), isNull(Exception.class), any(Context.class));
 			inorder.verify(listener).onProperty(eq(property().name("VERSION").value("3").build()), any(Context.class));
 			inorder.verify(listener).onProperty(eq(oldStyleProp), any(Context.class));
-		inorder.verify(listener).onComponentEnd(eq("COMP2"), any(Context.class));
+		inorder.verify(listener).onComponentEnd(eq(component("COMP2")), any(Context.class));
 		
-		inorder.verify(listener).onComponentBegin(eq("COMP2"), any(Context.class));
+		inorder.verify(listener).onComponentBegin(eq(component("COMP2")), any(Context.class));
 			inorder.verify(listener).onVersion(eq("2"), any(Context.class));
 			inorder.verify(listener).onProperty(eq(newStyleProp), any(Context.class));
-			inorder.verify(listener).onComponentBegin(eq("COMP3"), any(Context.class));
+			inorder.verify(listener).onComponentBegin(eq(component("COMP3")), any(Context.class));
 				inorder.verify(listener).onProperty(eq(newStyleProp), any(Context.class));
-			inorder.verify(listener).onComponentEnd(eq("COMP3"), any(Context.class));
-			inorder.verify(listener).onComponentBegin(eq("COMP2"), any(Context.class));
+			inorder.verify(listener).onComponentEnd(eq(component("COMP3")), any(Context.class));
+			inorder.verify(listener).onComponentBegin(eq(component("COMP2")), any(Context.class));
 				inorder.verify(listener).onVersion(eq("1"), any(Context.class));
 				inorder.verify(listener).onProperty(eq(oldStyleProp), any(Context.class));
-			inorder.verify(listener).onComponentEnd(eq("COMP2"), any(Context.class));
+			inorder.verify(listener).onComponentEnd(eq(component("COMP2")), any(Context.class));
 			inorder.verify(listener).onProperty(eq(newStyleProp), any(Context.class));
-		inorder.verify(listener).onComponentEnd(eq("COMP2"), any(Context.class));
+		inorder.verify(listener).onComponentEnd(eq(component("COMP2")), any(Context.class));
 		//@formatter:on
 
 		//@formatter:off
@@ -1293,25 +1294,25 @@ public class VObjectReaderTest {
 		InOrder inorder = inOrder(listener);
 
 		//@formatter:off
-		inorder.verify(listener).onComponentBegin(eq("VCALENDAR"), any(Context.class));
+		inorder.verify(listener).onComponentBegin(eq(component("VCALENDAR")), any(Context.class));
 			inorder.verify(listener).onProperty(eq(oldStyleProp), any(Context.class));
-		inorder.verify(listener).onComponentEnd(eq("VCALENDAR"), any(Context.class));
+		inorder.verify(listener).onComponentEnd(eq(component("VCALENDAR")), any(Context.class));
 		
-		inorder.verify(listener).onComponentBegin(eq("VCALENDAR"), any(Context.class));
+		inorder.verify(listener).onComponentBegin(eq(component("VCALENDAR")), any(Context.class));
 			inorder.verify(listener).onWarning(eq(Warning.UNKNOWN_VERSION), eq(property().name("VERSION").value("10").build()), isNull(Exception.class), any(Context.class));
 			inorder.verify(listener).onProperty(eq(property().name("VERSION").value("10").build()), any(Context.class));
 			inorder.verify(listener).onProperty(eq(oldStyleProp), any(Context.class));
-		inorder.verify(listener).onComponentEnd(eq("VCALENDAR"), any(Context.class));
+		inorder.verify(listener).onComponentEnd(eq(component("VCALENDAR")), any(Context.class));
 		
-		inorder.verify(listener).onComponentBegin(eq("VCALENDAR"), any(Context.class));
+		inorder.verify(listener).onComponentBegin(eq(component("VCALENDAR")), any(Context.class));
 			inorder.verify(listener).onVersion(eq("1.0"), any(Context.class));
 			inorder.verify(listener).onProperty(eq(oldStyleProp), any(Context.class));
-		inorder.verify(listener).onComponentEnd(eq("VCALENDAR"), any(Context.class));
+		inorder.verify(listener).onComponentEnd(eq(component("VCALENDAR")), any(Context.class));
 		
-		inorder.verify(listener).onComponentBegin(eq("VCALENDAR"), any(Context.class));
+		inorder.verify(listener).onComponentBegin(eq(component("VCALENDAR")), any(Context.class));
 			inorder.verify(listener).onVersion(eq("2.0"), any(Context.class));
 			inorder.verify(listener).onProperty(eq(newStyleProp), any(Context.class));
-		inorder.verify(listener).onComponentEnd(eq("VCALENDAR"), any(Context.class));
+		inorder.verify(listener).onComponentEnd(eq(component("VCALENDAR")), any(Context.class));
 		//@formatter:on
 
 		//@formatter:off
@@ -1376,30 +1377,30 @@ public class VObjectReaderTest {
 		InOrder inorder = inOrder(listener);
 
 		//@formatter:off
-		inorder.verify(listener).onComponentBegin(eq("VCARD"), any(Context.class));
+		inorder.verify(listener).onComponentBegin(eq(component("VCARD")), any(Context.class));
 			inorder.verify(listener).onProperty(eq(oldStyleProp), any(Context.class));
-		inorder.verify(listener).onComponentEnd(eq("VCARD"), any(Context.class));
+		inorder.verify(listener).onComponentEnd(eq(component("VCARD")), any(Context.class));
 		
-		inorder.verify(listener).onComponentBegin(eq("VCARD"), any(Context.class));
+		inorder.verify(listener).onComponentBegin(eq(component("VCARD")), any(Context.class));
 			inorder.verify(listener).onWarning(eq(Warning.UNKNOWN_VERSION), eq(property().name("VERSION").value("10").build()), isNull(Exception.class), any(Context.class));
 			inorder.verify(listener).onProperty(eq(property().name("VERSION").value("10").build()), any(Context.class));
 			inorder.verify(listener).onProperty(eq(oldStyleProp), any(Context.class));
-		inorder.verify(listener).onComponentEnd(eq("VCARD"), any(Context.class));
+		inorder.verify(listener).onComponentEnd(eq(component("VCARD")), any(Context.class));
 		
-		inorder.verify(listener).onComponentBegin(eq("VCARD"), any(Context.class));
+		inorder.verify(listener).onComponentBegin(eq(component("VCARD")), any(Context.class));
 			inorder.verify(listener).onVersion(eq("2.1"), any(Context.class));
 			inorder.verify(listener).onProperty(eq(oldStyleProp), any(Context.class));
-		inorder.verify(listener).onComponentEnd(eq("VCARD"), any(Context.class));
+		inorder.verify(listener).onComponentEnd(eq(component("VCARD")), any(Context.class));
 		
-		inorder.verify(listener).onComponentBegin(eq("VCARD"), any(Context.class));
+		inorder.verify(listener).onComponentBegin(eq(component("VCARD")), any(Context.class));
 			inorder.verify(listener).onVersion(eq("3.0"), any(Context.class));
 			inorder.verify(listener).onProperty(eq(newStyleProp), any(Context.class));
-		inorder.verify(listener).onComponentEnd(eq("VCARD"), any(Context.class));
+		inorder.verify(listener).onComponentEnd(eq(component("VCARD")), any(Context.class));
 		
-		inorder.verify(listener).onComponentBegin(eq("VCARD"), any(Context.class));
+		inorder.verify(listener).onComponentBegin(eq(component("VCARD")), any(Context.class));
 			inorder.verify(listener).onVersion(eq("4.0"), any(Context.class));
 			inorder.verify(listener).onProperty(eq(newStyleProp), any(Context.class));
-		inorder.verify(listener).onComponentEnd(eq("VCARD"), any(Context.class));
+		inorder.verify(listener).onComponentEnd(eq(component("VCARD")), any(Context.class));
 		//@formatter:on
 
 		//@formatter:off
@@ -1452,17 +1453,17 @@ public class VObjectReaderTest {
 			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock() {
 				@Override
-				public void onComponentBegin(String name, Context context) {
+				public void onComponentBegin(LaciToken name, Context context) {
 					super.onComponentBegin(name, context);
-					if (name.equals("COMP1")) {
+					if (name.equalsIgnoreCase("COMP1")) {
 						context.stop();
 					}
 				}
 
 				@Override
-				public void onComponentEnd(String name, Context context) {
+				public void onComponentEnd(LaciToken name, Context context) {
 					super.onComponentEnd(name, context);
-					if (name.equals("COMP2")) {
+					if (name.equalsIgnoreCase("COMP2")) {
 						context.stop();
 					}
 				}
@@ -1479,15 +1480,15 @@ public class VObjectReaderTest {
 			InOrder inorder = inOrder(listener);
 
 			reader.parse(listener);
-			inorder.verify(listener).onComponentBegin(eq("COMP1"), any(Context.class));
+			inorder.verify(listener).onComponentBegin(eq(component("COMP1")), any(Context.class));
 			inorder.verifyNoMoreInteractions();
 
 			reader.parse(listener);
 			inorder.verify(listener).onProperty(eq(property().name("PROP").value("value").build()), any(Context.class));
-			inorder.verify(listener).onComponentEnd(eq("COMP1"), any(Context.class));
-			inorder.verify(listener).onComponentBegin(eq("COMP2"), any(Context.class));
+			inorder.verify(listener).onComponentEnd(eq(component("COMP1")), any(Context.class));
+			inorder.verify(listener).onComponentBegin(eq(component("COMP2")), any(Context.class));
 			inorder.verify(listener).onProperty(eq(property().name("PROP").value("value").build()), any(Context.class));
-			inorder.verify(listener).onComponentEnd(eq("COMP2"), any(Context.class));
+			inorder.verify(listener).onComponentEnd(eq(component("COMP2")), any(Context.class));
 			inorder.verifyNoMoreInteractions();
 
 			reader.parse(listener);
@@ -1547,7 +1548,12 @@ public class VObjectReaderTest {
 	 * @return the object
 	 */
 	private static Context context(List<String> components, String unfoldedLine, int lineNumber) {
-		Context context = new Context(components);
+		List<LaciToken> componentsLaci = new ArrayList<LaciToken>();
+		for (String component : components) {
+			componentsLaci.add(new LaciToken(component));
+		}
+
+		Context context = new Context(componentsLaci);
 		context.unfoldedLine.append(unfoldedLine);
 		context.lineNumber = lineNumber;
 		return context;
@@ -1571,6 +1577,10 @@ public class VObjectReaderTest {
 
 	private static VObjectReader reader(String string, SyntaxStyle syntaxStyle) {
 		return new VObjectReader(new StringReader(string), new SyntaxRules(syntaxStyle));
+	}
+
+	private static LaciToken component(String name) {
+		return new LaciToken(name);
 	}
 
 	private static VObjectPropertyBuilder property() {
@@ -1619,11 +1629,11 @@ public class VObjectReaderTest {
 		 */
 		private final List<Context> contexts = new ArrayList<Context>();
 
-		public void onComponentBegin(String name, Context context) {
+		public void onComponentBegin(LaciToken name, Context context) {
 			contexts.add(copy(context));
 		}
 
-		public void onComponentEnd(String name, Context context) {
+		public void onComponentEnd(LaciToken name, Context context) {
 			contexts.add(copy(context));
 		}
 
@@ -1640,7 +1650,7 @@ public class VObjectReaderTest {
 		}
 
 		private Context copy(Context orig) {
-			Context copy = new Context(new ArrayList<String>(orig.parentComponents));
+			Context copy = new Context(new ArrayList<LaciToken>(orig.parentComponents));
 			copy.unfoldedLine.append(orig.getUnfoldedLine());
 			copy.lineNumber = orig.lineNumber;
 			return copy;

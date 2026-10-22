@@ -46,14 +46,10 @@ import org.junit.Test;
  */
 public class VObjectParametersTest {
 	@Test
-	public void convert_keys_to_uppercase() {
+	public void keys_case_insensitive() {
 		VObjectParameters parameters = new VObjectParameters();
 		parameters.put("name", "value1");
 		parameters.put("Name", "value2");
-
-		Map<String, List<String>> expected = new HashMap<String, List<String>>();
-		expected.put("NAME", Arrays.asList("value1", "value2"));
-		assertEquals(expected, parameters.getMap());
 
 		assertEquals(Arrays.asList("value1", "value2"), parameters.get("Name"));
 
@@ -80,9 +76,9 @@ public class VObjectParametersTest {
 		assertEquals(Arrays.asList("value1"), parameters.replace("name1", "value2"));
 		assertNull(parameters.replace("name2", "value3"));
 
-		Map<String, List<String>> expected = new HashMap<String, List<String>>();
-		expected.put("NAME1", Arrays.asList("value2"));
-		expected.put("NAME2", Arrays.asList("value3"));
+		Map<LaciToken, List<String>> expected = new HashMap<LaciToken, List<String>>();
+		expected.put(new LaciToken("NAME1"), Arrays.asList("value2"));
+		expected.put(new LaciToken("NAME2"), Arrays.asList("value3"));
 		assertEquals(expected, parameters.getMap());
 	}
 
@@ -94,15 +90,15 @@ public class VObjectParametersTest {
 		assertEquals(Arrays.asList("value1"), parameters.replaceAll("name1", "value2", "value3"));
 		assertNull(parameters.replaceAll("name2", "value4", "value5"));
 
-		Map<String, List<String>> expected = new HashMap<String, List<String>>();
-		expected.put("NAME1", Arrays.asList("value2", "value3"));
-		expected.put("NAME2", Arrays.asList("value4", "value5"));
+		Map<LaciToken, List<String>> expected = new HashMap<LaciToken, List<String>>();
+		expected.put(new LaciToken("NAME1"), Arrays.asList("value2", "value3"));
+		expected.put(new LaciToken("NAME2"), Arrays.asList("value4", "value5"));
 		assertEquals(expected, parameters.getMap());
 
 		assertEquals(Arrays.asList("value2", "value3"), parameters.replaceAll("name1"));
 
-		expected = new HashMap<String, List<String>>();
-		expected.put("NAME2", Arrays.asList("value4", "value5"));
+		expected = new HashMap<LaciToken, List<String>>();
+		expected.put(new LaciToken("NAME2"), Arrays.asList("value4", "value5"));
 		assertEquals(expected, parameters.getMap());
 	}
 
@@ -118,9 +114,9 @@ public class VObjectParametersTest {
 		assertFalse(parameters.remove("name3", "value1"));
 		assertTrue(parameters.remove("name2", "value1"));
 
-		Map<String, List<String>> expected = new HashMap<String, List<String>>();
-		expected.put("NAME1", Arrays.<String> asList());
-		expected.put("NAME2", Arrays.asList("value2"));
+		Map<LaciToken, List<String>> expected = new HashMap<LaciToken, List<String>>();
+		expected.put(new LaciToken("NAME1"), Arrays.<String> asList());
+		expected.put(new LaciToken("NAME2"), Arrays.asList("value2"));
 		assertEquals(expected, parameters.getMap());
 	}
 
@@ -158,11 +154,11 @@ public class VObjectParametersTest {
 		assertFalse(parameters.isQuotedPrintable());
 
 		parameters.clear();
-		parameters.put(null, "QUOTED-PRINTABLE");
+		parameters.put((String) null, "QUOTED-PRINTABLE");
 		assertTrue(parameters.isQuotedPrintable());
 
 		parameters.clear();
-		parameters.put(null, "quoted-printable");
+		parameters.put((String) null, "quoted-printable");
 		assertTrue(parameters.isQuotedPrintable());
 
 		parameters.clear();
@@ -174,7 +170,7 @@ public class VObjectParametersTest {
 		assertTrue(parameters.isQuotedPrintable());
 
 		parameters.clear();
-		parameters.putAll(null, "foo", "QUOTED-PRINTABLE");
+		parameters.putAll((String) null, "foo", "QUOTED-PRINTABLE");
 		assertTrue(parameters.isQuotedPrintable());
 
 		parameters.clear();

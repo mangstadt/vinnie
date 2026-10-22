@@ -33,11 +33,11 @@ import com.github.mangstadt.vinnie.io.Warning;
  * @author Michael Angstadt
  */
 public class DebugDataListener implements VObjectDataListener {
-	public void onComponentBegin(String name, Context context) {
+	public void onComponentBegin(LaciToken name, Context context) {
 		System.out.println("onComponentBegin(\"" + name + "\", " + context + ")");
 	}
 
-	public void onComponentEnd(String name, Context context) {
+	public void onComponentEnd(LaciToken name, Context context) {
 		System.out.println("onComponentEnd(\"" + name + "\", " + context + ")");
 	}
 

@@ -33,6 +33,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.github.mangstadt.vinnie.LaciToken;
+
 /**
  * Contains utility methods for parsing and writing property values.
  * @author Michael Angstadt
@@ -539,8 +541,8 @@ public final class VObjectPropertyValues {
 	 * </p>
 	 * <p>
 	 * Multimap values are collections of key/value pairs whose keys can be
-	 * multi-valued. Key/value pairs are separated by semicolons. Values are
-	 * separated by commas. Keys are converted to uppercase.
+	 * multi-valued. Keys are case-insensitive. Key/value pairs are separated by
+	 * semicolons. Values are separated by commas.
 	 * </p>
 	 * <p>
 	 * <b>Example:</b>
@@ -548,23 +550,23 @@ public final class VObjectPropertyValues {
 	 * 
 	 * <pre class="brush:java">
 	 * String value = "one=two;THREE=four,five\\,six\\;seven";
-	 * Map&lt;String, List&lt;String&gt;&gt; multimap = VObjectPropertyValues.parseMultimap(value);
-	 * Map&lt;String, List&lt;String&gt;&gt; expected = new HashMap&lt;String, List&lt;String&gt;&gt;();
-	 * expected.put("ONE", Arrays.asList("two"));
-	 * expected.put("THREE", Arrays.asList("four", "five,six;seven"));
+	 * Map&lt;LaciString, List&lt;String&gt;&gt; multimap = VObjectPropertyValues.parseMultimap(value);
+	 * Map&lt;LaciString, List&lt;String&gt;&gt; expected = new HashMap&lt;LaciString, List&lt;String&gt;&gt;();
+	 * expected.put(new LaciString("ONE"), Arrays.asList("two"));
+	 * expected.put(new LaciString("THREE"), Arrays.asList("four", "five,six;seven"));
 	 * assertEquals(expected, multimap);
 	 * </pre>
 	 * 
 	 * @param value the value to parse
 	 * @return the parsed values
 	 */
-	public static Map<String, List<String>> parseMultimap(String value) {
+	public static Map<LaciToken, List<String>> parseMultimap(String value) {
 		if (value.isEmpty()) {
-			return new HashMap<String, List<String>>(0); //return a mutable map
+			return new HashMap<LaciToken, List<String>>(0); //return a mutable map
 		}
 
-		Map<String, List<String>> multimap = new LinkedHashMap<String, List<String>>();
-		String curName = null;
+		Map<LaciToken, List<String>> multimap = new LinkedHashMap<LaciToken, List<String>>();
+		LaciToken curName = null;
 		List<String> curValues = new ArrayList<String>();
 
 		boolean escaped = false;
@@ -580,7 +582,7 @@ public final class VObjectPropertyValues {
 			switch (c) {
 			case ';':
 				if (curName == null) {
-					curName = unescape(value, cursor, i).toUpperCase();
+					curName = new LaciToken(unescape(value, cursor, i));
 				} else {
 					curValues.add(unescape(value, cursor, i));
 				}
@@ -603,7 +605,7 @@ public final class VObjectPropertyValues {
 				break;
 			case '=':
 				if (curName == null) {
-					curName = unescape(value, cursor, i).toUpperCase();
+					curName = new LaciToken(unescape(value, cursor, i));
 					cursor = i + 1;
 				}
 				break;
@@ -618,7 +620,7 @@ public final class VObjectPropertyValues {
 		}
 
 		if (curName == null) {
-			curName = unescape(value, cursor, value.length()).toUpperCase();
+			curName = new LaciToken(unescape(value, cursor, value.length()));
 		} else {
 			curValues.add(unescape(value, cursor, value.length()));
 		}
@@ -644,8 +646,8 @@ public final class VObjectPropertyValues {
 	 * </p>
 	 * <p>
 	 * Multimap values are collections of key/value pairs whose keys can be
-	 * multi-valued. Key/value pairs are separated by semicolons. Values are
-	 * separated by commas. Keys are converted to uppercase.
+	 * multi-valued. Keys are case-insensitive. Key/value pairs are separated by
+	 * semicolons. Values are separated by commas.
 	 * </p>
 	 * <p>
 	 * Each value's {@code toString()} method is called to generate its string
@@ -656,9 +658,9 @@ public final class VObjectPropertyValues {
 	 * </p>
 	 * 
 	 * <pre class="brush:java">
-	 * Map&lt;String, List&lt;?&gt;&gt; input = new LinkedHashMap&lt;String, List&lt;?&gt;&gt;();
-	 * input.put("one", Arrays.asList("two"));
-	 * input.put("THREE", Arrays.asList("four", "five,six;seven"));
+	 * Map&lt;LaciString, List&lt;?&gt;&gt; input = new LinkedHashMap&lt;LaciString, List&lt;?&gt;&gt;();
+	 * input.put(new LaciString("one"), Arrays.asList("two"));
+	 * input.put(new LaciString("THREE"), Arrays.asList("four", "five,six;seven"));
 	 * 
 	 * String value = VObjectPropertyValues.writeMultimap(input);
 	 * assertEquals("ONE=two;THREE=four,five\\,six\\;seven", value);
@@ -667,10 +669,10 @@ public final class VObjectPropertyValues {
 	 * @param multimap the multimap to write
 	 * @return the multimap value string
 	 */
-	public static String writeMultimap(Map<String, ? extends List<?>> multimap) {
+	public static String writeMultimap(Map<LaciToken, ? extends List<?>> multimap) {
 		StringBuilder sb = new StringBuilder();
 		boolean firstKey = true;
-		for (Map.Entry<String, ? extends List<?>> entry : multimap.entrySet()) {
+		for (Map.Entry<LaciToken, ? extends List<?>> entry : multimap.entrySet()) {
 			if (!firstKey) {
 				sb.append(';');
 			}

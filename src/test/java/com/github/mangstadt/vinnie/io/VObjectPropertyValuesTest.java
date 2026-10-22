@@ -40,6 +40,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import com.github.mangstadt.vinnie.LaciToken;
 import com.github.mangstadt.vinnie.io.VObjectPropertyValues.SemiStructuredValueBuilder;
 import com.github.mangstadt.vinnie.io.VObjectPropertyValues.SemiStructuredValueIterator;
 import com.github.mangstadt.vinnie.io.VObjectPropertyValues.StructuredValueBuilder;
@@ -211,13 +212,13 @@ public class VObjectPropertyValuesTest {
 
 	@Test
 	public void parseMultimap() {
-		Map<String, List<String>> actual = VObjectPropertyValues.parseMultimap("one=two;;ONE=two;THREE;FOUR=five,six\\,seven\\;eight;NINE=;TEN=eleven=twelve");
-		Map<String, List<String>> expected = new HashMap<String, List<String>>();
-		expected.put("ONE", Arrays.asList("two", "two"));
-		expected.put("THREE", Arrays.asList(""));
-		expected.put("FOUR", Arrays.asList("five", "six,seven;eight"));
-		expected.put("NINE", Arrays.asList(""));
-		expected.put("TEN", Arrays.asList("eleven=twelve"));
+		Map<LaciToken, List<String>> actual = VObjectPropertyValues.parseMultimap("ONE=two;one=two;;ONE=two;THREE;FOUR=five,six\\,seven\\;eight;NINE=;TEN=eleven=twelve");
+		Map<LaciToken, List<String>> expected = new HashMap<LaciToken, List<String>>();
+		expected.put(new LaciToken("ONE"), Arrays.asList("two", "two", "two"));
+		expected.put(new LaciToken("THREE"), Arrays.asList(""));
+		expected.put(new LaciToken("FOUR"), Arrays.asList("five", "six,seven;eight"));
+		expected.put(new LaciToken("NINE"), Arrays.asList(""));
+		expected.put(new LaciToken("TEN"), Arrays.asList("eleven=twelve"));
 		assertEquals(expected, actual);
 
 		actual = VObjectPropertyValues.parseMultimap("");
@@ -226,12 +227,12 @@ public class VObjectPropertyValuesTest {
 
 	@Test
 	public void writeMultimap() {
-		Map<String, List<String>> input = new LinkedHashMap<String, List<String>>();
-		input.put("A", asList("one"));
-		input.put("B", asList("two", "three,four;five", null));
-		input.put("C", asList(""));
-		input.put("d", asList("six=seven"));
-		input.put("E", Arrays.<String> asList());
+		Map<LaciToken, List<String>> input = new LinkedHashMap<LaciToken, List<String>>();
+		input.put(new LaciToken("A"), asList("one"));
+		input.put(new LaciToken("B"), asList("two", "three,four;five", null));
+		input.put(new LaciToken("C"), asList(""));
+		input.put(new LaciToken("d"), asList("six=seven"));
+		input.put(new LaciToken("E"), Arrays.<String> asList());
 
 		String expected = "A=one;B=two,three\\,four\\;five,null;C=;D=six=seven;E";
 		String actual = VObjectPropertyValues.writeMultimap(input);

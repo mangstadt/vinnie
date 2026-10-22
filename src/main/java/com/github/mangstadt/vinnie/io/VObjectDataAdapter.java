@@ -24,6 +24,7 @@
 
 package com.github.mangstadt.vinnie.io;
 
+import com.github.mangstadt.vinnie.LaciToken;
 import com.github.mangstadt.vinnie.VObjectProperty;
 
 /**
@@ -31,11 +32,11 @@ import com.github.mangstadt.vinnie.VObjectProperty;
  * @author Michael Angstadt
  */
 public class VObjectDataAdapter implements VObjectDataListener {
-	public void onComponentBegin(String name, Context context) {
+	public void onComponentBegin(LaciToken name, Context context) {
 		//empty
 	}
 
-	public void onComponentEnd(String name, Context context) {
+	public void onComponentEnd(LaciToken name, Context context) {
 		//empty
 	}
 

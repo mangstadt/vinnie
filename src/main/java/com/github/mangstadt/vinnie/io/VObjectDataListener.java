@@ -24,6 +24,7 @@
 
 package com.github.mangstadt.vinnie.io;
 
+import com.github.mangstadt.vinnie.LaciToken;
 import com.github.mangstadt.vinnie.VObjectProperty;
 
 /**
@@ -36,10 +37,10 @@ public interface VObjectDataListener {
 	/**
 	 * Called when a component begins (in other words, when a BEGIN property is
 	 * encountered).
-	 * @param name the component name (will always be in uppercase)
+	 * @param name the component name
 	 * @param context the parse context
 	 */
-	void onComponentBegin(String name, Context context);
+	void onComponentBegin(LaciToken name, Context context);
 
 	/**
 	 * <p>
@@ -82,10 +83,10 @@ public interface VObjectDataListener {
 	 * <li>onWarning(): UNMATCHED_END</li>
 	 * <li>onWarning(): UNMATCHED_END</li>
 	 * </ol>
-	 * @param name the component name (will always be in uppercase)
+	 * @param name the component name
 	 * @param context the parse context
 	 */
-	void onComponentEnd(String name, Context context);
+	void onComponentEnd(LaciToken name, Context context);
 
 	/**
 	 * Called when a property is read.

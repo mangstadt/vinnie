@@ -27,6 +27,7 @@ package com.github.mangstadt.vinnie.io;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.github.mangstadt.vinnie.LaciToken;
 import com.github.mangstadt.vinnie.SyntaxStyle;
 
 /**
@@ -36,7 +37,7 @@ import com.github.mangstadt.vinnie.SyntaxStyle;
  */
 public class SyntaxRules {
 	private SyntaxStyle defaultSyntaxStyle;
-	private final Map<String, Map<String, SyntaxStyle>> syntaxRules = new HashMap<String, Map<String, SyntaxStyle>>();
+	private final Map<LaciToken, Map<String, SyntaxStyle>> syntaxRules = new HashMap<LaciToken, Map<String, SyntaxStyle>>();
 
 	/**
 	 * Creates a new set of syntax rules.
@@ -70,10 +71,7 @@ public class SyntaxRules {
 	 * @param component the component name (e.g. "VCARD")
 	 * @return true if this component has syntax rules, false if not
 	 */
-	public boolean hasSyntaxRules(String component) {
-		if (component != null) {
-			component = component.toUpperCase();
-		}
+	public boolean hasSyntaxRules(LaciToken component) {
 		return syntaxRules.containsKey(component);
 	}
 
@@ -84,8 +82,7 @@ public class SyntaxRules {
 	 * "2.1")
 	 * @return the syntax style or null if none was found
 	 */
-	public SyntaxStyle getSyntaxStyle(String component, String versionValue) {
-		component = (component == null) ? null : component.toUpperCase();
+	public SyntaxStyle getSyntaxStyle(LaciToken component, String versionValue) {
 		Map<String, SyntaxStyle> rules = syntaxRules.get(component);
 		return (rules == null) ? null : rules.get(versionValue);
 	}
@@ -99,9 +96,7 @@ public class SyntaxRules {
 	 * @param syntaxStyle the syntax style to use when a VERSION property with
 	 * the given value, and under the given component, is encountered
 	 */
-	public void addRule(String component, String version, SyntaxStyle syntaxStyle) {
-		component = (component == null) ? null : component.toUpperCase();
-
+	public void addRule(LaciToken component, String version, SyntaxStyle syntaxStyle) {
 		Map<String, SyntaxStyle> rules = syntaxRules.get(component);
 		if (rules == null) {
 			rules = new HashMap<String, SyntaxStyle>();
@@ -125,7 +120,7 @@ public class SyntaxRules {
 		 * at the very beginning.
 		 */
 		SyntaxRules rules = new SyntaxRules(SyntaxStyle.OLD);
-		String component = "VCALENDAR";
+		LaciToken component = new LaciToken("VCALENDAR");
 		rules.addRule(component, "1.0", SyntaxStyle.OLD);
 		rules.addRule(component, "2.0", SyntaxStyle.NEW);
 		return rules;
@@ -145,7 +140,7 @@ public class SyntaxRules {
 		 * beginning.
 		 */
 		SyntaxRules rules = new SyntaxRules(SyntaxStyle.OLD);
-		String component = "VCARD";
+		LaciToken component = new LaciToken("VCARD");
 		rules.addRule(component, "2.1", SyntaxStyle.OLD);
 		rules.addRule(component, "3.0", SyntaxStyle.NEW);
 		rules.addRule(component, "4.0", SyntaxStyle.NEW);

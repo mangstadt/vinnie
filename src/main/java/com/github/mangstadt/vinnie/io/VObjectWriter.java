@@ -34,6 +34,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
+import com.github.mangstadt.vinnie.LaciToken;
 import com.github.mangstadt.vinnie.SyntaxStyle;
 import com.github.mangstadt.vinnie.VObjectParameters;
 import com.github.mangstadt.vinnie.VObjectProperty;
@@ -518,8 +519,8 @@ public class VObjectWriter implements Closeable, Flushable {
 		writer.append(name);
 
 		//write the parameters
-		for (Map.Entry<String, List<String>> parameter : parameters) {
-			String parameterName = parameter.getKey();
+		for (Map.Entry<LaciToken, List<String>> parameter : parameters) {
+			LaciToken parameterName = parameter.getKey();
 			List<String> parameterValues = parameter.getValue();
 			if (parameterValues.isEmpty()) {
 				continue;
@@ -533,7 +534,7 @@ public class VObjectWriter implements Closeable, Flushable {
 
 					writer.append(';');
 					if (parameterName != null) {
-						writer.append(parameterName).append('=');
+						writer.append(parameterName.toUpperCase()).append('=');
 					}
 					writer.append(parameterValue);
 				}
@@ -542,7 +543,7 @@ public class VObjectWriter implements Closeable, Flushable {
 
 				writer.append(';');
 				if (parameterName != null) {
-					writer.append(parameterName).append('=');
+					writer.append(parameterName.toUpperCase()).append('=');
 				}
 
 				boolean first = true;
@@ -609,13 +610,13 @@ public class VObjectWriter implements Closeable, Flushable {
 	}
 	
 	private void validateParameters(String name, VObjectParameters parameters) {
-		for (Map.Entry<String, List<String>> parameter : parameters) {
+		for (Map.Entry<LaciToken, List<String>> parameter : parameters) {
 			//validate the parameter name
-			String parameterName = parameter.getKey();
+			LaciToken parameterName = parameter.getKey();
 			if (parameterName == null && syntaxStyle == SyntaxStyle.NEW) {
 				throw new IllegalArgumentException("Property \"" + name + "\" has a parameter whose name is null. This is not permitted with new style syntax.");
 			}
-			if (parameterName != null && !allowedParameterNameChars.check(parameterName)) {
+			if (parameterName != null && !allowedParameterNameChars.check(parameterName.toUpperCase())) {
 				throw new IllegalArgumentException("Property \"" + name + "\" has a parameter named \"" + parameterName + "\".  This parameter's name contains one or more invalid characters.  The following characters are not permitted: " + allowedParameterNameChars.flip());
 			}
 

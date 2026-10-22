@@ -36,33 +36,26 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * A simple multimap implementation for holding the parameters of a
- * {@link VObjectProperty}. Enforces case-insensitivity of parameter names by
- * converting them to uppercase.
+ * A multimap implementation for holding the parameters of a
+ * {@link VObjectProperty}.
  * @author Michael Angstadt
  */
-public class VObjectParameters implements Iterable<Map.Entry<String, List<String>>> {
-	private final Map<String, List<String>> multimap;
+public class VObjectParameters implements Iterable<Map.Entry<LaciToken, List<String>>> {
+	private final Map<LaciToken, List<String>> multimap;
 
 	/**
 	 * Creates an empty list of parameters.
 	 */
 	public VObjectParameters() {
-		multimap = new LinkedHashMap<String, List<String>>(); //preserve insertion order of keys
+		multimap = new LinkedHashMap<LaciToken, List<String>>(); //preserve insertion order of keys
 	}
 
 	/**
-	 * <p>
 	 * Creates a list of parameters backed by the given map. Any changes made to
 	 * the given map will effect the parameter list and vice versa.
-	 * </p>
-	 * <p>
-	 * If the given map is not empty, care should be taken to ensure that all of
-	 * its keys are in uppercase before passing it into this constructor.
-	 * </p>
 	 * @param map the map
 	 */
-	public VObjectParameters(Map<String, List<String>> map) {
+	public VObjectParameters(Map<LaciToken, List<String>> map) {
 		multimap = map;
 	}
 
@@ -72,8 +65,8 @@ public class VObjectParameters implements Iterable<Map.Entry<String, List<String
 	 */
 	public VObjectParameters(VObjectParameters original) {
 		this();
-		for (Map.Entry<String, List<String>> entry : original) {
-			String name = entry.getKey();
+		for (Map.Entry<LaciToken, List<String>> entry : original) {
+			LaciToken name = entry.getKey();
 			List<String> values = entry.getValue();
 			multimap.put(name, new ArrayList<String>(values));
 		}
@@ -81,37 +74,38 @@ public class VObjectParameters implements Iterable<Map.Entry<String, List<String
 
 	/**
 	 * Gets the values that are assigned to a key.
-	 * @param key the key
+	 * @param key the key or null for nameless values
 	 * @return the values or null if the key does not exist
 	 */
 	public List<String> get(String key) {
-		key = sanitizeKey(key);
-		return _get(key);
+		return get(LaciToken.create(key));
 	}
 
 	/**
-	 * @param key assumed to already be in uppercase
+	 * Gets the values that are assigned to a key.
+	 * @param key the key or null for nameless values
+	 * @return the values or null if the key does not exist
 	 */
-	private List<String> _get(String key) {
+	public List<String> get(LaciToken key) {
 		return multimap.get(key);
 	}
 
 	/**
 	 * Inserts a value.
-	 * @param key the key
+	 * @param key the key or null for nameless values
 	 * @param value the value to add
 	 */
 	public void put(String key, String value) {
-		key = sanitizeKey(key);
-		_put(key, value);
+		put(LaciToken.create(key), value);
 	}
 
 	/**
-	 * @param key assumed to already be in uppercase
+	 * Inserts a value.
+	 * @param key the key or null for nameless values
 	 * @param value the value to add
 	 */
-	private void _put(String key, String value) {
-		List<String> list = _get(key);
+	public void put(LaciToken key, String value) {
+		List<String> list = get(key);
 		if (list == null) {
 			list = new ArrayList<String>();
 			multimap.put(key, list);
@@ -121,23 +115,24 @@ public class VObjectParameters implements Iterable<Map.Entry<String, List<String
 
 	/**
 	 * Inserts multiple values.
-	 * @param key the key
+	 * @param key the key or null for nameless values
 	 * @param values the values to add
 	 */
 	public void putAll(String key, String... values) {
-		if (values.length == 0) {
-			return;
-		}
-		key = sanitizeKey(key);
-		_putAll(key, values);
+		putAll(LaciToken.create(key), values);
 	}
 
 	/**
-	 * @param key assumed to already be in uppercase
+	 * Inserts multiple values.
+	 * @param key the key or null for nameless values
 	 * @param values the values to add
 	 */
-	private void _putAll(String key, String... values) {
-		List<String> list = _get(key);
+	public void putAll(LaciToken key, String... values) {
+		if (values.length == 0) {
+			return;
+		}
+
+		List<String> list = get(key);
 		if (list == null) {
 			list = new ArrayList<String>();
 			multimap.put(key, list);
@@ -147,57 +142,86 @@ public class VObjectParameters implements Iterable<Map.Entry<String, List<String
 
 	/**
 	 * Replaces all the values of the given key with the given value.
-	 * @param key the key
+	 * @param key the key or null for nameless values
 	 * @param value the value
 	 * @return the replaced values or null if the key didn't exist
 	 */
 	public List<String> replace(String key, String value) {
-		key = sanitizeKey(key);
-		List<String> replaced = _removeAll(key);
-		_put(key, value);
+		return replace(LaciToken.create(key), value);
+	}
+
+	/**
+	 * Replaces all the values of the given key with the given value.
+	 * @param key the key or null for nameless values
+	 * @param value the value
+	 * @return the replaced values or null if the key didn't exist
+	 */
+	public List<String> replace(LaciToken key, String value) {
+		List<String> replaced = removeAll(key);
+		put(key, value);
 		return replaced;
 	}
 
 	/**
 	 * Replaces all the values of the given key with the given values.
-	 * @param key the key
+	 * @param key the key or null for nameless values
 	 * @param values the values
 	 * @return the replaced values or null if the key didn't exist
 	 */
 	public List<String> replaceAll(String key, String... values) {
-		key = sanitizeKey(key);
-		List<String> replaced = _removeAll(key);
+		return replaceAll(LaciToken.create(key), values);
+	}
+
+	/**
+	 * Replaces all the values of the given key with the given values.
+	 * @param key the key or null for nameless values
+	 * @param values the values
+	 * @return the replaced values or null if the key didn't exist
+	 */
+	public List<String> replaceAll(LaciToken key, String... values) {
+		List<String> replaced = removeAll(key);
 		if (values.length > 0) {
-			_putAll(key, values);
+			putAll(key, values);
 		}
 		return replaced;
 	}
 
 	/**
 	 * Removes a value.
-	 * @param key the key
+	 * @param key the key or null for nameless values
 	 * @param value the value to remove
 	 * @return true if the value was found, false if not
 	 */
 	public boolean remove(String key, String value) {
+		return remove(LaciToken.create(key), value);
+	}
+
+	/**
+	 * Removes a value.
+	 * @param key the key or null for nameless values
+	 * @param value the value to remove
+	 * @return true if the value was found, false if not
+	 */
+	public boolean remove(LaciToken key, String value) {
 		List<String> values = get(key);
 		return (values == null) ? false : values.remove(value);
 	}
 
 	/**
 	 * Removes all values associated with a key, along with the key itself.
-	 * @param key the key
+	 * @param key the key or null for nameless values
 	 * @return the removed values or null if the key didn't exist
 	 */
 	public List<String> removeAll(String key) {
-		key = sanitizeKey(key);
-		return _removeAll(key);
+		return removeAll(LaciToken.create(key));
 	}
 
 	/**
-	 * @param key assumed to already be in uppercase
+	 * Removes all values associated with a key, along with the key itself.
+	 * @param key the key or null for nameless values
+	 * @return the removed values or null if the key didn't exist
 	 */
-	private List<String> _removeAll(String key) {
+	public List<String> removeAll(LaciToken key) {
 		return multimap.remove(key);
 	}
 
@@ -210,10 +234,19 @@ public class VObjectParameters implements Iterable<Map.Entry<String, List<String
 
 	/**
 	 * Gets the first value assigned to the given key.
-	 * @param key the key
+	 * @param key the key or null for nameless values
 	 * @return the value or null if the given key does not have any values
 	 */
 	public String first(String key) {
+		return first(LaciToken.create(key));
+	}
+
+	/**
+	 * Gets the first value assigned to the given key.
+	 * @param key the key or null for nameless values
+	 * @return the value or null if the given key does not have any values
+	 */
+	public String first(LaciToken key) {
 		List<String> values = get(key);
 		return (values == null || values.isEmpty()) ? null : values.get(0);
 	}
@@ -224,7 +257,7 @@ public class VObjectParameters implements Iterable<Map.Entry<String, List<String
 	 */
 	public boolean isQuotedPrintable() {
 		for (String key : new String[] { "ENCODING", null }) {
-			List<String> values = _get(key);
+			List<String> values = get(key);
 			if (values == null) {
 				continue;
 			}
@@ -256,7 +289,7 @@ public class VObjectParameters implements Iterable<Map.Entry<String, List<String
 	 * Gets the map that backs this parameters list.
 	 * @return the map
 	 */
-	public Map<String, List<String>> getMap() {
+	public Map<LaciToken, List<String>> getMap() {
 		return multimap;
 	}
 
@@ -264,18 +297,8 @@ public class VObjectParameters implements Iterable<Map.Entry<String, List<String
 	 * Creates an iterator over all the parameters (for use in foreach loops).
 	 * @return the iterator
 	 */
-	public Iterator<Entry<String, List<String>>> iterator() {
+	public Iterator<Entry<LaciToken, List<String>>> iterator() {
 		return multimap.entrySet().iterator();
-	}
-
-	/**
-	 * Converts the given key to uppercase. Call this method before passing a
-	 * key to the multimap.
-	 * @param key the key
-	 * @return the sanitized key
-	 */
-	private String sanitizeKey(String key) {
-		return (key == null) ? null : key.toUpperCase();
 	}
 
 	@Override

@@ -27,6 +27,8 @@ package com.github.mangstadt.vinnie.io;
 import java.util.Collections;
 import java.util.List;
 
+import com.github.mangstadt.vinnie.LaciToken;
+
 /**
  * Contains information related to the status of a parse operation, such as the
  * parent component hierarchy and line number.
@@ -34,21 +36,21 @@ import java.util.List;
  * @see VObjectDataListener
  */
 public class Context {
-	final List<String> parentComponents;
+	final List<LaciToken> parentComponents;
 	final Buffer unfoldedLine = new Buffer();
 	int lineNumber = 1;
 	boolean stop = false;
 
-	Context(List<String> parentComponents) {
+	Context(List<LaciToken> parentComponents) {
 		this.parentComponents = Collections.unmodifiableList(parentComponents);
 	}
 
 	/**
 	 * Gets the hierarchy of parent components the parser is currently inside
 	 * of, starting with the outer-most component.
-	 * @return the component names (in uppercase; this list is immutable)
+	 * @return the component names (this list is immutable)
 	 */
-	public List<String> getParentComponents() {
+	public List<LaciToken> getParentComponents() {
 		return parentComponents;
 	}
 
