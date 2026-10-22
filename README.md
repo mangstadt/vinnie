@@ -99,7 +99,7 @@ END:VCARD
  * Automatic decoding/encoding of quoted-printable data.
  * Streaming API.
  * Extensive unit test coverage.
- * Low Java version requirement (1.5 or above).
+ * Low Java version requirement (1.6 or above).
  * No dependencies on external libraries.
 
 # Maven/Gradle
