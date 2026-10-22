@@ -25,6 +25,7 @@
 package com.github.mangstadt.vinnie.io;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import com.github.mangstadt.vinnie.SyntaxStyle;
@@ -72,7 +73,7 @@ public class SyntaxRules {
 	 */
 	public boolean hasSyntaxRules(String component) {
 		if (component != null) {
-			component = component.toUpperCase();
+			component = component.toUpperCase(Locale.ROOT);
 		}
 		return syntaxRules.containsKey(component);
 	}
@@ -85,7 +86,7 @@ public class SyntaxRules {
 	 * @return the syntax style or null if none was found
 	 */
 	public SyntaxStyle getSyntaxStyle(String component, String versionValue) {
-		component = (component == null) ? null : component.toUpperCase();
+		component = (component == null) ? null : component.toUpperCase(Locale.ROOT);
 		Map<String, SyntaxStyle> rules = syntaxRules.get(component);
 		return (rules == null) ? null : rules.get(versionValue);
 	}
@@ -100,7 +101,7 @@ public class SyntaxRules {
 	 * the given value, and under the given component, is encountered
 	 */
 	public void addRule(String component, String version, SyntaxStyle syntaxStyle) {
-		component = (component == null) ? null : component.toUpperCase();
+		component = (component == null) ? null : component.toUpperCase(Locale.ROOT);
 
 		Map<String, SyntaxStyle> rules = syntaxRules.get(component);
 		if (rules == null) {

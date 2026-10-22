@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -580,7 +581,7 @@ public final class VObjectPropertyValues {
 			switch (c) {
 			case ';':
 				if (curName == null) {
-					curName = unescape(value, cursor, i).toUpperCase();
+					curName = unescape(value, cursor, i).toUpperCase(Locale.ROOT);
 				} else {
 					curValues.add(unescape(value, cursor, i));
 				}
@@ -603,7 +604,7 @@ public final class VObjectPropertyValues {
 				break;
 			case '=':
 				if (curName == null) {
-					curName = unescape(value, cursor, i).toUpperCase();
+					curName = unescape(value, cursor, i).toUpperCase(Locale.ROOT);
 					cursor = i + 1;
 				}
 				break;
@@ -618,7 +619,7 @@ public final class VObjectPropertyValues {
 		}
 
 		if (curName == null) {
-			curName = unescape(value, cursor, value.length()).toUpperCase();
+			curName = unescape(value, cursor, value.length()).toUpperCase(Locale.ROOT);
 		} else {
 			curValues.add(unescape(value, cursor, value.length()));
 		}
@@ -675,7 +676,7 @@ public final class VObjectPropertyValues {
 				sb.append(';');
 			}
 
-			String key = entry.getKey().toUpperCase();
+			String key = entry.getKey().toUpperCase(Locale.ROOT);
 			escape(key, true, sb);
 
 			List<?> values = entry.getValue();

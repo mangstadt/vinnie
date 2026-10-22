@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -275,7 +276,7 @@ public class VObjectParameters implements Iterable<Map.Entry<String, List<String
 	 * @return the sanitized key
 	 */
 	private String sanitizeKey(String key) {
-		return (key == null) ? null : key.toUpperCase();
+		return (key == null) ? null : key.toUpperCase(Locale.ROOT);
 	}
 
 	@Override

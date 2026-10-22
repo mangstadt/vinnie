@@ -36,6 +36,7 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import com.github.mangstadt.vinnie.SyntaxStyle;
 import com.github.mangstadt.vinnie.VObjectProperty;
@@ -421,7 +422,7 @@ public class VObjectReader implements Closeable {
 			 */
 
 			if ("BEGIN".equalsIgnoreCase(property.getName().trim())) {
-				String componentName = property.getValue().trim().toUpperCase();
+				String componentName = property.getValue().trim().toUpperCase(Locale.ROOT);
 				if (componentName.isEmpty()) {
 					listener.onWarning(Warning.EMPTY_BEGIN, null, null, context);
 					continue;
@@ -434,7 +435,7 @@ public class VObjectReader implements Closeable {
 			}
 
 			if ("END".equalsIgnoreCase(property.getName().trim())) {
-				String componentName = property.getValue().trim().toUpperCase();
+				String componentName = property.getValue().trim().toUpperCase(Locale.ROOT);
 				if (componentName.isEmpty()) {
 					listener.onWarning(Warning.EMPTY_END, null, null, context);
 					continue;
@@ -714,7 +715,7 @@ public class VObjectReader implements Closeable {
 
 				//set the parameter name
 				if (ch == '=' && curParamName == null) {
-					String paramName = buffer.getAndClear().toUpperCase();
+					String paramName = buffer.getAndClear().toUpperCase(Locale.ROOT);
 					if (syntax == SyntaxStyle.OLD) {
 						//old style allows whitespace to surround the "=", so remove it
 						paramName = rtrim(paramName);
