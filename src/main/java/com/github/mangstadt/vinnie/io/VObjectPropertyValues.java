@@ -24,6 +24,8 @@
 
 package com.github.mangstadt.vinnie.io;
 
+import static com.github.mangstadt.vinnie.Utils.NEWLINE;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,11 +42,6 @@ import com.github.mangstadt.vinnie.LaciToken;
  * @author Michael Angstadt
  */
 public final class VObjectPropertyValues {
-	/**
-	 * The local computer's newline character sequence.
-	 */
-	private static final String NEWLINE = System.getProperty("line.separator");
-
 	/**
 	 * <p>
 	 * Unescapes all escaped characters in a property value. Escaped newlines
@@ -75,6 +72,10 @@ public final class VObjectPropertyValues {
 	 * @return the unescaped substring
 	 */
 	private static String unescape(String string, int start, int end) {
+		/*
+		 * This lazily-created StringBuilder pattern is not encapsulated in a
+		 * reusable class because doing so makes it about 6% slower.
+		 */
 		StringBuilder sb = null;
 		boolean escaped = false;
 		for (int i = start; i < end; i++) {
@@ -88,19 +89,16 @@ public final class VObjectPropertyValues {
 					sb.append(string, start, i - 1);
 				}
 
-				switch (c) {
-				case 'n':
-				case 'N':
+				if (c == 'n' || c == 'N') {
 					sb.append(NEWLINE);
-					continue;
+				} else {
+					sb.append(c);
 				}
 
-				sb.append(c);
 				continue;
 			}
 
-			switch (c) {
-			case '\\':
+			if (c == '\\') {
 				escaped = true;
 				continue;
 			}
@@ -157,21 +155,17 @@ public final class VObjectPropertyValues {
 		StringBuilder sb = null;
 		for (int i = 0; i < value.length(); i++) {
 			char c = value.charAt(i);
-			switch (c) {
-			case '\\':
-			case ',':
-			case ';':
+
+			if (c == '\\' || c == ',' || c == ';') {
 				if (sb == null) {
 					sb = new StringBuilder(value.length() * 2);
 					sb.append(value, 0, i);
 				}
-				sb.append('\\').append(c);
-				break;
-			default:
-				if (sb != null) {
-					sb.append(c);
-				}
-				break;
+				sb.append('\\');
+			}
+
+			if (sb != null) {
+				sb.append(c);
 			}
 		}
 		return (sb == null) ? value : sb.toString();
@@ -565,79 +559,90 @@ public final class VObjectPropertyValues {
 			return new HashMap<LaciToken, List<String>>(0); //return a mutable map
 		}
 
-		Map<LaciToken, List<String>> multimap = new LinkedHashMap<LaciToken, List<String>>();
-		LaciToken curName = null;
-		List<String> curValues = new ArrayList<String>();
+		return new MultimapParser(value).parse();
+	}
 
-		boolean escaped = false;
-		int cursor = 0;
-		for (int i = 0; i < value.length(); i++) {
-			if (escaped) {
-				escaped = false;
-				continue;
-			}
+	private static class MultimapParser {
+		private final String value;
+		private final Map<LaciToken, List<String>> multimap = new LinkedHashMap<LaciToken, List<String>>();
+		private LaciToken curName = null;
+		private List<String> curValues = new ArrayList<String>();
+		private boolean escaped = false;
+		private int cursor = 0;
 
-			char c = value.charAt(i);
-
-			switch (c) {
-			case ';':
-				if (curName == null) {
-					curName = new LaciToken(unescape(value, cursor, i));
-				} else {
-					curValues.add(unescape(value, cursor, i));
-				}
-
-				if (curName.length() > 0) {
-					if (curValues.isEmpty()) {
-						curValues.add("");
-					}
-					List<String> existing = multimap.get(curName);
-					if (existing == null) {
-						multimap.put(curName, curValues);
-					} else {
-						existing.addAll(curValues);
-					}
-				}
-
-				curName = null;
-				curValues = new ArrayList<String>();
-				cursor = i + 1;
-				break;
-			case '=':
-				if (curName == null) {
-					curName = new LaciToken(unescape(value, cursor, i));
-					cursor = i + 1;
-				}
-				break;
-			case ',':
-				curValues.add(unescape(value, cursor, i));
-				cursor = i + 1;
-				break;
-			case '\\':
-				escaped = true;
-				break;
-			}
+		public MultimapParser(String value) {
+			this.value = value;
 		}
 
-		if (curName == null) {
-			curName = new LaciToken(unescape(value, cursor, value.length()));
-		} else {
-			curValues.add(unescape(value, cursor, value.length()));
+		public Map<LaciToken, List<String>> parse() {
+			for (int i = 0; i < value.length(); i++) {
+				if (escaped) {
+					escaped = false;
+					continue;
+				}
+
+				char c = value.charAt(i);
+
+				switch (c) {
+				case ';':
+					handleSemicolon(i);
+					break;
+				case '=':
+					handleEquals(i);
+					break;
+				case ',':
+					handleComma(i);
+					break;
+				case '\\':
+					escaped = true;
+					break;
+				}
+			}
+
+			handleEndValue(value.length());
+
+			return multimap;
 		}
 
-		if (curName.length() > 0) {
-			if (curValues.isEmpty()) {
-				curValues.add("");
-			}
-			List<String> existing = multimap.get(curName);
-			if (existing == null) {
-				multimap.put(curName, curValues);
+		private void handleSemicolon(int i) {
+			handleEndValue(i);
+
+			curName = null;
+			curValues = new ArrayList<String>();
+			cursor = i + 1;
+		}
+
+		private void handleEndValue(int i) {
+			if (curName == null) {
+				curName = new LaciToken(unescape(value, cursor, i));
 			} else {
-				existing.addAll(curValues);
+				curValues.add(unescape(value, cursor, i));
+			}
+
+			if (curName.length() > 0) {
+				if (curValues.isEmpty()) {
+					curValues.add("");
+				}
+				List<String> existing = multimap.get(curName);
+				if (existing == null) {
+					multimap.put(curName, curValues);
+				} else {
+					existing.addAll(curValues);
+				}
 			}
 		}
 
-		return multimap;
+		private void handleEquals(int i) {
+			if (curName == null) {
+				curName = new LaciToken(unescape(value, cursor, i));
+				cursor = i + 1;
+			}
+		}
+
+		private void handleComma(int i) {
+			curValues.add(unescape(value, cursor, i));
+			cursor = i + 1;
+		}
 	}
 
 	/**

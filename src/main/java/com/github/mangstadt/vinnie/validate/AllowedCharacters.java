@@ -122,40 +122,35 @@ public class AllowedCharacters {
 				continue;
 			}
 
-			String toPrint = null;
-
-			char c = (char) i;
-			switch (c) {
-			case ' ':
-				toPrint = "<space>";
-				break;
-			case '\r':
-				toPrint = "\\r";
-				break;
-			case '\n':
-				toPrint = "\\n";
-				break;
-			case '\t':
-				toPrint = "\\t";
-				break;
-			default:
-				if (i < 32 || i == 127) {
-					if (printableOnly) {
-						continue;
-					}
-					toPrint = "(" + i + ")";
-				}
+			if (printableOnly && !isPrintableChar(i)) {
+				continue;
 			}
 
-			sb.append(' ');
-			if (toPrint == null) {
-				sb.append(c);
-			} else {
-				sb.append(toPrint);
-			}
+			sb.append(' ').append(makeHumanReadable(i));
 		}
 		sb.append(" ]");
 		return sb.toString();
+	}
+
+	private boolean isPrintableChar(int i) {
+		return i >= 32 && i < 127;
+	}
+
+	private String makeHumanReadable(int i) {
+		char c = (char) i;
+
+		switch (c) {
+		case ' ':
+			return "<space>";
+		case '\r':
+			return "\\r";
+		case '\n':
+			return "\\n";
+		case '\t':
+			return "\\t";
+		default:
+			return isPrintableChar(i) ? Character.toString(c) : "(" + i + ")";
+		}
 	}
 
 	/**

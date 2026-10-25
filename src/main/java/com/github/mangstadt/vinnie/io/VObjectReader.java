@@ -24,6 +24,9 @@
 
 package com.github.mangstadt.vinnie.io;
 
+import static com.github.mangstadt.vinnie.Utils.NEWLINE;
+import static com.github.mangstadt.vinnie.Utils.isCRLF;
+import static com.github.mangstadt.vinnie.Utils.isCROrLF;
 import static com.github.mangstadt.vinnie.Utils.ltrim;
 import static com.github.mangstadt.vinnie.Utils.rtrim;
 
@@ -196,7 +199,6 @@ import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
  * @author Michael Angstadt
  */
 public class VObjectReader implements Closeable {
-	private static final String NEWLINE = System.getProperty("line.separator");
 	private static final LaciToken BEGIN = new LaciToken("BEGIN");
 	private static final LaciToken END = new LaciToken("END");
 	private static final LaciToken VERSION = new LaciToken("VERSION");
@@ -423,57 +425,78 @@ public class VObjectReader implements Closeable {
 			LaciToken propertyNameTrimmed = new LaciToken(property.getName().trim());
 
 			if (BEGIN.equals(propertyNameTrimmed)) {
-				LaciToken componentName = new LaciToken(property.getValue().trim());
-				if (componentName.isEmpty()) {
-					listener.onWarning(Warning.EMPTY_BEGIN, null, null, context);
-					continue;
-				}
-
-				listener.onComponentBegin(componentName, context);
-
-				stack.push(componentName);
+				handleBeginComponent(property, listener);
 				continue;
 			}
 
 			if (END.equals(propertyNameTrimmed)) {
-				LaciToken componentName = new LaciToken(property.getValue().trim());
-				if (componentName.isEmpty()) {
-					listener.onWarning(Warning.EMPTY_END, null, null, context);
-					continue;
-				}
-
-				//find the component that this END property matches up with
-				int popCount = stack.popCount(componentName);
-				if (popCount == 0) {
-					//END property does not match up with any BEGIN properties, so ignore
-					listener.onWarning(Warning.UNMATCHED_END, null, null, context);
-					continue;
-				}
-
-				while (popCount > 0) {
-					LaciToken poppedName = stack.pop();
-					listener.onComponentEnd(poppedName, context);
-					popCount--;
-				}
+				handleEndComponent(property, listener);
 				continue;
 			}
 
 			if (VERSION.equalsIgnoreCase(property.getName())) {
-				LaciToken parentComponent = stack.peekName();
-				if (syntaxRules.hasSyntaxRules(parentComponent)) {
-					SyntaxStyle style = syntaxRules.getSyntaxStyle(parentComponent, property.getValue());
-					if (style == null) {
-						listener.onWarning(Warning.UNKNOWN_VERSION, property, null, context);
-					} else {
-						listener.onVersion(property.getValue(), context);
-						stack.updateSyntax(style);
-						continue;
-					}
+				boolean versionProcessed = handleVersion(property, listener);
+				if (versionProcessed) {
+					continue;
 				}
 			}
 
 			listener.onProperty(property, context);
 		}
+	}
+
+	private void handleBeginComponent(VObjectProperty property, VObjectDataListener listener) {
+		LaciToken componentName = new LaciToken(property.getValue().trim());
+		if (componentName.isEmpty()) {
+			listener.onWarning(Warning.EMPTY_BEGIN, null, null, context);
+			return;
+		}
+
+		listener.onComponentBegin(componentName, context);
+
+		stack.push(componentName);
+	}
+
+	private void handleEndComponent(VObjectProperty property, VObjectDataListener listener) {
+		LaciToken componentName = new LaciToken(property.getValue().trim());
+		if (componentName.isEmpty()) {
+			listener.onWarning(Warning.EMPTY_END, null, null, context);
+			return;
+		}
+
+		//find the component that this END property matches up with
+		int popCount = stack.popCount(componentName);
+		if (popCount == 0) {
+			//END property does not match up with any BEGIN properties, so ignore
+			listener.onWarning(Warning.UNMATCHED_END, null, null, context);
+			return;
+		}
+
+		while (popCount > 0) {
+			LaciToken poppedName = stack.pop();
+			listener.onComponentEnd(poppedName, context);
+			popCount--;
+		}
+	}
+
+	/**
+	 * @return true if the property was a recognized VERSION value, false if not
+	 */
+	private boolean handleVersion(VObjectProperty property, VObjectDataListener listener) {
+		LaciToken parentComponent = stack.peekName();
+		if (!syntaxRules.hasSyntaxRules(parentComponent)) {
+			return false;
+		}
+
+		SyntaxStyle style = syntaxRules.getSyntaxStyle(parentComponent, property.getValue());
+		if (style == null) {
+			listener.onWarning(Warning.UNKNOWN_VERSION, property, null, context);
+			return false;
+		}
+
+		listener.onVersion(property.getValue(), context);
+		stack.updateSyntax(style);
+		return true;
 	}
 
 	/**
@@ -545,7 +568,7 @@ public class VObjectReader implements Closeable {
 
 			ch = (char) read;
 
-			if (prevChar == '\r' && ch == '\n') {
+			if (isCRLF(prevChar, ch)) {
 				/*
 				 * The newline was already processed when the "\r" character was
 				 * encountered, so ignore the accompanying "\n" character.
@@ -553,7 +576,7 @@ public class VObjectReader implements Closeable {
 				continue;
 			}
 
-			if (isNewline(ch)) {
+			if (isCROrLF(ch)) {
 				foldedQuotedPrintableLine = (inValue && prevChar == '=' && property.getParameters().isQuotedPrintable());
 				if (foldedQuotedPrintableLine) {
 					/*
@@ -571,7 +594,7 @@ public class VObjectReader implements Closeable {
 				continue;
 			}
 
-			if (isNewline(prevChar)) {
+			if (isCROrLF(prevChar)) {
 				if (isWhitespace(ch)) {
 					/*
 					 * This line is a continuation of the previous line (the
@@ -615,76 +638,23 @@ public class VObjectReader implements Closeable {
 				continue;
 			}
 
-			//decode escaped parameter value character
 			if (paramValueEscapeChar != 0) {
-				char escapeChar = paramValueEscapeChar;
+				unescapeAndAppendParamValueChar(paramValueEscapeChar, ch);
 				paramValueEscapeChar = 0;
-
-				switch (escapeChar) {
-				case '\\':
-					switch (ch) {
-					case '\\':
-						buffer.append(ch);
-						continue;
-					case ';':
-						/*
-						 * Semicolons can only be escaped in old style parameter
-						 * values. If a new style parameter value has
-						 * semicolons, the value should be surrounded in double
-						 * quotes.
-						 */
-						buffer.append(ch);
-						continue;
-					}
-					break;
-				case '^':
-					switch (ch) {
-					case '^':
-						buffer.append(ch);
-						continue;
-					case 'n':
-						buffer.append(NEWLINE);
-						continue;
-					case '\'':
-						buffer.append('"');
-						continue;
-					}
-					break;
-				}
-
-				/*
-				 * Treat the escape character as a normal character because it's
-				 * not a valid escape sequence.
-				 */
-				buffer.append(escapeChar).append(ch);
 				continue;
 			}
 
-			//check for a parameter value escape character
-			if (curParamName != null) {
-				switch (syntax) {
-				case OLD:
-					if (ch == '\\') {
-						paramValueEscapeChar = ch;
-						continue;
-					}
-					break;
-				case NEW:
-					if (ch == '^' && caretDecodingEnabled) {
-						paramValueEscapeChar = ch;
-						continue;
-					}
-					break;
-				}
+			if (isParamValueEscapeChar(curParamName, ch, syntax)) {
+				paramValueEscapeChar = ch;
+				continue;
 			}
 
-			//set the group
-			if (ch == '.' && property.getGroup() == null && property.getName() == null) {
+			if (isEndOfGroupName(ch, property)) {
 				property.setGroup(buffer.getAndClear());
 				continue;
 			}
 
-			if ((ch == ';' || ch == ':') && !inQuotes) {
+			if (isUnquotedSemicolonOrColon(ch, inQuotes)) {
 				if (property.getName() == null) {
 					//set the property name
 					property.setName(buffer.getAndClear());
@@ -706,30 +676,25 @@ public class VObjectReader implements Closeable {
 				continue;
 			}
 
-			if (property.getName() != null) {
-				//it's a multi-valued parameter
-				if (ch == ',' && curParamName != null && !inQuotes && syntax != SyntaxStyle.OLD) {
-					String paramValue = buffer.getAndClear();
-					property.getParameters().put(curParamName, paramValue);
-					continue;
-				}
+			if (isEndOfMultivaluedParamValue(property, ch, curParamName, inQuotes, syntax)) {
+				String paramValue = buffer.getAndClear();
+				property.getParameters().put(curParamName, paramValue);
+				continue;
+			}
 
-				//set the parameter name
-				if (ch == '=' && curParamName == null) {
-					String paramName = buffer.getAndClear();
-					if (syntax == SyntaxStyle.OLD) {
-						//old style allows whitespace to surround the "=", so remove it
-						paramName = rtrim(paramName);
-					}
-					curParamName = new LaciToken(paramName);
-					continue;
+			if (isEndOfParamName(property, ch, curParamName)) {
+				String paramName = buffer.getAndClear();
+				if (syntax == SyntaxStyle.OLD) {
+					//old style allows whitespace to surround the "=", so remove it
+					paramName = rtrim(paramName);
 				}
+				curParamName = new LaciToken(paramName);
+				continue;
+			}
 
-				//entering/leaving a double-quoted parameter value (new style only)
-				if (ch == '"' && curParamName != null && syntax != SyntaxStyle.OLD) {
-					inQuotes = !inQuotes;
-					continue;
-				}
+			if (isEnteringOrLeavingDoubleQuotedParamValue(property, ch, curParamName, syntax)) {
+				inQuotes = !inQuotes;
+				continue;
 			}
 
 			buffer.append(ch);
@@ -748,6 +713,81 @@ public class VObjectReader implements Closeable {
 		}
 
 		return property;
+	}
+
+	private void unescapeAndAppendParamValueChar(char escapeChar, char ch) {
+		switch (escapeChar) {
+		case '\\':
+			switch (ch) {
+			case '\\':
+				buffer.append(ch);
+				return;
+			case ';':
+				/*
+				 * Semicolons can only be escaped in old style parameter values.
+				 * If a new style parameter value has semicolons, the value
+				 * should be surrounded in double quotes.
+				 */
+				buffer.append(ch);
+				return;
+			}
+			break;
+		case '^':
+			switch (ch) {
+			case '^':
+				buffer.append(ch);
+				return;
+			case 'n':
+				buffer.append(NEWLINE);
+				return;
+			case '\'':
+				buffer.append('"');
+				return;
+			}
+			break;
+		}
+
+		/*
+		 * Treat the escape character as a normal character because it's not a
+		 * valid escape sequence.
+		 */
+		buffer.append(escapeChar).append(ch);
+	}
+
+	private boolean isParamValueEscapeChar(LaciToken curParamName, char ch, SyntaxStyle syntax) {
+		if (curParamName == null) {
+			//param name not read yet
+			return false;
+		}
+
+		switch (syntax) {
+		case OLD:
+			return (ch == '\\');
+		case NEW:
+			return (ch == '^' && caretDecodingEnabled);
+		}
+
+		return false;
+	}
+
+	private boolean isEndOfGroupName(char ch, VObjectProperty property) {
+		return ch == '.' && property.getGroup() == null && property.getName() == null;
+	}
+
+	private boolean isUnquotedSemicolonOrColon(char ch, boolean inQuotes) {
+		return (ch == ';' || ch == ':') && !inQuotes;
+	}
+
+	private boolean isEndOfMultivaluedParamValue(VObjectProperty property, char ch, LaciToken curParamName, boolean inQuotes, SyntaxStyle syntax) {
+		return property.getName() != null && ch == ',' && curParamName != null && !inQuotes && syntax != SyntaxStyle.OLD;
+	}
+
+	private boolean isEndOfParamName(VObjectProperty property, char ch, LaciToken curParamName) {
+		return property.getName() != null && ch == '=' && curParamName == null;
+	}
+
+	private boolean isEnteringOrLeavingDoubleQuotedParamValue(VObjectProperty property, char ch, LaciToken curParamName, SyntaxStyle syntax) {
+		return property.getName() != null && ch == '"' && curParamName != null && syntax != SyntaxStyle.OLD;
 	}
 
 	/**
@@ -814,15 +854,6 @@ public class VObjectReader implements Closeable {
 		}
 
 		return reader.read();
-	}
-
-	/**
-	 * Determines if the given character is a newline character.
-	 * @param ch the character
-	 * @return true if it's a newline character, false if not
-	 */
-	private static boolean isNewline(char ch) {
-		return ch == '\n' || ch == '\r';
 	}
 
 	/**

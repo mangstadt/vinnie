@@ -25,6 +25,8 @@
 package com.github.mangstadt.vinnie.io;
 
 import static com.github.mangstadt.vinnie.Utils.escapeNewlines;
+import static com.github.mangstadt.vinnie.Utils.isCRLF;
+import static com.github.mangstadt.vinnie.Utils.isCROrLF;
 
 import java.io.Closeable;
 import java.io.Flushable;
@@ -465,105 +467,18 @@ public class VObjectWriter implements Closeable, Flushable {
 		 */
 		validate(group, name, parameters);
 
-		parametersCopied = false;
+		CopyOnModify parametersWrapper = new CopyOnModify(parameters);
 
-		if (value == null) {
-			value = "";
-		}
+		value = sanitizeValue(parametersWrapper, value);
 
-		//sanitize value
-		switch (syntaxStyle) {
-		case OLD:
-			/*
-			 * Old style does not support the "\n" escape sequence so encode the
-			 * value in quoted-printable encoding if any newline characters
-			 * exist.
-			 */
-			if (containsNewlines(value) && !parameters.isQuotedPrintable()) {
-				parameters = copyParameters(parameters);
-				parameters.put("ENCODING", "QUOTED-PRINTABLE");
-			}
-			break;
-		case NEW:
-			value = escapeNewlines(value);
-			break;
-		}
+		boolean useQuotedPrintable = parametersWrapper.get().isQuotedPrintable();
+		Charset quotedPrintableCharset = useQuotedPrintable ? determineCharsetAndAddToParameters(parametersWrapper) : null;
 
-		/*
-		 * Determine if the property value must be encoded in quoted printable
-		 * encoding. If so, then determine what character set to use for the
-		 * encoding.
-		 */
-		boolean useQuotedPrintable = parameters.isQuotedPrintable();
-		Charset quotedPrintableCharset = null;
-		if (useQuotedPrintable) {
-			try {
-				quotedPrintableCharset = parameters.getCharset();
-			} catch (Exception e) {
-				//character set not recognized
-			}
+		writeGroup(group);
 
-			if (quotedPrintableCharset == null) {
-				quotedPrintableCharset = Charset.forName("UTF-8");
-				parameters = copyParameters(parameters);
-				parameters.replace("CHARSET", quotedPrintableCharset.name());
-			}
-		}
-
-		//write the group
-		if (group != null && !group.isEmpty()) {
-			writer.append(group).append('.');
-		}
-
-		//write the property name
 		writer.append(name);
 
-		//write the parameters
-		for (Map.Entry<LaciToken, List<String>> parameter : parameters) {
-			LaciToken parameterName = parameter.getKey();
-			List<String> parameterValues = parameter.getValue();
-			if (parameterValues.isEmpty()) {
-				continue;
-			}
-
-			if (syntaxStyle == SyntaxStyle.OLD) {
-				//e.g. ADR;TYPE=home;TYPE=work;TYPE=another,value:
-
-				for (String parameterValue : parameterValues) {
-					parameterValue = sanitizeOldStyleParameterValue(parameterValue);
-
-					writer.append(';');
-					if (parameterName != null) {
-						writer.append(parameterName.toUpperCase()).append('=');
-					}
-					writer.append(parameterValue);
-				}
-			} else {
-				//e.g. ADR;TYPE=home,work,"another,value":
-
-				writer.append(';');
-				if (parameterName != null) {
-					writer.append(parameterName.toUpperCase()).append('=');
-				}
-
-				boolean first = true;
-				for (String parameterValue : parameterValues) {
-					parameterValue = sanitizeNewStyleParameterValue(parameterValue);
-
-					if (!first) {
-						writer.append(',');
-					}
-
-					if (shouldQuoteParameterValue(parameterValue)) {
-						writer.append('"').append(parameterValue).append('"');
-					} else {
-						writer.append(parameterValue);
-					}
-
-					first = false;
-				}
-			}
-		}
+		writeParameters(parametersWrapper.get());
 
 		writer.append(':');
 		writer.write(value, useQuotedPrintable, quotedPrintableCharset);
@@ -583,12 +498,12 @@ public class VObjectWriter implements Closeable, Flushable {
 		validateName(name);
 		validateParameters(name, parameters);
 	}
-	
+
 	private void validateGroup(String group, String name) {
 		if (group == null) {
 			return;
 		}
-		
+
 		if (!allowedGroupChars.check(group)) {
 			throw new IllegalArgumentException("Property \"" + name + "\" has its group set to \"" + group + "\".  This group name contains one or more invalid characters.  The following characters are not permitted: " + allowedGroupChars.flip());
 		}
@@ -596,7 +511,7 @@ public class VObjectWriter implements Closeable, Flushable {
 			throw new IllegalArgumentException("Property \"" + name + "\" has its group set to \"" + group + "\".  This group name begins with one or more whitespace characters, which is not permitted.");
 		}
 	}
-	
+
 	private void validateName(String name) {
 		if (name.isEmpty()) {
 			throw new IllegalArgumentException("Property name cannot be empty.");
@@ -608,7 +523,7 @@ public class VObjectWriter implements Closeable, Flushable {
 			throw new IllegalArgumentException("Property name \"" + name + "\" begins with one or more whitespace characters, which is not permitted.");
 		}
 	}
-	
+
 	private void validateParameters(String name, VObjectParameters parameters) {
 		for (Map.Entry<LaciToken, List<String>> parameter : parameters) {
 			//validate the parameter name
@@ -630,6 +545,108 @@ public class VObjectWriter implements Closeable, Flushable {
 		}
 	}
 
+	private String sanitizeValue(CopyOnModify parameters, String value) {
+		if (value == null) {
+			value = "";
+		}
+
+		switch (syntaxStyle) {
+		case OLD:
+			/*
+			 * Old style does not support the "\n" escape sequence so encode the
+			 * value in quoted-printable encoding if any newline characters
+			 * exist.
+			 */
+			if (containsNewlines(value) && !parameters.get().isQuotedPrintable()) {
+				parameters.modify().put("ENCODING", "QUOTED-PRINTABLE");
+			}
+			break;
+		case NEW:
+			value = escapeNewlines(value);
+			break;
+		}
+
+		return value;
+	}
+
+	private Charset determineCharsetAndAddToParameters(CopyOnModify parameters) {
+		Charset quotedPrintableCharset = null;
+		try {
+			quotedPrintableCharset = parameters.get().getCharset();
+		} catch (Exception e) {
+			//character set not recognized
+		}
+
+		if (quotedPrintableCharset == null) {
+			quotedPrintableCharset = Charset.forName("UTF-8");
+			parameters.modify().replace("CHARSET", quotedPrintableCharset.name());
+		}
+
+		return quotedPrintableCharset;
+	}
+
+	private void writeGroup(String group) throws IOException {
+		if (group == null || group.isEmpty()) {
+			return;
+		}
+
+		writer.append(group).append('.');
+	}
+
+	private void writeParameters(VObjectParameters parameters) throws IOException {
+		for (Map.Entry<LaciToken, List<String>> parameter : parameters) {
+			LaciToken parameterName = parameter.getKey();
+			List<String> parameterValues = parameter.getValue();
+			if (parameterValues.isEmpty()) {
+				continue;
+			}
+
+			if (syntaxStyle == SyntaxStyle.OLD) {
+				//e.g. ADR;TYPE=home;TYPE=work;TYPE=another,value:
+				writeParameterOldStyle(parameterName, parameterValues);
+			} else {
+				//e.g. ADR;TYPE=home,work,"another,value":
+				writeParameterNewStyle(parameterName, parameterValues);
+			}
+		}
+	}
+
+	private void writeParameterOldStyle(LaciToken parameterName, List<String> parameterValues) throws IOException {
+		for (String parameterValue : parameterValues) {
+			parameterValue = sanitizeOldStyleParameterValue(parameterValue);
+
+			writer.append(';');
+			if (parameterName != null) {
+				writer.append(parameterName.toUpperCase()).append('=');
+			}
+			writer.append(parameterValue);
+		}
+	}
+
+	private void writeParameterNewStyle(LaciToken parameterName, List<String> parameterValues) throws IOException {
+		writer.append(';');
+		if (parameterName != null) {
+			writer.append(parameterName.toUpperCase()).append('=');
+		}
+
+		boolean first = true;
+		for (String parameterValue : parameterValues) {
+			parameterValue = sanitizeNewStyleParameterValue(parameterValue);
+
+			if (!first) {
+				writer.append(',');
+			}
+
+			if (shouldQuoteParameterValue(parameterValue)) {
+				writer.append('"').append(parameterValue).append('"');
+			} else {
+				writer.append(parameterValue);
+			}
+
+			first = false;
+		}
+	}
+
 	/**
 	 * Determines if a string contains at least one newline character.
 	 * @param string the string
@@ -638,9 +655,7 @@ public class VObjectWriter implements Closeable, Flushable {
 	private boolean containsNewlines(String string) {
 		for (int i = 0; i < string.length(); i++) {
 			char c = string.charAt(i);
-			switch (c) {
-			case '\r':
-			case '\n':
+			if (isCROrLF(c)) {
 				return true;
 			}
 		}
@@ -690,11 +705,7 @@ public class VObjectWriter implements Closeable, Flushable {
 	 * @return the sanitized parameter value
 	 */
 	private String sanitizeNewStyleParameterValue(String value) {
-		if (caretEncodingEnabled) {
-			return applyCaretEncoding(value);
-		}
-
-		return value;
+		return caretEncodingEnabled ? applyCaretEncoding(value) : value;
 	}
 
 	/**
@@ -738,8 +749,8 @@ public class VObjectWriter implements Closeable, Flushable {
 		for (int i = 0; i < value.length(); i++) {
 			char c = value.charAt(i);
 
-			if (c == '^' || c == '"' || c == '\r' || c == '\n') {
-				if (c == '\n' && prev == '\r') {
+			if (isEscapableCharForCaretEncoding(c)) {
+				if (isCRLF(prev, c)) {
 					/*
 					 * Do not write a second newline escape sequence if the
 					 * newline sequence is "\r\n".
@@ -749,19 +760,7 @@ public class VObjectWriter implements Closeable, Flushable {
 						sb = new StringBuilder(value.length() * 2);
 						sb.append(value, 0, i);
 					}
-					sb.append('^');
-
-					switch (c) {
-					case '\r':
-					case '\n':
-						sb.append('n');
-						break;
-					case '"':
-						sb.append('\'');
-						break;
-					default:
-						sb.append(c);
-					}
+					sb.append('^').append(caretEscape(c));
 				}
 			} else if (sb != null) {
 				sb.append(c);
@@ -772,21 +771,41 @@ public class VObjectWriter implements Closeable, Flushable {
 		return (sb == null) ? value : sb.toString();
 	}
 
-	private boolean parametersCopied;
+	private boolean isEscapableCharForCaretEncoding(char c) {
+		return c == '^' || c == '"' || c == '\r' || c == '\n';
+	}
 
-	/**
-	 * Copies the given list of parameters if it hasn't been copied before.
-	 * @param parameters the parameters
-	 * @return the copy or the same object if the parameters were copied before
-	 */
-	private VObjectParameters copyParameters(VObjectParameters parameters) {
-		if (parametersCopied) {
-			return parameters;
+	private char caretEscape(char c) {
+		switch (c) {
+		case '\r':
+		case '\n':
+			return 'n';
+		case '"':
+			return '\'';
+		default:
+			return c;
+		}
+	}
+
+	private static class CopyOnModify {
+		private VObjectParameters parameters;
+		private boolean copied;
+
+		public CopyOnModify(VObjectParameters parameters) {
+			this.parameters = parameters;
 		}
 
-		VObjectParameters copy = new VObjectParameters(parameters);
-		parametersCopied = true;
-		return copy;
+		public VObjectParameters modify() {
+			if (!copied) {
+				parameters = new VObjectParameters(parameters);
+				copied = true;
+			}
+			return get();
+		}
+
+		public VObjectParameters get() {
+			return parameters;
+		}
 	}
 
 	/**

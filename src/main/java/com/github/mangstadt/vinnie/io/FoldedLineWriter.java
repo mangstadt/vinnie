@@ -24,6 +24,9 @@
 
 package com.github.mangstadt.vinnie.io;
 
+import static com.github.mangstadt.vinnie.Utils.isCRLF;
+import static com.github.mangstadt.vinnie.Utils.isCROrLF;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
@@ -119,6 +122,19 @@ public class FoldedLineWriter extends Writer {
 			len = cbuf.length;
 		}
 
+		write(cbuf, off, len, quotedPrintable);
+	}
+
+	/**
+	 * Writes a portion of an array of characters.
+	 * @param cbuf the array of characters
+	 * @param off the offset from which to start writing characters
+	 * @param len the number of characters to write
+	 * @param quotedPrintable true if the string is encoded in quoted-printable
+	 * encoding, false if not
+	 * @throws IOException if there's a problem writing to the output stream
+	 */
+	private void write(char[] cbuf, int off, int len, boolean quotedPrintable) throws IOException {
 		if (lineLength == null) {
 			/*
 			 * If line folding is disabled, then write directly to the Writer.
@@ -127,14 +143,7 @@ public class FoldedLineWriter extends Writer {
 			return;
 		}
 
-		int effectiveLineLength = lineLength;
-		if (quotedPrintable) {
-			/*
-			 * Account for the "=" character that must be appended onto each
-			 * line.
-			 */
-			effectiveLineLength -= 1;
-		}
+		int effectiveLineLength = calculateEffectiveLineLength(quotedPrintable);
 
 		int encodedCharPos = -1;
 		int start = off;
@@ -153,21 +162,17 @@ public class FoldedLineWriter extends Writer {
 				}
 			}
 
-			if (c == '\n') {
-				writer.write(cbuf, start, i - start + 1);
-				curLineLength = 0;
-				start = i + 1;
+			if (isCRCharInCRLF(i, end, cbuf)) {
+				/*
+				 * Process newline at next loop iteration.
+				 */
 				continue;
 			}
 
-			if (c == '\r') {
-				if (i == end - 1 || cbuf[i + 1] != '\n') {
-					writer.write(cbuf, start, i - start + 1);
-					curLineLength = 0;
-					start = i + 1;
-				} else {
-					curLineLength++;
-				}
+			if (isCROrLF(c)) {
+				writer.write(cbuf, start, i - start + 1);
+				curLineLength = 0;
+				start = i + 1;
 				continue;
 			}
 
@@ -234,21 +239,7 @@ public class FoldedLineWriter extends Writer {
 					}
 				}
 
-				writer.write(cbuf, start, i - start);
-				if (quotedPrintable) {
-					writer.write('=');
-				}
-				writer.write(CRLF);
-
-				/*
-				 * Do not include indentation whitespace if the value is
-				 * quoted-printable.
-				 */
-				curLineLength = 1;
-				if (!quotedPrintable) {
-					writer.write(indent);
-					curLineLength += indent.length();
-				}
+				writeFoldedLine(i, start, cbuf, quotedPrintable);
 
 				start = i;
 
@@ -259,6 +250,36 @@ public class FoldedLineWriter extends Writer {
 		}
 
 		writer.write(cbuf, start, end - start);
+	}
+
+	private int calculateEffectiveLineLength(boolean quotedPrintable) {
+		/*
+		 * Account for the "=" character that must be appended onto each line
+		 * for quoted-printable values.
+		 */
+		return quotedPrintable ? lineLength - 1 : lineLength;
+	}
+
+	private boolean isCRCharInCRLF(int i, int end, char[] cbuf) {
+		return (i < end - 1) && isCRLF(cbuf[i], cbuf[i + 1]);
+	}
+
+	private void writeFoldedLine(int i, int start, char[] cbuf, boolean quotedPrintable) throws IOException {
+		writer.write(cbuf, start, i - start);
+		if (quotedPrintable) {
+			writer.write('=');
+		}
+		writer.write(CRLF);
+
+		/*
+		 * Do not include indentation whitespace if the value is
+		 * quoted-printable.
+		 */
+		curLineLength = 1;
+		if (!quotedPrintable) {
+			writer.write(indent);
+			curLineLength += indent.length();
+		}
 	}
 
 	/**

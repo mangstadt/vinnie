@@ -30,6 +30,11 @@ package com.github.mangstadt.vinnie;
  */
 public final class Utils {
 	/**
+	 * The local computer's newline character sequence.
+	 */
+	public static final String NEWLINE = System.getProperty("line.separator");
+
+	/**
 	 * Trims the whitespace off the left side of a string.
 	 * @param string the string to trim
 	 * @return the trimmed string
@@ -72,13 +77,13 @@ public final class Utils {
 		for (int i = 0; i < string.length(); i++) {
 			char c = string.charAt(i);
 
-			if (c == '\r' || c == '\n') {
+			if (isCROrLF(c)) {
 				if (sb == null) {
 					sb = new StringBuilder(string.length() * 2);
 					sb.append(string, 0, i);
 				}
 
-				if (c == '\n' && prev == '\r') {
+				if (isCRLF(prev, c)) {
 					/*
 					 * Do not write a second newline escape sequence if the
 					 * newline sequence is "\r\n".
@@ -93,6 +98,25 @@ public final class Utils {
 			prev = c;
 		}
 		return (sb == null) ? string : sb.toString();
+	}
+
+	/**
+	 * Determines if the given characters are \r and \n.
+	 * @param r the first character
+	 * @param n the second character
+	 * @return true if the characters are \r and \n, false if not
+	 */
+	public static boolean isCRLF(char r, char n) {
+		return r == '\r' && n == '\n';
+	}
+
+	/**
+	 * Determines if the given character is either \r or \n.
+	 * @param c the character
+	 * @return true if the character is \r or \n, false if not
+	 */
+	public static boolean isCROrLF(char c) {
+		return c == '\r' || c == '\n';
 	}
 
 	private Utils() {
