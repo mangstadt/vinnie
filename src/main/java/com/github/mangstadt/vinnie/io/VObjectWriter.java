@@ -24,6 +24,7 @@
 
 package com.github.mangstadt.vinnie.io;
 
+import static com.github.mangstadt.vinnie.Utils.CRLF;
 import static com.github.mangstadt.vinnie.Utils.escapeNewlines;
 import static com.github.mangstadt.vinnie.Utils.isCRLF;
 import static com.github.mangstadt.vinnie.Utils.isCROrLF;
@@ -40,6 +41,8 @@ import com.github.mangstadt.vinnie.LaciToken;
 import com.github.mangstadt.vinnie.SyntaxStyle;
 import com.github.mangstadt.vinnie.VObjectParameters;
 import com.github.mangstadt.vinnie.VObjectProperty;
+import com.github.mangstadt.vinnie.codec.EncoderException;
+import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
 import com.github.mangstadt.vinnie.validate.AllowedCharacters;
 import com.github.mangstadt.vinnie.validate.VObjectValidator;
 
@@ -215,14 +218,12 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * , sw.toString());
  * </pre>
  * <p>
- * The line folding length can be adjusted to a length of your choosing. In
- * addition, passing in a "null" line length will disable line folding.
+ * Line folding can be disabled.
  * </p>
  * 
  * <pre class="brush:java">
  * StringWriter sw = new StringWriter();
- * VObjectWriter vobjectWriter = new VObjectWriter(sw, ...);
- * vobjectWriter.getFoldedLineWriter().setLineLength(null);
+ * VObjectWriter vobjectWriter = VObjectWriter.withoutLineFolding(sw, ...);
  * 
  * vobjectWriter.writeProperty("NOTE", "Lorem ipsum dolor sit amet\, consectetur adipiscing elit. Vestibulum ultricies tempor orci ac dignissim.");
  * vobjectWriter.close();
@@ -231,16 +232,16 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * </pre>
  * 
  * <p>
- * You may also specify what kind of folding whitespace to use. The default is a
- * single space character, but this can be changed to any combination of tabs
- * and spaces. Note that new-style syntax requires the folding whitespace to be
- * EXACTLY ONE character long.
+ * You may specify the folding line length and indent whitespace by passing in a
+ * FoldedLineWriter object. The default is 75 characters and single space
+ * character respectively. Note that new-style syntax requires the folding
+ * whitespace to be EXACTLY ONE character long.
  * </p>
  * 
  * <pre class="brush:java">
  * StringWriter sw = new StringWriter();
- * VObjectWriter vobjectWriter = new VObjectWriter(sw, ...);
- * vobjectWriter.getFoldedLineWriter().setIndent("\t");
+ * FoldedLineWriter flw = new FoldedLineWriter(sw, 75, "\t");
+ * VObjectWriter vobjectWriter = new VObjectWriter(flw, ...);
  * 
  * vobjectWriter.writeProperty("NOTE", "Lorem ipsum dolor sit amet\, consectetur adipiscing elit. Vestibulum ultricies tempor orci ac dignissim.");
  * vobjectWriter.close();
@@ -253,7 +254,7 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * @author Michael Angstadt
  */
 public class VObjectWriter implements Closeable, Flushable {
-	private final FoldedLineWriter writer;
+	private final Writer writer;
 	private boolean caretEncodingEnabled = false;
 	private SyntaxStyle syntaxStyle;
 
@@ -263,12 +264,42 @@ public class VObjectWriter implements Closeable, Flushable {
 	private AllowedCharacters allowedParameterValueChars;
 
 	/**
+	 * <p>
 	 * Creates a new vobject writer.
-	 * @param writer the output stream
+	 * </p>
+	 * <p>
+	 * By default, standard line folding settings will be used. To change these
+	 * settings, pass a {@link FoldedLineWriter} object into this constructor.
+	 * </p>
+	 * @param writer the writer
 	 * @param syntaxStyle the syntax style to use
 	 */
 	public VObjectWriter(Writer writer, SyntaxStyle syntaxStyle) {
-		this.writer = new FoldedLineWriter(writer);
+		this(writer, syntaxStyle, true);
+	}
+
+	/**
+	 * Creates a new vobject writer with line folding disabled.
+	 * @param writer the writer
+	 * @param syntaxStyle the syntax style to use
+	 * @return the vobject writer
+	 * @throws IllegalArgumentException if a {@link FoldedLineWriter} was passed
+	 * into this method
+	 */
+	public static VObjectWriter withoutLineFolding(Writer writer, SyntaxStyle syntaxStyle) {
+		if (writer instanceof FoldedLineWriter) {
+			throw new IllegalArgumentException("FoldedLineWriter cannot be used here.");
+		}
+		return new VObjectWriter(writer, syntaxStyle, false);
+	}
+
+	private VObjectWriter(Writer writer, SyntaxStyle syntaxStyle, boolean useFoldedLineWriter) {
+		if (useFoldedLineWriter) {
+			this.writer = (writer instanceof FoldedLineWriter) ? (FoldedLineWriter) writer : new FoldedLineWriter(writer);
+		} else {
+			this.writer = writer;
+		}
+
 		this.syntaxStyle = syntaxStyle;
 
 		allowedGroupChars = VObjectValidator.allowedCharactersGroup(syntaxStyle, false);
@@ -279,9 +310,9 @@ public class VObjectWriter implements Closeable, Flushable {
 
 	/**
 	 * Gets the writer that is used to write data to the output stream.
-	 * @return the folded line writer
+	 * @return the writer
 	 */
-	public FoldedLineWriter getFoldedLineWriter() {
+	public Writer getWriter() {
 		return writer;
 	}
 
@@ -472,7 +503,9 @@ public class VObjectWriter implements Closeable, Flushable {
 		value = sanitizeValue(parametersWrapper, value);
 
 		boolean useQuotedPrintable = parametersWrapper.get().isQuotedPrintable();
-		Charset quotedPrintableCharset = useQuotedPrintable ? determineCharsetAndAddToParameters(parametersWrapper) : null;
+		if (useQuotedPrintable) {
+			value = encodeQuotedPrintableValue(parametersWrapper, value);
+		}
 
 		writeGroup(group);
 
@@ -481,8 +514,13 @@ public class VObjectWriter implements Closeable, Flushable {
 		writeParameters(parametersWrapper.get());
 
 		writer.append(':');
-		writer.write(value, useQuotedPrintable, quotedPrintableCharset);
-		writer.writeln();
+
+		if (useQuotedPrintable && writer instanceof FoldedLineWriter) {
+			((FoldedLineWriter) writer).writeQuotedPrintable(value);
+		} else {
+			writer.write(value);
+		}
+		writer.write(CRLF);
 	}
 
 	/**
@@ -569,20 +607,30 @@ public class VObjectWriter implements Closeable, Flushable {
 		return value;
 	}
 
-	private Charset determineCharsetAndAddToParameters(CopyOnModify parameters) {
-		Charset quotedPrintableCharset = null;
+	private String encodeQuotedPrintableValue(CopyOnModify parameters, String value) throws IOException {
+		Charset charset = null;
 		try {
-			quotedPrintableCharset = parameters.get().getCharset();
+			charset = parameters.get().getCharset();
 		} catch (Exception e) {
 			//character set not recognized
 		}
 
-		if (quotedPrintableCharset == null) {
-			quotedPrintableCharset = Charset.forName("UTF-8");
-			parameters.modify().replace("CHARSET", quotedPrintableCharset.name());
+		if (charset == null) {
+			charset = Charset.forName("UTF-8");
+			parameters.modify().replace("CHARSET", charset.name());
 		}
 
-		return quotedPrintableCharset;
+		QuotedPrintableCodec codec = new QuotedPrintableCodec(charset.name());
+		try {
+			return codec.encode(value);
+		} catch (EncoderException e) {
+			/*
+			 * Thrown if an unsupported charset is passed into the codec. This
+			 * should never happen because we were able to create a Charset
+			 * object above.
+			 */
+			throw new IOException(e);
+		}
 	}
 
 	private void writeGroup(String group) throws IOException {

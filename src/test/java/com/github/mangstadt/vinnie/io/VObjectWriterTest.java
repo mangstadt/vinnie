@@ -645,8 +645,7 @@ public class VObjectWriterTest {
 		{
 			for (boolean caretEncoding : new boolean[] { false, true }) {
 				StringWriter sw = new StringWriter();
-				VObjectWriter writer = new VObjectWriter(sw, style);
-				writer.getFoldedLineWriter().setLineLength(null);
+				VObjectWriter writer = VObjectWriter.withoutLineFolding(sw, style);
 				writer.setCaretEncodingEnabled(caretEncoding);
 
 				String input = testString(":\r\n");
@@ -674,8 +673,7 @@ public class VObjectWriterTest {
 			boolean caretEncoding = false;
 			{
 				StringWriter sw = new StringWriter();
-				VObjectWriter writer = new VObjectWriter(sw, style);
-				writer.getFoldedLineWriter().setLineLength(null);
+				VObjectWriter writer = VObjectWriter.withoutLineFolding(sw, style);
 				writer.setCaretEncodingEnabled(caretEncoding);
 
 				String input = testString("\"\r\n");
@@ -703,8 +701,7 @@ public class VObjectWriterTest {
 			caretEncoding = true;
 			{
 				StringWriter sw = new StringWriter();
-				VObjectWriter writer = new VObjectWriter(sw, style);
-				writer.getFoldedLineWriter().setLineLength(null);
+				VObjectWriter writer = VObjectWriter.withoutLineFolding(sw, style);
 				writer.setCaretEncodingEnabled(caretEncoding);
 
 				String input = testString("\r\n") + "\r\n\n\r"; //make sure all three kinds of newline sequences are handled
@@ -757,8 +754,7 @@ public class VObjectWriterTest {
 		SyntaxStyle style = SyntaxStyle.OLD;
 		{
 			StringWriter sw = new StringWriter();
-			VObjectWriter writer = new VObjectWriter(sw, style);
-			writer.getFoldedLineWriter().setLineLength(null);
+			VObjectWriter writer = VObjectWriter.withoutLineFolding(sw, style);
 
 			VObjectParameters parameters = new VObjectParameters();
 			VObjectParameters expectedParams = new VObjectParameters(parameters);
@@ -839,8 +835,7 @@ public class VObjectWriterTest {
 
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			StringWriter sw = new StringWriter();
-			VObjectWriter writer = new VObjectWriter(sw, style);
-			writer.getFoldedLineWriter().setLineLength(null);
+			VObjectWriter writer = VObjectWriter.withoutLineFolding(sw, style);
 
 			//no parameters
 			VObjectParameters parameters = new VObjectParameters();

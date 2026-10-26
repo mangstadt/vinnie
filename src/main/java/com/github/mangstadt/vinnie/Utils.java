@@ -34,6 +34,8 @@ public final class Utils {
 	 */
 	public static final String NEWLINE = System.getProperty("line.separator");
 
+	public static final String CRLF = "\r\n";
+
 	/**
 	 * Trims the whitespace off the left side of a string.
 	 * @param string the string to trim

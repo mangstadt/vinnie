@@ -24,57 +24,87 @@
 
 package com.github.mangstadt.vinnie.io;
 
+import static com.github.mangstadt.vinnie.Utils.CRLF;
 import static com.github.mangstadt.vinnie.Utils.isCRLF;
 import static com.github.mangstadt.vinnie.Utils.isCROrLF;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.nio.charset.Charset;
-
-import com.github.mangstadt.vinnie.SyntaxStyle;
-import com.github.mangstadt.vinnie.codec.EncoderException;
-import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
 
 /**
  * Automatically folds lines as they are written.
  * @author Michael Angstadt
  */
 public class FoldedLineWriter extends Writer {
-	private static final String CRLF = "\r\n";
 	private final Writer writer;
-
-	private Integer lineLength = 75;
-	private String indent = " ";
+	private final int lineLength;
+	private final String indent;
 
 	private int curLineLength = 0;
 
 	/**
-	 * Creates a folded line writer.
+	 * Creates a folded line writer with standard settings: line length 75 and
+	 * single space indent.
 	 * @param writer the writer object to wrap
 	 */
 	public FoldedLineWriter(Writer writer) {
+		this(writer, 75, " ");
+	}
+
+	/**
+	 * Creates a folded line writer.
+	 * @param writer the writer object to wrap
+	 * @param lineLength the maximum length a line can be before it is folded
+	 * (excluding the newline)
+	 * @param indent the string that is prepended onto each folded line. Must
+	 * have a length of at least one and must consist only of tabs and spaces
+	 * @throws IllegalArgumentException if line length or indent are invalid
+	 */
+	public FoldedLineWriter(Writer writer, int lineLength, String indent) {
+		validate(lineLength, indent);
+
 		this.writer = writer;
+		this.lineLength = lineLength;
+		this.indent = indent;
+	}
+
+	private static void validate(int lineLength, String indent) {
+		if (lineLength <= 0) {
+			throw new IllegalArgumentException("Line length must be greater than 0.");
+		}
+		if (lineLength <= indent.length()) {
+			throw new IllegalArgumentException("Line length must be greater than indent string length.");
+		}
+
+		if (indent.isEmpty()) {
+			throw new IllegalArgumentException("Indent string cannot be empty.");
+		}
+		if (indent.length() >= lineLength) {
+			throw new IllegalArgumentException("Indent string length must be less than the line length.");
+		}
+		for (int i = 0; i < indent.length(); i++) {
+			char c = indent.charAt(i);
+			if (c != ' ' && c != '\t') {
+				throw new IllegalArgumentException("Indent string can only contain tabs and spaces.");
+			}
+		}
 	}
 
 	/**
-	 * Writes a newline.
+	 * <p>
+	 * Writes a string that's been encoded in quoted-printable encoding.
+	 * </p>
+	 * <p>
+	 * The folded line writer must know that a quoted-printable string is being
+	 * written because an equals character must be appended onto each folded
+	 * line, and the next line must receive no indentation whitespace.
+	 * </p>
+	 * @param encoded the quoted-printable string
 	 * @throws IOException if there's a problem writing to the output stream
 	 */
-	public void writeln() throws IOException {
-		write(CRLF);
-	}
-
-	/**
-	 * Writes a string.
-	 * @param str the string to write
-	 * @param quotedPrintable true to encode the string in quoted-printable
-	 * encoding, false not to
-	 * @param charset the character set to use when encoding the string into
-	 * quoted-printable
-	 * @throws IOException if there's a problem writing to the output stream
-	 */
-	public void write(CharSequence str, boolean quotedPrintable, Charset charset) throws IOException {
-		write(str.toString().toCharArray(), 0, str.length(), quotedPrintable, charset);
+	public void writeQuotedPrintable(String encoded) throws IOException {
+		char[] array = encoded.toCharArray();
+		write(array, 0, array.length, true);
 	}
 
 	/**
@@ -86,43 +116,7 @@ public class FoldedLineWriter extends Writer {
 	 */
 	@Override
 	public void write(char[] cbuf, int off, int len) throws IOException {
-		write(cbuf, off, len, false, null);
-	}
-
-	/**
-	 * Writes a portion of an array of characters.
-	 * @param cbuf the array of characters
-	 * @param off the offset from which to start writing characters
-	 * @param len the number of characters to write
-	 * @param quotedPrintable true to encode the string in quoted-printable
-	 * encoding, false not to
-	 * @param charset the character set to use when encoding the string into
-	 * quoted-printable
-	 * @throws IOException if there's a problem writing to the output stream
-	 */
-	public void write(char[] cbuf, int off, int len, boolean quotedPrintable, Charset charset) throws IOException {
-		if (quotedPrintable) {
-			String str = new String(cbuf, off, len);
-			QuotedPrintableCodec codec = new QuotedPrintableCodec(charset.name());
-
-			String encoded;
-			try {
-				encoded = codec.encode(str);
-			} catch (EncoderException e) {
-				/*
-				 * Thrown if an unsupported charset is passed into the codec.
-				 * This should never happen because we already know the charset
-				 * is valid (a Charset object is passed into the method).
-				 */
-				throw new IOException(e);
-			}
-
-			cbuf = encoded.toCharArray();
-			off = 0;
-			len = cbuf.length;
-		}
-
-		write(cbuf, off, len, quotedPrintable);
+		write(cbuf, off, len, false);
 	}
 
 	/**
@@ -135,14 +129,6 @@ public class FoldedLineWriter extends Writer {
 	 * @throws IOException if there's a problem writing to the output stream
 	 */
 	private void write(char[] cbuf, int off, int len, boolean quotedPrintable) throws IOException {
-		if (lineLength == null) {
-			/*
-			 * If line folding is disabled, then write directly to the Writer.
-			 */
-			writer.write(cbuf, off, len);
-			return;
-		}
-
 		int effectiveLineLength = calculateEffectiveLineLength(quotedPrintable);
 
 		int encodedCharPos = -1;
@@ -176,7 +162,7 @@ public class FoldedLineWriter extends Writer {
 				continue;
 			}
 
-			if (c == '=' && quotedPrintable) {
+			if (quotedPrintable && c == '=') {
 				encodedCharPos = 0;
 			}
 
@@ -285,30 +271,10 @@ public class FoldedLineWriter extends Writer {
 	/**
 	 * Gets the maximum length a line can be before it is folded (excluding the
 	 * newline, defaults to 75).
-	 * @return the line length or null if folding is disabled
+	 * @return the line length
 	 */
-	public Integer getLineLength() {
+	public int getLineLength() {
 		return lineLength;
-	}
-
-	/**
-	 * Sets the maximum length a line can be before it is folded (excluding the
-	 * newline, defaults to 75).
-	 * @param lineLength the line length or null to disable folding
-	 * @throws IllegalArgumentException if the line length is less than or equal
-	 * to zero, or the line length is less than the length of the indent string
-	 */
-	public void setLineLength(Integer lineLength) {
-		if (lineLength != null) {
-			if (lineLength <= 0) {
-				throw new IllegalArgumentException("Line length must be greater than 0.");
-			}
-			if (lineLength <= indent.length()) {
-				throw new IllegalArgumentException("Line length must be greater than indent string length.");
-			}
-		}
-
-		this.lineLength = lineLength;
 	}
 
 	/**
@@ -318,39 +284,6 @@ public class FoldedLineWriter extends Writer {
 	 */
 	public String getIndent() {
 		return indent;
-	}
-
-	/**
-	 * Sets the string that is prepended to each folded line (defaults to a
-	 * single space character).
-	 * @param indent the indent string (cannot be empty, may only contain tabs
-	 * and spaces). Note that data streams using {@link SyntaxStyle#NEW} syntax
-	 * MUST use an indent string that contains EXACTLY ONE character.
-	 * @throws IllegalArgumentException if the indent string is empty, or the
-	 * length of the indent string is greater than the max line length, or the
-	 * indent string contains illegal characters
-	 */
-	public void setIndent(String indent) {
-		if (indent.isEmpty()) {
-			throw new IllegalArgumentException("Indent string cannot be empty.");
-		}
-
-		if (lineLength != null && indent.length() >= lineLength) {
-			throw new IllegalArgumentException("Indent string length must be less than the line length.");
-		}
-
-		for (int i = 0; i < indent.length(); i++) {
-			char c = indent.charAt(i);
-			switch (c) {
-			case ' ':
-			case '\t':
-				break;
-			default:
-				throw new IllegalArgumentException("Indent string can only contain tabs and spaces.");
-			}
-		}
-
-		this.indent = indent;
 	}
 
 	/**
