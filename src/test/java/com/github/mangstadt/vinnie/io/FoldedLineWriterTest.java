@@ -176,6 +176,30 @@ public class FoldedLineWriterTest {
 	}
 
 	/**
+	 * Same as {@link #exceed_max_line_length_when_space_encountered_end_of_string} test, but
+	 * with one more character after the space.
+	 * @author ChatGPT
+	 */
+	@Test
+	public void exceed_max_line_length_when_space_encountered_second_last_char() throws Exception {
+		StringWriter sw = new StringWriter();
+		FoldedLineWriter writer = new FoldedLineWriter(sw, 5, " ");
+
+		writer.write("Lorem a");
+		writer.close();
+
+		String actual = sw.toString();
+
+		//@formatter:off
+		String expected =
+		"Lorem \r\n" +
+		" a";
+		//@formatter:on
+
+		assertEquals(expected, actual);
+	}
+
+	/**
 	 * The folding whitespace string can be changed.
 	 */
 	@Test
@@ -363,7 +387,7 @@ public class FoldedLineWriterTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void lineLength_too_small() throws Exception {
 		StringWriter sw = new StringWriter();
-		new FoldedLineWriter(sw, 0, " ");
+		new FoldedLineWriter(sw, 3, " ");
 	}
 
 	@Test(expected = IllegalArgumentException.class)

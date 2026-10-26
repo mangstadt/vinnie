@@ -69,8 +69,11 @@ public class FoldedLineWriter extends Writer {
 	}
 
 	private static void validate(int lineLength, String indent) {
-		if (lineLength <= 0) {
-			throw new IllegalArgumentException("Line length must be greater than 0.");
+		if (lineLength < 4) {
+			/*
+			 * Line folding breaks when line length is < 4.
+			 */
+			throw new IllegalArgumentException("Line length must be greater than 3.");
 		}
 		if (lineLength <= indent.length()) {
 			throw new IllegalArgumentException("Line length must be greater than indent string length.");
@@ -185,7 +188,7 @@ public class FoldedLineWriter extends Writer {
 						i++;
 						c = cbuf[i];
 					}
-					if (i >= end - 1) {
+					if (i >= end - 1 && Character.isWhitespace(c)) {
 						/*
 						 * The rest of the char array is whitespace, so leave
 						 * the loop.
