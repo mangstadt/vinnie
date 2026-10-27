@@ -399,6 +399,7 @@ public class VObjectReaderTest {
 	public void empty_lines() throws Exception {
 		//@formatter:off
 		String string =
+		"\r\n" +
 		"PROP1:value1\r\n" +
 		"\r\n" +
 		"PROP2:value2\r\n" +
@@ -420,9 +421,9 @@ public class VObjectReaderTest {
 
 			//@formatter:off
 			assertContexts(listener,
-				context("PROP1:value1", 1),
-				context("PROP2:value2", 3),
-				context("PROP3:value3", 7)
+				context("PROP1:value1", 2),
+				context("PROP2:value2", 4),
+				context("PROP3:value3", 8)
 			);
 			//@formatter:on
 		}
@@ -1533,9 +1534,9 @@ public class VObjectReaderTest {
 			Context e = expectedList.get(i);
 			Context a = actual.get(i);
 
-			assertEquals("Context " + i + ": expected <" + e.getParentComponents() + "> but was: <" + a.getParentComponents() + ">", e.getParentComponents(), a.getParentComponents());
-			assertEquals("Context " + i + ": expected <" + e.getUnfoldedLine() + "> but was: <" + a.getUnfoldedLine() + ">", e.getUnfoldedLine(), a.getUnfoldedLine());
-			assertEquals("Context " + i + ": expected <" + e.getLineNumber() + "> but was: <" + a.getLineNumber() + ">", e.getLineNumber(), a.getLineNumber());
+			assertEquals("Context " + i + ": ", e.getParentComponents(), a.getParentComponents());
+			assertEquals("Context " + i + ": ", e.getUnfoldedLine(), a.getUnfoldedLine());
+			assertEquals("Context " + i + ": ", e.getLineNumber(), a.getLineNumber());
 		}
 	}
 
@@ -1630,30 +1631,30 @@ public class VObjectReaderTest {
 		private final List<Context> contexts = new ArrayList<Context>();
 
 		public void onComponentBegin(LaciToken name, Context context) {
-			contexts.add(copy(context));
+			addCopy(context);
 		}
 
 		public void onComponentEnd(LaciToken name, Context context) {
-			contexts.add(copy(context));
+			addCopy(context);
 		}
 
 		public void onProperty(VObjectProperty property, Context context) {
-			contexts.add(copy(context));
+			addCopy(context);
 		}
 
 		public void onVersion(String value, Context context) {
-			contexts.add(copy(context));
+			addCopy(context);
 		}
 
 		public void onWarning(Warning warning, VObjectProperty property, Exception thrown, Context context) {
-			contexts.add(copy(context));
+			addCopy(context);
 		}
 
-		private Context copy(Context orig) {
+		private void addCopy(Context orig) {
 			Context copy = new Context(new ArrayList<LaciToken>(orig.parentComponents));
 			copy.unfoldedLine.append(orig.getUnfoldedLine());
 			copy.lineNumber = orig.lineNumber;
-			return copy;
+			contexts.add(copy);
 		}
 	}
 }

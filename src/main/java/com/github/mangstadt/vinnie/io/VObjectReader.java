@@ -556,6 +556,11 @@ public class VObjectReader implements Closeable {
 		 */
 		char prevChar;
 
+		/*
+		 * Ignore all newlines at the beginning of the input stream.
+		 */
+		boolean firstNonNewlineCharHasBeenRead = false;
+
 		while (true) {
 			prevChar = ch;
 
@@ -590,12 +595,15 @@ public class VObjectReader implements Closeable {
 
 				//keep track of the current line number
 				lineNumber++;
+				if (!firstNonNewlineCharHasBeenRead) {
+					context.lineNumber = lineNumber;
+				}
 
 				continue;
 			}
 
-			if (isCROrLF(prevChar)) {
-				if (isWhitespace(ch)) {
+			if (isCROrLF(prevChar) && firstNonNewlineCharHasBeenRead) {
+				if (isSpaceOrTab(ch)) {
 					/*
 					 * This line is a continuation of the previous line (the
 					 * line is folded).
@@ -621,7 +629,7 @@ public class VObjectReader implements Closeable {
 			}
 
 			if (inFoldedLineWhitespace) {
-				if (isWhitespace(ch) && syntax == SyntaxStyle.OLD) {
+				if (isSpaceOrTab(ch) && syntax == SyntaxStyle.OLD) {
 					/*
 					 * 2.1 allows multiple whitespace characters to be used for
 					 * folding (section 2.1.3).
@@ -630,6 +638,8 @@ public class VObjectReader implements Closeable {
 				}
 				inFoldedLineWhitespace = false;
 			}
+
+			firstNonNewlineCharHasBeenRead = true;
 
 			context.unfoldedLine.append(ch);
 
@@ -861,7 +871,7 @@ public class VObjectReader implements Closeable {
 	 * @param ch the character
 	 * @return true if it's a space or a tab, false if not
 	 */
-	private static boolean isWhitespace(char ch) {
+	private static boolean isSpaceOrTab(char ch) {
 		return ch == ' ' || ch == '\t';
 	}
 
