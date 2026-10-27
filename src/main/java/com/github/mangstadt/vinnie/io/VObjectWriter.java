@@ -265,11 +265,11 @@ public class VObjectWriter implements Closeable, Flushable {
 
 	/**
 	 * <p>
-	 * Creates a new vobject writer.
+	 * Creates a new vobject writer using standard line folding settings.
 	 * </p>
 	 * <p>
-	 * By default, standard line folding settings will be used. To change these
-	 * settings, pass a {@link FoldedLineWriter} object into this constructor.
+	 * If a {@link FoldedLineWriter} is passed into this method, its folding
+	 * settings will be used instead.
 	 * </p>
 	 * @param writer the writer
 	 * @param syntaxStyle the syntax style to use
@@ -279,27 +279,31 @@ public class VObjectWriter implements Closeable, Flushable {
 	}
 
 	/**
+	 * Creates a new vobject writer that uses custom line folding settings.
+	 * @param writer the folded line writer
+	 * @param syntaxStyle the syntax style to use
+	 */
+	public VObjectWriter(FoldedLineWriter writer, SyntaxStyle syntaxStyle) {
+		this(writer, syntaxStyle, false);
+	}
+
+	/**
 	 * Creates a new vobject writer with line folding disabled.
 	 * @param writer the writer
 	 * @param syntaxStyle the syntax style to use
 	 * @return the vobject writer
-	 * @throws IllegalArgumentException if a {@link FoldedLineWriter} was passed
+	 * @throws IllegalArgumentException if a {@link FoldedLineWriter} is passed
 	 * into this method
 	 */
 	public static VObjectWriter withoutLineFolding(Writer writer, SyntaxStyle syntaxStyle) {
 		if (writer instanceof FoldedLineWriter) {
-			throw new IllegalArgumentException("FoldedLineWriter cannot be used here.");
+			throw new IllegalArgumentException("FoldedLineWriter cannot be passed into this method.");
 		}
 		return new VObjectWriter(writer, syntaxStyle, false);
 	}
 
-	private VObjectWriter(Writer writer, SyntaxStyle syntaxStyle, boolean useFoldedLineWriter) {
-		if (useFoldedLineWriter) {
-			this.writer = (writer instanceof FoldedLineWriter) ? (FoldedLineWriter) writer : new FoldedLineWriter(writer);
-		} else {
-			this.writer = writer;
-		}
-
+	private VObjectWriter(Writer writer, SyntaxStyle syntaxStyle, boolean wrapWriter) {
+		this.writer = (wrapWriter && !(writer instanceof FoldedLineWriter)) ? new FoldedLineWriter(writer) : writer;
 		setSyntaxStyle(syntaxStyle);
 	}
 
