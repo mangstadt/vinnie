@@ -258,9 +258,9 @@ public class VObjectWriter implements Closeable, Flushable {
 	private boolean caretEncodingEnabled = false;
 	private SyntaxStyle syntaxStyle;
 
-	private final AllowedCharacters allowedPropertyNameChars;
-	private final AllowedCharacters allowedGroupChars;
-	private final AllowedCharacters allowedParameterNameChars;
+	private AllowedCharacters allowedPropertyNameChars;
+	private AllowedCharacters allowedGroupChars;
+	private AllowedCharacters allowedParameterNameChars;
 	private AllowedCharacters allowedParameterValueChars;
 
 	/**
@@ -300,12 +300,7 @@ public class VObjectWriter implements Closeable, Flushable {
 			this.writer = writer;
 		}
 
-		this.syntaxStyle = syntaxStyle;
-
-		allowedGroupChars = VObjectValidator.allowedCharactersGroup(syntaxStyle, false);
-		allowedPropertyNameChars = VObjectValidator.allowedCharactersPropertyName(syntaxStyle, false);
-		allowedParameterNameChars = VObjectValidator.allowedCharactersParameterName(syntaxStyle, false);
-		allowedParameterValueChars = VObjectValidator.allowedCharactersParameterValue(syntaxStyle, false, false);
+		setSyntaxStyle(syntaxStyle);
 	}
 
 	/**
@@ -417,6 +412,10 @@ public class VObjectWriter implements Closeable, Flushable {
 	 */
 	public void setSyntaxStyle(SyntaxStyle syntaxStyle) {
 		this.syntaxStyle = syntaxStyle;
+		allowedGroupChars = VObjectValidator.allowedCharactersGroup(syntaxStyle, false);
+		allowedPropertyNameChars = VObjectValidator.allowedCharactersPropertyName(syntaxStyle, false);
+		allowedParameterNameChars = VObjectValidator.allowedCharactersParameterName(syntaxStyle, false);
+		allowedParameterValueChars = VObjectValidator.allowedCharactersParameterValue(syntaxStyle, caretEncodingEnabled, false);
 	}
 
 	/**
