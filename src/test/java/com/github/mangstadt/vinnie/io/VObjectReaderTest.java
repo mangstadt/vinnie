@@ -976,6 +976,12 @@ public class VObjectReaderTest {
 		}
 	}
 
+	@Test(expected=NullPointerException.class)
+	public void setDefaultQuotedPrintableCharset_null() throws Exception {
+		VObjectReader reader = reader("", SyntaxStyle.OLD);
+		reader.setDefaultQuotedPrintableCharset(null);
+	}
+
 	/**
 	 * Tests quoted-printable encoding.
 	 */

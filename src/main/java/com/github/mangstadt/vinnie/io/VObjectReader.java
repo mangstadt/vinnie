@@ -291,6 +291,9 @@ public class VObjectReader implements Closeable {
 	 * null)
 	 */
 	public void setDefaultQuotedPrintableCharset(Charset charset) {
+		if (charset == null) {
+			throw new NullPointerException();
+		}
 		defaultQuotedPrintableCharset = charset;
 	}
 
