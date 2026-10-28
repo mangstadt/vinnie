@@ -24,6 +24,7 @@
 
 package com.github.mangstadt.vinnie.validate;
 
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -100,7 +101,7 @@ public class VObjectValidator {
 				//@formatter:on
 			}
 
-			propertyName.put(syntax, map);
+			propertyName.put(syntax, Collections.unmodifiableMap(map));
 		}
 
 		syntax = SyntaxStyle.NEW;
@@ -124,7 +125,7 @@ public class VObjectValidator {
 				//@formatter:on
 			}
 
-			propertyName.put(syntax, map);
+			propertyName.put(syntax, Collections.unmodifiableMap(map));
 		}
 	}
 
@@ -154,7 +155,7 @@ public class VObjectValidator {
 				map.put(strict, propertyName.get(syntax).get(strict));
 			}
 
-			parameterName.put(syntax, map);
+			parameterName.put(syntax, Collections.unmodifiableMap(map));
 		}
 
 		syntax = SyntaxStyle.NEW;
@@ -172,7 +173,7 @@ public class VObjectValidator {
 				map.put(strict, propertyName.get(syntax).get(strict));
 			}
 
-			parameterName.put(syntax, map);
+			parameterName.put(syntax, Collections.unmodifiableMap(map));
 		}
 	}
 
@@ -207,7 +208,7 @@ public class VObjectValidator {
 					.build());
 					//@formatter::on
 				}
-				map.put(caretEncoding, map2);
+				map.put(caretEncoding, Collections.unmodifiableMap(map2));
 			}
 
 			caretEncoding = true;
@@ -250,7 +251,7 @@ public class VObjectValidator {
 					//@formatter:on
 				}
 
-				map.put(caretEncoding, map2);
+				map.put(caretEncoding, Collections.unmodifiableMap(map2));
 			}
 
 			caretEncoding = true;
@@ -276,7 +277,7 @@ public class VObjectValidator {
 					//@formatter:on
 				}
 
-				map.put(caretEncoding, map2);
+				map.put(caretEncoding, Collections.unmodifiableMap(map2));
 			}
 
 			parameterValue.put(syntax, map);
