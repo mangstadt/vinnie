@@ -287,7 +287,7 @@ public class VObjectPropertyValuesTest {
 	@Test
 	public void writeMultimap_empty_value_first() {
 		Map<LaciToken, List<String>> input = new LinkedHashMap<LaciToken, List<String>>();
-		input.put(new LaciToken("A"), asList());
+		input.put(new LaciToken("A"), Arrays.<String> asList());
 		input.put(new LaciToken("B"), asList("one"));
 
 		String expected = "A;B=one";
