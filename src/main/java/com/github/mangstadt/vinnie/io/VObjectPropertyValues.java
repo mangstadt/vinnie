@@ -744,7 +744,8 @@ public final class VObjectPropertyValues {
 	 * Splits a string.
 	 * @param string the string to split
 	 * @param delimiter the delimiter to split by
-	 * @param limit the number of split values to parse or -1 to parse them all
+	 * @param limit the number of split values to parse or &lt; 1 to parse them
+	 * all
 	 * @return the split values
 	 */
 	private static List<String> split(String string, char delimiter, int limit) {
@@ -752,7 +753,14 @@ public final class VObjectPropertyValues {
 			return new ArrayList<String>(0); //return a mutable list
 		}
 
-		List<String> list = new ArrayList<String>();
+		List<String> list = (limit < 1) ? new ArrayList<String>() : new ArrayList<String>(limit);
+
+		if (limit == 1) {
+			String value = unescape(string);
+			list.add(value);
+			return list;
+		}
+
 		boolean escaped = false;
 		int cursor = 0;
 		for (int i = 0; i < string.length(); i++) {

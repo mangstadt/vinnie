@@ -110,6 +110,10 @@ public class VObjectPropertyValuesTest {
 		expected = asList("one", "two;three");
 		assertEquals(expected, actual);
 
+		actual = VObjectPropertyValues.parseSemiStructured("one;two;three", 1);
+		expected = asList("one;two;three");
+		assertEquals(expected, actual);
+
 		actual = VObjectPropertyValues.parseSemiStructured("");
 		expected = asList();
 		assertEquals(expected, actual);
