@@ -721,10 +721,22 @@ public final class VObjectPropertyValues {
 		int index = -1;
 		for (int i = sb.length() - 1; i >= 0; i--) {
 			char c = sb.charAt(i);
-			if (c != ';') {
-				index = i;
-				break;
+			if (c == ';') {
+				continue;
 			}
+
+			boolean atTheEndOfTheString = (i == sb.length() - 1);
+			boolean escapedSemicolonFound = (c == '\\' && !atTheEndOfTheString);
+			if (escapedSemicolonFound) {
+				/*
+				 * Do not trim escaped semicolons, treat as normal characters.
+				 */
+				index = i + 1;
+			} else {
+				index = i;
+			}
+
+			break;
 		}
 		sb.setLength(index + 1);
 	}

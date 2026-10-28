@@ -148,6 +148,47 @@ public class VObjectPropertyValuesTest {
 		}
 	}
 
+	@Test
+	public void writeSemiStructured_do_not_trim_trailing_escaped_semicolons() {
+		String actual, expected;
+
+		{
+			List<Object> input = Arrays.<Object> asList("one", "", "two;");
+
+			actual = VObjectPropertyValues.writeSemiStructured(input, false, false);
+			expected = "one;;two\\;";
+			assertEquals(expected, actual);
+
+			actual = VObjectPropertyValues.writeSemiStructured(input, false, true);
+			expected = "one;;two\\;";
+			assertEquals(expected, actual);
+		}
+
+		{
+			List<Object> input = Arrays.<Object> asList("one", "", "two;", "", "");
+
+			actual = VObjectPropertyValues.writeSemiStructured(input, false, false);
+			expected = "one;;two\\;";
+			assertEquals(expected, actual);
+
+			actual = VObjectPropertyValues.writeSemiStructured(input, false, true);
+			expected = "one;;two\\;;;";
+			assertEquals(expected, actual);
+		}
+
+		{
+			List<Object> input = Arrays.<Object> asList("one", "", "two;;", "", "");
+
+			actual = VObjectPropertyValues.writeSemiStructured(input, false, false);
+			expected = "one;;two\\;\\;";
+			assertEquals(expected, actual);
+
+			actual = VObjectPropertyValues.writeSemiStructured(input, false, true);
+			expected = "one;;two\\;\\;;;";
+			assertEquals(expected, actual);
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	@Test
 	public void parseStructured() {
