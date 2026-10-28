@@ -279,6 +279,17 @@ public class VObjectPropertyValuesTest {
 		String actual = VObjectPropertyValues.writeMultimap(input);
 		assertEquals(expected, actual);
 	}
+	
+	@Test
+	public void writeMultimap_empty_value_first() {
+		Map<LaciToken, List<String>> input = new LinkedHashMap<LaciToken, List<String>>();
+		input.put(new LaciToken("A"), asList());
+		input.put(new LaciToken("B"), asList("one"));
+
+		String expected = "A;B=one";
+		String actual = VObjectPropertyValues.writeMultimap(input);
+		assertEquals(expected, actual);
+	}
 
 	@Test
 	public void SemiStructuredValueIterator() {

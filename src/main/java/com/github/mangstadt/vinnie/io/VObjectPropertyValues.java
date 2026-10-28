@@ -681,6 +681,7 @@ public final class VObjectPropertyValues {
 			if (!firstKey) {
 				sb.append(';');
 			}
+			firstKey = false;
 
 			String key = entry.getKey().toUpperCase();
 			escape(key, true, sb);
@@ -706,8 +707,6 @@ public final class VObjectPropertyValues {
 
 				firstValue = false;
 			}
-
-			firstKey = false;
 		}
 
 		return sb.toString();
