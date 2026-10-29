@@ -42,17 +42,9 @@ public class AllowedCharacters {
 	 * character set (character codes greater than 127), false to only allow
 	 * 7-bit ASCII
 	 */
-	public AllowedCharacters(BitSet bitSet, boolean allowNonAscii) {
+	private AllowedCharacters(BitSet bitSet, boolean allowNonAscii) {
 		this.bitSet = bitSet;
 		this.allowNonAscii = allowNonAscii;
-	}
-
-	/**
-	 * Gets the underlying {@link BitSet} object.
-	 * @return the {@link BitSet} object
-	 */
-	public BitSet bitSet() {
-		return bitSet;
 	}
 
 	/**
@@ -92,9 +84,9 @@ public class AllowedCharacters {
 	 * @return the reverse list
 	 */
 	public AllowedCharacters flip() {
-		BitSet bitSet = (BitSet) this.bitSet.clone();
-		bitSet.flip(0, LENGTH);
-		return new AllowedCharacters(bitSet, !allowNonAscii);
+		BitSet clone = (BitSet) bitSet.clone();
+		clone.flip(0, LENGTH);
+		return new AllowedCharacters(clone, !allowNonAscii);
 	}
 
 	/**
@@ -190,11 +182,13 @@ public class AllowedCharacters {
 
 		/**
 		 * Allow characters within the given range.
-		 * @param from the character to start at
-		 * @param to the character to end at (inclusive)
+		 * @param from the character to start at (ASCII only)
+		 * @param to the character to end at (inclusive, ASCII only)
 		 * @return this
 		 */
 		public Builder allow(int from, int to) {
+			requireAscii(from);
+			requireAscii(to);
 			bitSet.set(from, to + 1);
 			return this;
 		}
@@ -202,6 +196,7 @@ public class AllowedCharacters {
 		/**
 		 * Allow all the characters in the given string.
 		 * @param characters the string containing the allowable characters
+		 * (ASCII only)
 		 * @return this
 		 */
 		public Builder allow(String characters) {
@@ -211,11 +206,11 @@ public class AllowedCharacters {
 
 		/**
 		 * Allow the given character.
-		 * @param c the character
+		 * @param c the character (ASCII only)
 		 * @return this
 		 */
 		public Builder allow(char c) {
-			bitSet.set(c);
+			set(c, true);
 			return this;
 		}
 
@@ -240,7 +235,8 @@ public class AllowedCharacters {
 
 		/**
 		 * Reject all the characters in the given string.
-		 * @param characters the string containing the illegal characters
+		 * @param characters the string containing the illegal characters (ASCII
+		 * only)
 		 * @return this
 		 */
 		public Builder except(String characters) {
@@ -250,11 +246,11 @@ public class AllowedCharacters {
 
 		/**
 		 * Reject the given character.
-		 * @param c the character
+		 * @param c the character (ASCII only)
 		 * @return this
 		 */
 		public Builder except(char c) {
-			bitSet.set(c, false);
+			set(c, false);
 			return this;
 		}
 
@@ -263,13 +259,24 @@ public class AllowedCharacters {
 		 * @return the object
 		 */
 		public AllowedCharacters build() {
-			return new AllowedCharacters(bitSet, allowNonAscii);
+			return new AllowedCharacters((BitSet) bitSet.clone(), allowNonAscii);
+		}
+
+		private void set(int i, boolean value) {
+			requireAscii(i);
+			bitSet.set(i, value);
 		}
 
 		private void setAll(String characters, boolean value) {
 			for (int i = 0; i < characters.length(); i++) {
 				char c = characters.charAt(i);
-				bitSet.set(c, value);
+				set(c, value);
+			}
+		}
+
+		private void requireAscii(int i) {
+			if (i >= LENGTH) {
+				throw new IllegalArgumentException("Only ASCII characters can be specified.");
 			}
 		}
 	}
