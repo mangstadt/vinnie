@@ -101,6 +101,32 @@
 				</configuration>
 			</plugin>
 
+			<!--
+			Adds the module descriptor to META-INF/versions/9 of the JAR, so it still runs on Java 6.
+			ModiTect compiles it itself, so the build still runs on Java 8.
+			-->
+			<plugin>
+				<groupId>org.moditect</groupId>
+				<artifactId>moditect-maven-plugin</artifactId>
+				<version>1.2.2.Final</version>
+				<executions>
+					<execution>
+						<id>add-module-info</id>
+						<phase>package</phase>
+						<goals>
+							<goal>add-module-info</goal>
+						</goals>
+						<configuration>
+							<jvmVersion>9</jvmVersion>
+							<overwriteExistingFiles>true</overwriteExistingFiles>
+							<module>
+								<moduleInfoFile>${project.basedir}/src/main/moditect/module-info.java</moduleInfoFile>
+							</module>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 			<!-- Create a source code JAR -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
