@@ -594,8 +594,8 @@ public class VObjectWriter implements Closeable, Flushable {
 		switch (syntaxStyle) {
 		case LEGACY:
 			/*
-			 * Old syntax does not support the "\n" escape sequence so encode the
-			 * value in quoted-printable encoding if any newline characters
+			 * Legacy syntax does not support the "\n" escape sequence so encode
+			 * the value in quoted-printable encoding if any newline characters
 			 * exist.
 			 */
 			if (containsNewlines(value) && !parameters.get().isQuotedPrintable()) {
