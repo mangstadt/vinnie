@@ -74,7 +74,7 @@ public class PullRequest5 {
 	@Test
 	public void lowercase_encoding_parameter_is_encoded() throws Exception {
 		StringWriter sw = new StringWriter();
-		VObjectWriter writer = new VObjectWriter(sw, SyntaxStyle.NEW);
+		VObjectWriter writer = new VObjectWriter(sw, SyntaxStyle.MODERN);
 
 		VObjectParameters parameters = new VObjectParameters();
 		parameters.put("encoding", "QUOTED-PRINTABLE");

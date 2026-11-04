@@ -62,7 +62,7 @@ public class VObjectValidator {
 		boolean strict;
 		SyntaxStyle syntax;
 
-		syntax = SyntaxStyle.OLD;
+		syntax = SyntaxStyle.LEGACY;
 		{
 			Map<Boolean, AllowedCharacters> map = new HashMap<Boolean, AllowedCharacters>();
 			strict = false;
@@ -104,13 +104,13 @@ public class VObjectValidator {
 			propertyName.put(syntax, Collections.unmodifiableMap(map));
 		}
 
-		syntax = SyntaxStyle.NEW;
+		syntax = SyntaxStyle.MODERN;
 		{
 			Map<Boolean, AllowedCharacters> map = new HashMap<Boolean, AllowedCharacters>();
 			strict = false;
 			{
-				//same as old style syntax
-				map.put(strict, propertyName.get(SyntaxStyle.OLD).get(strict));
+				//same as legacy syntax
+				map.put(strict, propertyName.get(SyntaxStyle.LEGACY).get(strict));
 			}
 
 			strict = true;
@@ -136,7 +136,7 @@ public class VObjectValidator {
 		boolean strict;
 		SyntaxStyle syntax;
 
-		syntax = SyntaxStyle.OLD;
+		syntax = SyntaxStyle.LEGACY;
 		{
 			Map<Boolean, AllowedCharacters> map = new HashMap<Boolean, AllowedCharacters>();
 			strict = false;
@@ -158,13 +158,13 @@ public class VObjectValidator {
 			parameterName.put(syntax, Collections.unmodifiableMap(map));
 		}
 
-		syntax = SyntaxStyle.NEW;
+		syntax = SyntaxStyle.MODERN;
 		{
 			Map<Boolean, AllowedCharacters> map = new HashMap<Boolean, AllowedCharacters>();
 			strict = false;
 			{
-				//same as old style syntax
-				map.put(strict, parameterName.get(SyntaxStyle.OLD).get(strict));
+				//same as legacy syntax
+				map.put(strict, parameterName.get(SyntaxStyle.LEGACY).get(strict));
 			}
 
 			strict = true;
@@ -179,10 +179,11 @@ public class VObjectValidator {
 
 	private static final Map<SyntaxStyle, Map<Boolean, Map<Boolean, AllowedCharacters>>> parameterValue = new EnumMap<SyntaxStyle, Map<Boolean, Map<Boolean, AllowedCharacters>>>(SyntaxStyle.class);
 	static {
-		boolean strict, caretEncoding;
+		boolean strict;
+		boolean caretEncoding;
 		SyntaxStyle syntax;
 
-		syntax = SyntaxStyle.OLD;
+		syntax = SyntaxStyle.LEGACY;
 		{
 			Map<Boolean, Map<Boolean, AllowedCharacters>> map = new HashMap<Boolean, Map<Boolean, AllowedCharacters>>();
 			caretEncoding = false;
@@ -215,7 +216,7 @@ public class VObjectValidator {
 			{
 				/*
 				 * Same as when caret encoding is disabled because
-				 * old style syntax does not support caret encoding.
+				 * legacy syntax does not support caret encoding.
 				 */
 				map.put(caretEncoding, map.get(false));
 			}
@@ -223,7 +224,7 @@ public class VObjectValidator {
 			parameterValue.put(syntax, map);
 		}
 
-		syntax = SyntaxStyle.NEW;
+		syntax = SyntaxStyle.MODERN;
 		{
 			Map<Boolean, Map<Boolean, AllowedCharacters>> map = new HashMap<Boolean, Map<Boolean, AllowedCharacters>>();
 			caretEncoding = false;

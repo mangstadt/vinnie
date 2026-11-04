@@ -126,10 +126,9 @@ public class FoldedLineWriterTest {
 	 * the next line and possibly being ignored by the consuming application.
 	 * </p>
 	 * <p>
-	 * This is a possibility with old style syntax because old style syntax
-	 * allows multiple characters to be included in the folding whitespace. New
-	 * style syntax, by contrast, requires exactly one folding whitespace
-	 * character.
+	 * This is a possibility with legacy syntax because legacy syntax allows
+	 * multiple characters to be included in the folding whitespace. Modern
+	 * syntax, by contrast, requires exactly one folding whitespace character.
 	 * </p>
 	 */
 	@Test
@@ -282,7 +281,7 @@ public class FoldedLineWriterTest {
 
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void quoted_printable_encoded_char_not_split_between_lines() throws Exception {
 		StringWriter sw = new StringWriter();
