@@ -75,12 +75,12 @@
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
-				<version>2.4.0</version>
+				<version>5.1.9</version> <!-- Latest version to support Java 8 -->
 				<extensions>true</extensions>
 			</plugin>
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.4.3</version>
+				<version>3.5.0</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
 				</configuration>
@@ -88,7 +88,7 @@
 
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
+				<version>3.16.0</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
 					<source>${java.version}</source>
@@ -96,11 +96,16 @@
 				</configuration>
 			</plugin>
 
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.6.0</version>
+			</plugin>
+
 			<!-- Create a source code JAR -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>2.1.2</version>
+				<version>3.4.0</version>
 				<executions>
 					<execution>
 						<goals>
@@ -114,7 +119,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.12.0</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
 					<linksource>true</linksource>
@@ -174,7 +179,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-pmd-plugin</artifactId>
-				<version>3.6</version>
+				<version>3.28.0</version>
 				<configuration>
 					<targetJdk>${java.version}</targetJdk>
 				</configuration>
@@ -187,7 +192,7 @@
 			<plugin>
 				<groupId>org.pitest</groupId>
 				<artifactId>pitest-maven</artifactId>
-				<version>1.1.10</version>
+				<version>1.17.4</version> <!-- Latest version to support Java 8 -->
 				<configuration>
 					<targetClasses>
 						<param>com.github.mangstadt.vinnie.*</param>
@@ -208,7 +213,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.6</version>
+				<version>0.8.15</version>
 				<executions>
 					<execution>
 						<goals>
