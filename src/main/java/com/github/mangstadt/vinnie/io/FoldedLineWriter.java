@@ -179,9 +179,9 @@ public class FoldedLineWriter extends Writer {
 				 * folding whitespace of the following folded line and
 				 * potentially being lost.
 				 * 
-				 * Old syntax style allows multiple whitespace characters to be
-				 * used for folding, so it could get lost here. New syntax style
-				 * only allows one character to be used.
+				 * Legacy style allows multiple whitespace characters to be used
+				 * for folding, so it could get lost here. Modern style only
+				 * allows one character to be used.
 				 */
 				if (Character.isWhitespace(c)) {
 					while (Character.isWhitespace(c) && i < end - 1) {

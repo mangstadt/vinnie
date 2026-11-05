@@ -322,8 +322,8 @@ public class VObjectReaderTest {
 	/**
 	 * When checking for BEGIN and END properties, the property name and value
 	 * should be trimmed so that any whitespace around the colon ignored.
-	 * Whitespace around the colon is allowed by old style syntax, though it
-	 * never happens in practice.
+	 * Whitespace around the colon is allowed by legacy syntax, though it never
+	 * happens in practice.
 	 */
 	@Test
 	public void whitespace_around_component_names() throws Exception {
@@ -682,7 +682,7 @@ public class VObjectReaderTest {
 		"PROP;PARAM = value:value";
 		//@formatter:on
 
-		SyntaxStyle style = SyntaxStyle.OLD;
+		SyntaxStyle style = SyntaxStyle.LEGACY;
 		{
 			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
@@ -700,7 +700,7 @@ public class VObjectReaderTest {
 			//@formatter:on
 		}
 
-		style = SyntaxStyle.NEW;
+		style = SyntaxStyle.MODERN;
 		{
 			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
@@ -720,7 +720,7 @@ public class VObjectReaderTest {
 	}
 
 	/**
-	 * New style syntax has special syntax for defining multi-valued parameters.
+	 * Modern syntax has special syntax for defining multi-valued parameters.
 	 */
 	@Test
 	public void multi_valued_parameters() throws Exception {
@@ -729,7 +729,7 @@ public class VObjectReaderTest {
 		"PROP;PARAM=value1,value2:value";
 		//@formatter:on
 
-		SyntaxStyle style = SyntaxStyle.OLD;
+		SyntaxStyle style = SyntaxStyle.LEGACY;
 		{
 			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
@@ -747,7 +747,7 @@ public class VObjectReaderTest {
 			//@formatter:on
 		}
 
-		style = SyntaxStyle.NEW;
+		style = SyntaxStyle.MODERN;
 		{
 			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
@@ -767,9 +767,9 @@ public class VObjectReaderTest {
 	}
 
 	/**
-	 * New style syntax lets you surround parameter values in double quotes.
-	 * Doing this lets you put special characters like semi-colons in the
-	 * property value.
+	 * Modern syntax lets you surround parameter values in double quotes. Doing
+	 * this lets you put special characters like semi-colons in the property
+	 * value.
 	 */
 	@Test
 	public void parameter_values_in_double_quotes() throws Exception {
@@ -779,8 +779,8 @@ public class VObjectReaderTest {
 		//@formatter:on
 
 		Map<SyntaxStyle, VObjectProperty> styleToProperty = new HashMap<SyntaxStyle, VObjectProperty>();
-		styleToProperty.put(SyntaxStyle.OLD, property().name("PROP").param("PARAM", "\"a").param(null, "b").value("c,d\":value").build());
-		styleToProperty.put(SyntaxStyle.NEW, property().name("PROP").param("PARAM", "a;b:c,d").value("value").build());
+		styleToProperty.put(SyntaxStyle.LEGACY, property().name("PROP").param("PARAM", "\"a").param(null, "b").value("c,d\":value").build());
+		styleToProperty.put(SyntaxStyle.MODERN, property().name("PROP").param("PARAM", "a;b:c,d").value("value").build());
 
 		for (SyntaxStyle style : styleToProperty.keySet()) {
 			VObjectProperty expectedProperty = styleToProperty.get(style);
@@ -807,7 +807,7 @@ public class VObjectReaderTest {
 	 */
 	@Test
 	public void parameter_value_escaping() throws Exception {
-		SyntaxStyle style = SyntaxStyle.OLD;
+		SyntaxStyle style = SyntaxStyle.LEGACY;
 		{
 			//1: backslash that doesn't escape anything
 			//2: caret-escaped caret
@@ -823,7 +823,7 @@ public class VObjectReaderTest {
 			"PROP;PARAM=1\\ 2^^ 3^n 4^N 5^' 6^ 7\\; 8\" 9\\\\:";
 			//@formatter:on
 
-			for (boolean caretDecodingEnabled : new boolean[] { false, true }) { //caret decoding has no effect in old style
+			for (boolean caretDecodingEnabled : new boolean[] { false, true }) { //caret decoding has no effect in legacy syntax
 				VObjectReader reader = reader(string, style);
 				reader.setCaretDecodingEnabled(caretDecodingEnabled);
 				VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
@@ -842,7 +842,7 @@ public class VObjectReaderTest {
 			}
 		}
 
-		style = SyntaxStyle.NEW;
+		style = SyntaxStyle.MODERN;
 		{
 			//1: backslash that doesn't escape anything
 			//2: caret-escaped caret
@@ -913,7 +913,7 @@ public class VObjectReaderTest {
 		"PROP:last";
 		//@formatter:on
 
-		SyntaxStyle style = SyntaxStyle.OLD;
+		SyntaxStyle style = SyntaxStyle.LEGACY;
 		{
 			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
@@ -943,7 +943,7 @@ public class VObjectReaderTest {
 			//@formatter:on
 		}
 
-		style = SyntaxStyle.NEW;
+		style = SyntaxStyle.MODERN;
 		{
 			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
@@ -976,9 +976,9 @@ public class VObjectReaderTest {
 		}
 	}
 
-	@Test(expected=NullPointerException.class)
+	@Test(expected = NullPointerException.class)
 	public void setDefaultQuotedPrintableCharset_null() throws Exception {
-		VObjectReader reader = reader("", SyntaxStyle.OLD);
+		VObjectReader reader = reader("", SyntaxStyle.LEGACY);
 		reader.setDefaultQuotedPrintableCharset(null);
 	}
 
@@ -1165,7 +1165,7 @@ public class VObjectReaderTest {
 		String string =
 		"VERSION:1\r\n" +
 		"BEGIN:COMP1\r\n" +
-			"PROP;PARAM=\"value\":\r\n" + //default to OLD style
+			"PROP;PARAM=\"value\":\r\n" + //default to legacy syntax
 		"END:COMP1\r\n" +
 		"BEGIN:COMP1\r\n" +
 			"VERSION:2\r\n" + //wrong parent
@@ -1189,47 +1189,47 @@ public class VObjectReaderTest {
 		"END:COMP2\r\n";
 		//@formatter:on
 
-		SyntaxRules rules = new SyntaxRules(SyntaxStyle.OLD);
-		rules.addRule(new LaciToken("COMP2"), "1", SyntaxStyle.OLD);
-		rules.addRule(new LaciToken("COMP2"), "2", SyntaxStyle.NEW);
+		SyntaxRules rules = new SyntaxRules(SyntaxStyle.LEGACY);
+		rules.addRule(new LaciToken("COMP2"), "1", SyntaxStyle.LEGACY);
+		rules.addRule(new LaciToken("COMP2"), "2", SyntaxStyle.MODERN);
 
 		VObjectReader reader = new VObjectReader(new StringReader(string), rules);
 		VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
 		reader.parse(listener);
 
-		VObjectProperty oldStyleProp = property().name("PROP").param("PARAM", "\"value\"").value("").build();
-		VObjectProperty newStyleProp = property().name("PROP").param("PARAM", "value").value("").build();
+		VObjectProperty legacyProp = property().name("PROP").param("PARAM", "\"value\"").value("").build();
+		VObjectProperty modernProp = property().name("PROP").param("PARAM", "value").value("").build();
 
 		InOrder inorder = inOrder(listener);
 
 		//@formatter:off
 		inorder.verify(listener).onProperty(eq(property().name("VERSION").value("1").build()), any(Context.class));
 		inorder.verify(listener).onComponentBegin(eq(component("COMP1")), any(Context.class));
-			inorder.verify(listener).onProperty(eq(oldStyleProp), any(Context.class));
+			inorder.verify(listener).onProperty(eq(legacyProp), any(Context.class));
 		inorder.verify(listener).onComponentEnd(eq(component("COMP1")), any(Context.class));
 		
 		inorder.verify(listener).onComponentBegin(eq(component("COMP1")), any(Context.class));
 			inorder.verify(listener).onProperty(eq(property().name("VERSION").value("2").build()), any(Context.class));
-			inorder.verify(listener).onProperty(eq(oldStyleProp), any(Context.class));
+			inorder.verify(listener).onProperty(eq(legacyProp), any(Context.class));
 		inorder.verify(listener).onComponentEnd(eq(component("COMP1")), any(Context.class));
 		
 		inorder.verify(listener).onComponentBegin(eq(component("COMP2")), any(Context.class));
 			inorder.verify(listener).onWarning(eq(Warning.UNKNOWN_VERSION), eq(property().name("VERSION").value("3").build()), isNull(Exception.class), any(Context.class));
 			inorder.verify(listener).onProperty(eq(property().name("VERSION").value("3").build()), any(Context.class));
-			inorder.verify(listener).onProperty(eq(oldStyleProp), any(Context.class));
+			inorder.verify(listener).onProperty(eq(legacyProp), any(Context.class));
 		inorder.verify(listener).onComponentEnd(eq(component("COMP2")), any(Context.class));
 		
 		inorder.verify(listener).onComponentBegin(eq(component("COMP2")), any(Context.class));
 			inorder.verify(listener).onVersion(eq("2"), any(Context.class));
-			inorder.verify(listener).onProperty(eq(newStyleProp), any(Context.class));
+			inorder.verify(listener).onProperty(eq(modernProp), any(Context.class));
 			inorder.verify(listener).onComponentBegin(eq(component("COMP3")), any(Context.class));
-				inorder.verify(listener).onProperty(eq(newStyleProp), any(Context.class));
+				inorder.verify(listener).onProperty(eq(modernProp), any(Context.class));
 			inorder.verify(listener).onComponentEnd(eq(component("COMP3")), any(Context.class));
 			inorder.verify(listener).onComponentBegin(eq(component("COMP2")), any(Context.class));
 				inorder.verify(listener).onVersion(eq("1"), any(Context.class));
-				inorder.verify(listener).onProperty(eq(oldStyleProp), any(Context.class));
+				inorder.verify(listener).onProperty(eq(legacyProp), any(Context.class));
 			inorder.verify(listener).onComponentEnd(eq(component("COMP2")), any(Context.class));
-			inorder.verify(listener).onProperty(eq(newStyleProp), any(Context.class));
+			inorder.verify(listener).onProperty(eq(modernProp), any(Context.class));
 		inorder.verify(listener).onComponentEnd(eq(component("COMP2")), any(Context.class));
 		//@formatter:on
 
@@ -1295,30 +1295,30 @@ public class VObjectReaderTest {
 		VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
 		reader.parse(listener);
 
-		VObjectProperty oldStyleProp = property().name("PROP").param("PARAM", "\"value\"").value("").build();
-		VObjectProperty newStyleProp = property().name("PROP").param("PARAM", "value").value("").build();
+		VObjectProperty legacyProp = property().name("PROP").param("PARAM", "\"value\"").value("").build();
+		VObjectProperty modernProp = property().name("PROP").param("PARAM", "value").value("").build();
 
 		InOrder inorder = inOrder(listener);
 
 		//@formatter:off
 		inorder.verify(listener).onComponentBegin(eq(component("VCALENDAR")), any(Context.class));
-			inorder.verify(listener).onProperty(eq(oldStyleProp), any(Context.class));
+			inorder.verify(listener).onProperty(eq(legacyProp), any(Context.class));
 		inorder.verify(listener).onComponentEnd(eq(component("VCALENDAR")), any(Context.class));
 		
 		inorder.verify(listener).onComponentBegin(eq(component("VCALENDAR")), any(Context.class));
 			inorder.verify(listener).onWarning(eq(Warning.UNKNOWN_VERSION), eq(property().name("VERSION").value("10").build()), isNull(Exception.class), any(Context.class));
 			inorder.verify(listener).onProperty(eq(property().name("VERSION").value("10").build()), any(Context.class));
-			inorder.verify(listener).onProperty(eq(oldStyleProp), any(Context.class));
+			inorder.verify(listener).onProperty(eq(legacyProp), any(Context.class));
 		inorder.verify(listener).onComponentEnd(eq(component("VCALENDAR")), any(Context.class));
 		
 		inorder.verify(listener).onComponentBegin(eq(component("VCALENDAR")), any(Context.class));
 			inorder.verify(listener).onVersion(eq("1.0"), any(Context.class));
-			inorder.verify(listener).onProperty(eq(oldStyleProp), any(Context.class));
+			inorder.verify(listener).onProperty(eq(legacyProp), any(Context.class));
 		inorder.verify(listener).onComponentEnd(eq(component("VCALENDAR")), any(Context.class));
 		
 		inorder.verify(listener).onComponentBegin(eq(component("VCALENDAR")), any(Context.class));
 			inorder.verify(listener).onVersion(eq("2.0"), any(Context.class));
-			inorder.verify(listener).onProperty(eq(newStyleProp), any(Context.class));
+			inorder.verify(listener).onProperty(eq(modernProp), any(Context.class));
 		inorder.verify(listener).onComponentEnd(eq(component("VCALENDAR")), any(Context.class));
 		//@formatter:on
 
@@ -1378,35 +1378,35 @@ public class VObjectReaderTest {
 		VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
 		reader.parse(listener);
 
-		VObjectProperty oldStyleProp = property().name("PROP").param("PARAM", "\"value\"").value("").build();
-		VObjectProperty newStyleProp = property().name("PROP").param("PARAM", "value").value("").build();
+		VObjectProperty legacyProp = property().name("PROP").param("PARAM", "\"value\"").value("").build();
+		VObjectProperty modernProp = property().name("PROP").param("PARAM", "value").value("").build();
 
 		InOrder inorder = inOrder(listener);
 
 		//@formatter:off
 		inorder.verify(listener).onComponentBegin(eq(component("VCARD")), any(Context.class));
-			inorder.verify(listener).onProperty(eq(oldStyleProp), any(Context.class));
+			inorder.verify(listener).onProperty(eq(legacyProp), any(Context.class));
 		inorder.verify(listener).onComponentEnd(eq(component("VCARD")), any(Context.class));
 		
 		inorder.verify(listener).onComponentBegin(eq(component("VCARD")), any(Context.class));
 			inorder.verify(listener).onWarning(eq(Warning.UNKNOWN_VERSION), eq(property().name("VERSION").value("10").build()), isNull(Exception.class), any(Context.class));
 			inorder.verify(listener).onProperty(eq(property().name("VERSION").value("10").build()), any(Context.class));
-			inorder.verify(listener).onProperty(eq(oldStyleProp), any(Context.class));
+			inorder.verify(listener).onProperty(eq(legacyProp), any(Context.class));
 		inorder.verify(listener).onComponentEnd(eq(component("VCARD")), any(Context.class));
 		
 		inorder.verify(listener).onComponentBegin(eq(component("VCARD")), any(Context.class));
 			inorder.verify(listener).onVersion(eq("2.1"), any(Context.class));
-			inorder.verify(listener).onProperty(eq(oldStyleProp), any(Context.class));
+			inorder.verify(listener).onProperty(eq(legacyProp), any(Context.class));
 		inorder.verify(listener).onComponentEnd(eq(component("VCARD")), any(Context.class));
 		
 		inorder.verify(listener).onComponentBegin(eq(component("VCARD")), any(Context.class));
 			inorder.verify(listener).onVersion(eq("3.0"), any(Context.class));
-			inorder.verify(listener).onProperty(eq(newStyleProp), any(Context.class));
+			inorder.verify(listener).onProperty(eq(modernProp), any(Context.class));
 		inorder.verify(listener).onComponentEnd(eq(component("VCARD")), any(Context.class));
 		
 		inorder.verify(listener).onComponentBegin(eq(component("VCARD")), any(Context.class));
 			inorder.verify(listener).onVersion(eq("4.0"), any(Context.class));
-			inorder.verify(listener).onProperty(eq(newStyleProp), any(Context.class));
+			inorder.verify(listener).onProperty(eq(modernProp), any(Context.class));
 		inorder.verify(listener).onComponentEnd(eq(component("VCARD")), any(Context.class));
 		//@formatter:on
 

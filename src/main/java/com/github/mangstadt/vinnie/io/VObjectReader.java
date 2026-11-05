@@ -302,7 +302,7 @@ public class VObjectReader implements Closeable {
 	 * Gets whether the reader will decode parameter values that use circumflex
 	 * accent encoding (enabled by default). This escaping mechanism allows
 	 * newlines and double quotes to be included in parameter values. It is only
-	 * supported by new style syntax.
+	 * supported by modern syntax.
 	 * </p>
 	 * 
 	 * <table class="simpleTable">
@@ -345,7 +345,7 @@ public class VObjectReader implements Closeable {
 	 * Sets whether the reader will decode parameter values that use circumflex
 	 * accent encoding (enabled by default). This escaping mechanism allows
 	 * newlines and double quotes to be included in parameter values. It is only
-	 * supported by new style syntax.
+	 * supported by modern syntax.
 	 * </p>
 	 * 
 	 * <table class="simpleTable">
@@ -421,7 +421,7 @@ public class VObjectReader implements Closeable {
 
 			/*
 			 * Note: Property names are trimmed when checking for BEGIN and END
-			 * properties because old style syntax allows there to be whitespace
+			 * properties because legacy syntax allows there to be whitespace
 			 * around the colon character for these two properties. Component
 			 * names are trimmed for the same reason.
 			 */
@@ -632,7 +632,7 @@ public class VObjectReader implements Closeable {
 			}
 
 			if (inFoldedLineWhitespace) {
-				if (isSpaceOrTab(ch) && syntax == SyntaxStyle.OLD) {
+				if (isSpaceOrTab(ch) && syntax == SyntaxStyle.LEGACY) {
 					/*
 					 * 2.1 allows multiple whitespace characters to be used for
 					 * folding (section 2.1.3).
@@ -674,8 +674,8 @@ public class VObjectReader implements Closeable {
 				} else {
 					//set a parameter value
 					String paramValue = buffer.getAndClear();
-					if (syntax == SyntaxStyle.OLD) {
-						//old style allows whitespace to surround the "=", so remove it
+					if (syntax == SyntaxStyle.LEGACY) {
+						//legacy allows whitespace to surround the "=", so remove it
 						paramValue = ltrim(paramValue);
 					}
 					property.getParameters().put(curParamName, paramValue);
@@ -697,8 +697,8 @@ public class VObjectReader implements Closeable {
 
 			if (isEndOfParamName(property, ch, curParamName)) {
 				String paramName = buffer.getAndClear();
-				if (syntax == SyntaxStyle.OLD) {
-					//old style allows whitespace to surround the "=", so remove it
+				if (syntax == SyntaxStyle.LEGACY) {
+					//legacy allows whitespace to surround the "=", so remove it
 					paramName = rtrim(paramName);
 				}
 				curParamName = new LaciToken(paramName);
@@ -737,9 +737,10 @@ public class VObjectReader implements Closeable {
 				return;
 			case ';':
 				/*
-				 * Semicolons can only be escaped in old style parameter values.
-				 * If a new style parameter value has semicolons, the value
-				 * should be surrounded in double quotes.
+				 * Semicolons can only be escaped in parameter values when
+				 * legacy syntax is being used. In modern syntax, if a parameter
+				 * value has semicolons, the value should be surrounded in
+				 * double quotes.
 				 */
 				buffer.append(ch);
 				return;
@@ -774,9 +775,9 @@ public class VObjectReader implements Closeable {
 		}
 
 		switch (syntax) {
-		case OLD:
+		case LEGACY:
 			return (ch == '\\');
-		case NEW:
+		case MODERN:
 			return (ch == '^' && caretDecodingEnabled);
 		}
 
@@ -792,7 +793,7 @@ public class VObjectReader implements Closeable {
 	}
 
 	private boolean isEndOfMultivaluedParamValue(VObjectProperty property, char ch, LaciToken curParamName, boolean inQuotes, SyntaxStyle syntax) {
-		return property.getName() != null && ch == ',' && curParamName != null && !inQuotes && syntax != SyntaxStyle.OLD;
+		return property.getName() != null && ch == ',' && curParamName != null && !inQuotes && syntax != SyntaxStyle.LEGACY;
 	}
 
 	private boolean isEndOfParamName(VObjectProperty property, char ch, LaciToken curParamName) {
@@ -800,7 +801,7 @@ public class VObjectReader implements Closeable {
 	}
 
 	private boolean isEnteringOrLeavingDoubleQuotedParamValue(VObjectProperty property, char ch, LaciToken curParamName, SyntaxStyle syntax) {
-		return property.getName() != null && ch == '"' && curParamName != null && syntax != SyntaxStyle.OLD;
+		return property.getName() != null && ch == '"' && curParamName != null && syntax != SyntaxStyle.LEGACY;
 	}
 
 	/**

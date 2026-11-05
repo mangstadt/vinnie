@@ -200,7 +200,7 @@ public class VObjectWriterTest {
 	@Test
 	public void close() throws Exception {
 		Writer w = mock(Writer.class);
-		VObjectWriter writer = new VObjectWriter(w, SyntaxStyle.OLD);
+		VObjectWriter writer = new VObjectWriter(w, SyntaxStyle.LEGACY);
 		writer.close();
 
 		verify(w).close();
@@ -209,7 +209,7 @@ public class VObjectWriterTest {
 	@Test
 	public void flush() throws Exception {
 		Writer w = mock(Writer.class);
-		VObjectWriter writer = new VObjectWriter(w, SyntaxStyle.OLD);
+		VObjectWriter writer = new VObjectWriter(w, SyntaxStyle.LEGACY);
 		writer.flush();
 
 		verify(w).flush();
@@ -423,7 +423,7 @@ public class VObjectWriterTest {
 		parameters.put("MULTIPLE", "two");
 		list.add(parameters);
 
-		SyntaxStyle style = SyntaxStyle.OLD;
+		SyntaxStyle style = SyntaxStyle.LEGACY;
 		{
 			for (boolean caretEncoding : new boolean[] { false, true }) {
 				StringWriter sw = new StringWriter();
@@ -446,7 +446,7 @@ public class VObjectWriterTest {
 			}
 		}
 
-		style = SyntaxStyle.NEW;
+		style = SyntaxStyle.MODERN;
 		{
 			for (boolean caretEncoding : new boolean[] { false, true }) {
 				StringWriter sw = new StringWriter();
@@ -483,7 +483,7 @@ public class VObjectWriterTest {
 		parameters.put((String) null, "two");
 		list.add(parameters);
 
-		SyntaxStyle style = SyntaxStyle.OLD;
+		SyntaxStyle style = SyntaxStyle.LEGACY;
 		{
 			for (boolean caretEncoding : new boolean[] { false, true }) {
 				StringWriter sw = new StringWriter();
@@ -505,7 +505,7 @@ public class VObjectWriterTest {
 			}
 		}
 
-		style = SyntaxStyle.NEW;
+		style = SyntaxStyle.MODERN;
 		{
 			for (boolean caretEncoding : new boolean[] { false, true }) {
 				StringWriter sw = new StringWriter();
@@ -567,7 +567,7 @@ public class VObjectWriterTest {
 	 */
 	@Test
 	public void parameters_invalid_characters_in_value() throws Exception {
-		SyntaxStyle style = SyntaxStyle.OLD;
+		SyntaxStyle style = SyntaxStyle.LEGACY;
 		{
 			for (boolean caretEncoding : new boolean[] { false, true }) {
 				for (char c : ":\n\r".toCharArray()) {
@@ -597,7 +597,7 @@ public class VObjectWriterTest {
 			}
 		}
 
-		style = SyntaxStyle.NEW;
+		style = SyntaxStyle.MODERN;
 		{
 			boolean caretEncoding = false;
 			{
@@ -638,10 +638,10 @@ public class VObjectWriterTest {
 	 */
 	@Test
 	public void parameters_escape_special_characters_in_value() throws Exception {
-		//Old style:
+		//Legacy syntax:
 		//Replaces \ with \\
 		//Replaces ; with \;
-		SyntaxStyle style = SyntaxStyle.OLD;
+		SyntaxStyle style = SyntaxStyle.LEGACY;
 		{
 			for (boolean caretEncoding : new boolean[] { false, true }) {
 				StringWriter sw = new StringWriter();
@@ -666,9 +666,9 @@ public class VObjectWriterTest {
 			}
 		}
 
-		style = SyntaxStyle.NEW;
+		style = SyntaxStyle.MODERN;
 		{
-			//New style without caret escaping
+			//modern syntax without caret escaping
 			//surrounds in double quotes, since it contains , ; or :
 			boolean caretEncoding = false;
 			{
@@ -693,7 +693,7 @@ public class VObjectWriterTest {
 				assertEquals(expected, actual);
 			}
 
-			//New style with caret escaping
+			//modern syntax with caret escaping
 			//replaces ^ with ^^
 			//replaces newline with ^n
 			//replaces " with ^'
@@ -746,12 +746,13 @@ public class VObjectWriterTest {
 	}
 
 	/**
-	 * When the property value contains newlines, it should encode in
-	 * quoted-printable in old style, and escape newlines in new style.
+	 * When the property value contains newlines, it should encode it in
+	 * quoted-printable under legacy syntax, and escape the newlines under
+	 * modern syntax.
 	 */
 	@Test
 	public void property_value_with_newlines() throws Exception {
-		SyntaxStyle style = SyntaxStyle.OLD;
+		SyntaxStyle style = SyntaxStyle.LEGACY;
 		{
 			StringWriter sw = new StringWriter();
 			VObjectWriter writer = VObjectWriter.withoutLineFolding(sw, style);
@@ -804,7 +805,7 @@ public class VObjectWriterTest {
 			assertEquals(expected, actual);
 		}
 
-		style = SyntaxStyle.NEW;
+		style = SyntaxStyle.MODERN;
 		{
 			StringWriter sw = new StringWriter();
 			VObjectWriter writer = new VObjectWriter(sw, style);

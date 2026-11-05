@@ -31,12 +31,12 @@ package com.github.mangstadt.vinnie;
  */
 public enum SyntaxStyle {
 	/**
-	 * "Old style" syntax (vCard 2.1 and vCal 1.0).
+	 * Syntax used by older specifications (vCard 2.1 and vCal 1.0).
 	 */
-	OLD,
+	LEGACY,
 
 	/**
-	 * "New style" syntax (vCard 3.0/4.0 and iCal 2.0).
+	 * Syntax used by more recent specifications (vCard 3.0/4.0 and iCal 2.0).
 	 */
-	NEW
+	MODERN
 }

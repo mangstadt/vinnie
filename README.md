@@ -5,7 +5,6 @@
 | Continuous Integration: | [![](https://travis-ci.org/mangstadt/vinnie.svg?branch=master)](https://travis-ci.org/mangstadt/vinnie) |
 | Code Coverage: | [![codecov.io](http://codecov.io/github/mangstadt/vinnie/coverage.svg?branch=master)](http://codecov.io/github/mangstadt/vinnie?branch=master) |
 | Maven Central: | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.mangstadt/vinnie/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.mangstadt/vinnie) |
-| Chat Room: | [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mangstadt/vinnie?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) |
 | License: | [![MIT License](https://img.shields.io/badge/License-MIT-red.svg)](https://github.com/mangstadt/vinnie/blob/master/LICENSES) |
 
 vinnie is a lightweight Java library that reads and writes "vobject" data (vCard and iCalendar).  It is used by the [ez-vcard](https://github.com/mangstadt/ez-vcard) and [biweekly](https://github.com/mangstadt/biweekly) projects.
@@ -134,7 +133,6 @@ To build a JAR: `mvn package`
 You have some options:
 
  * Post an [issue](https://github.com/mangstadt/vinnie/issues)
- * [Gitter chat room](https://gitter.im/mangstadt/vinnie)
- * Email me directly: [mike.angstadt@gmail.com](mailto:mike.angstadt@gmail.com)
+ * Start a [discussion](https://github.com/mangstadt/vinnie/discussions)
 
 [![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=8CEN7MPKRBKU6&lc=US&item_name=Michael%20Angstadt&item_number=vinnie&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)

@@ -112,17 +112,17 @@ public class SyntaxRules {
 	 */
 	public static SyntaxRules iCalendar() {
 		/*
-		 * Initialize to the old style syntax because the VERSION property can
+		 * Initialize to legacy syntax because the VERSION property can
 		 * technically exist anywhere inside the data stream under this version.
 		 * 
 		 * However, this setting is rarely important in practice because I've
 		 * never seen an iCalendar object that doesn't put its VERSION property
 		 * at the very beginning.
 		 */
-		SyntaxRules rules = new SyntaxRules(SyntaxStyle.OLD);
+		SyntaxRules rules = new SyntaxRules(SyntaxStyle.LEGACY);
 		LaciToken component = new LaciToken("VCALENDAR");
-		rules.addRule(component, "1.0", SyntaxStyle.OLD);
-		rules.addRule(component, "2.0", SyntaxStyle.NEW);
+		rules.addRule(component, "1.0", SyntaxStyle.LEGACY);
+		rules.addRule(component, "2.0", SyntaxStyle.MODERN);
 		return rules;
 	}
 
@@ -132,18 +132,18 @@ public class SyntaxRules {
 	 */
 	public static SyntaxRules vcard() {
 		/*
-		 * Initialize to the old style syntax because the VERSION property can
+		 * Initialize to legacy syntax because the VERSION property can
 		 * technically exist anywhere inside the data stream under this version.
 		 * 
 		 * However, this setting is rarely important in practice because I've
 		 * never seen a vCard that doesn't put its VERSION property at the very
 		 * beginning.
 		 */
-		SyntaxRules rules = new SyntaxRules(SyntaxStyle.OLD);
+		SyntaxRules rules = new SyntaxRules(SyntaxStyle.LEGACY);
 		LaciToken component = new LaciToken("VCARD");
-		rules.addRule(component, "2.1", SyntaxStyle.OLD);
-		rules.addRule(component, "3.0", SyntaxStyle.NEW);
-		rules.addRule(component, "4.0", SyntaxStyle.NEW);
+		rules.addRule(component, "2.1", SyntaxStyle.LEGACY);
+		rules.addRule(component, "3.0", SyntaxStyle.MODERN);
+		rules.addRule(component, "4.0", SyntaxStyle.MODERN);
 		return rules;
 	}
 }

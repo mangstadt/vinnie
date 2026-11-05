@@ -320,7 +320,7 @@ public class VObjectWriter implements Closeable, Flushable {
 	 * Gets whether the writer will apply circumflex accent encoding on
 	 * parameter values (disabled by default). This escaping mechanism allows
 	 * for newlines and double quotes to be included in parameter values. It is
-	 * only supported by new style syntax.
+	 * only supported by modern syntax.
 	 * </p>
 	 * 
 	 * <table class="simpleTable">
@@ -363,7 +363,7 @@ public class VObjectWriter implements Closeable, Flushable {
 	 * Sets whether the writer will apply circumflex accent encoding on
 	 * parameter values (disabled by default). This escaping mechanism allows
 	 * for newlines and double quotes to be included in parameter values. It is
-	 * only supported by new style syntax.
+	 * only supported by modern syntax.
 	 * </p>
 	 * 
 	 * <table class="simpleTable">
@@ -569,8 +569,8 @@ public class VObjectWriter implements Closeable, Flushable {
 		for (Map.Entry<LaciToken, List<String>> parameter : parameters) {
 			//validate the parameter name
 			LaciToken parameterName = parameter.getKey();
-			if (parameterName == null && syntaxStyle == SyntaxStyle.NEW) {
-				throw new IllegalArgumentException("Property \"" + name + "\" has a parameter whose name is null. This is not permitted with new style syntax.");
+			if (parameterName == null && syntaxStyle == SyntaxStyle.MODERN) {
+				throw new IllegalArgumentException("Property \"" + name + "\" has a parameter whose name is null. This is not permitted with modern syntax.");
 			}
 			if (parameterName != null && !allowedParameterNameChars.check(parameterName.toUpperCase())) {
 				throw new IllegalArgumentException("Property \"" + name + "\" has a parameter named \"" + parameterName + "\".  This parameter's name contains one or more invalid characters.  The following characters are not permitted: " + allowedParameterNameChars.flip());
@@ -592,17 +592,17 @@ public class VObjectWriter implements Closeable, Flushable {
 		}
 
 		switch (syntaxStyle) {
-		case OLD:
+		case LEGACY:
 			/*
-			 * Old style does not support the "\n" escape sequence so encode the
-			 * value in quoted-printable encoding if any newline characters
+			 * Legacy syntax does not support the "\n" escape sequence so encode
+			 * the value in quoted-printable encoding if any newline characters
 			 * exist.
 			 */
 			if (containsNewlines(value) && !parameters.get().isQuotedPrintable()) {
 				parameters.modify().put("ENCODING", "QUOTED-PRINTABLE");
 			}
 			break;
-		case NEW:
+		case MODERN:
 			value = escapeNewlines(value);
 			break;
 		}
@@ -652,19 +652,19 @@ public class VObjectWriter implements Closeable, Flushable {
 				continue;
 			}
 
-			if (syntaxStyle == SyntaxStyle.OLD) {
+			if (syntaxStyle == SyntaxStyle.LEGACY) {
 				//e.g. ADR;TYPE=home;TYPE=work;TYPE=another,value:
-				writeParameterOldStyle(parameterName, parameterValues);
+				writeParameterLegacy(parameterName, parameterValues);
 			} else {
 				//e.g. ADR;TYPE=home,work,"another,value":
-				writeParameterNewStyle(parameterName, parameterValues);
+				writeParameterModern(parameterName, parameterValues);
 			}
 		}
 	}
 
-	private void writeParameterOldStyle(LaciToken parameterName, List<String> parameterValues) throws IOException {
+	private void writeParameterLegacy(LaciToken parameterName, List<String> parameterValues) throws IOException {
 		for (String parameterValue : parameterValues) {
-			parameterValue = sanitizeOldStyleParameterValue(parameterValue);
+			parameterValue = sanitizeParameterValueForLegacySyntax(parameterValue);
 
 			writer.append(';');
 			if (parameterName != null) {
@@ -674,7 +674,7 @@ public class VObjectWriter implements Closeable, Flushable {
 		}
 	}
 
-	private void writeParameterNewStyle(LaciToken parameterName, List<String> parameterValues) throws IOException {
+	private void writeParameterModern(LaciToken parameterName, List<String> parameterValues) throws IOException {
 		writer.append(';');
 		if (parameterName != null) {
 			writer.append(parameterName.toUpperCase()).append('=');
@@ -682,7 +682,7 @@ public class VObjectWriter implements Closeable, Flushable {
 
 		boolean first = true;
 		for (String parameterValue : parameterValues) {
-			parameterValue = sanitizeNewStyleParameterValue(parameterValue);
+			parameterValue = sanitizeParameterValueForModernSyntax(parameterValue);
 
 			if (!first) {
 				writer.append(',');
@@ -746,7 +746,7 @@ public class VObjectWriter implements Closeable, Flushable {
 
 	/**
 	 * <p>
-	 * Sanitizes a parameter value for new style syntax.
+	 * Sanitizes a parameter value for modern syntax.
 	 * </p>
 	 * <p>
 	 * This method applies circumflex accent encoding, if it's enabled.
@@ -755,13 +755,13 @@ public class VObjectWriter implements Closeable, Flushable {
 	 * @param value the parameter value
 	 * @return the sanitized parameter value
 	 */
-	private String sanitizeNewStyleParameterValue(String value) {
+	private String sanitizeParameterValueForModernSyntax(String value) {
 		return caretEncodingEnabled ? applyCaretEncoding(value) : value;
 	}
 
 	/**
 	 * <p>
-	 * Sanitizes a parameter value for old style syntax.
+	 * Sanitizes a parameter value for legacy syntax.
 	 * </p>
 	 * <p>
 	 * This method escapes backslashes and semicolons.
@@ -769,7 +769,7 @@ public class VObjectWriter implements Closeable, Flushable {
 	 * @param value the parameter value
 	 * @return the sanitized parameter value
 	 */
-	private String sanitizeOldStyleParameterValue(String value) {
+	private String sanitizeParameterValueForLegacySyntax(String value) {
 		StringBuilder sb = null;
 		for (int i = 0; i < value.length(); i++) {
 			char c = value.charAt(i);
