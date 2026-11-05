@@ -27,7 +27,6 @@ package com.github.mangstadt.vinnie.io;
 import static com.github.mangstadt.vinnie.Utils.CRLF;
 import static com.github.mangstadt.vinnie.Utils.escapeNewlines;
 import static com.github.mangstadt.vinnie.Utils.isCRLF;
-import static com.github.mangstadt.vinnie.Utils.isCROrLF;
 
 import java.io.Closeable;
 import java.io.Flushable;
@@ -40,6 +39,7 @@ import java.util.Map;
 
 import com.github.mangstadt.vinnie.LaciToken;
 import com.github.mangstadt.vinnie.SyntaxStyle;
+import com.github.mangstadt.vinnie.Utils;
 import com.github.mangstadt.vinnie.VObjectParameters;
 import com.github.mangstadt.vinnie.VObjectProperty;
 import com.github.mangstadt.vinnie.codec.EncoderException;
@@ -252,6 +252,7 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * "\tltricies tempor orci ac dignissim.\r\n"
  * , sw.toString());
  * </pre>
+ * 
  * @author Michael Angstadt
  */
 public class VObjectWriter implements Closeable, Flushable {
@@ -430,7 +431,7 @@ public class VObjectWriter implements Closeable, Flushable {
 	 * @throws IOException if there's a problem writing to the data stream
 	 */
 	public void writeBeginComponent(String componentName) throws IOException {
-		if (componentName == null || componentName.isEmpty()) {
+		if (isNullOrEmpty(componentName)) {
 			throw new IllegalArgumentException("Component name cannot be null or empty.");
 		}
 		writeProperty("BEGIN", componentName);
@@ -443,7 +444,7 @@ public class VObjectWriter implements Closeable, Flushable {
 	 * @throws IOException if there's a problem writing to the data stream
 	 */
 	public void writeEndComponent(String componentName) throws IOException {
-		if (componentName == null || componentName.isEmpty()) {
+		if (isNullOrEmpty(componentName)) {
 			throw new IllegalArgumentException("Component name cannot be null or empty.");
 		}
 		writeProperty("END", componentName);
@@ -456,10 +457,14 @@ public class VObjectWriter implements Closeable, Flushable {
 	 * @throws IOException if there's a problem writing to the data stream
 	 */
 	public void writeVersion(String version) throws IOException {
-		if (version == null || version.isEmpty()) {
+		if (isNullOrEmpty(version)) {
 			throw new IllegalArgumentException("Version string cannot be null or empty.");
 		}
 		writeProperty("VERSION", version);
+	}
+
+	private static boolean isNullOrEmpty(String s) {
+		return s == null || s.isEmpty();
 	}
 
 	/**
@@ -549,7 +554,7 @@ public class VObjectWriter implements Closeable, Flushable {
 		if (!allowedGroupChars.check(group)) {
 			throw new IllegalArgumentException("Property \"" + name + "\" has its group set to \"" + group + "\".  This group name contains one or more invalid characters.  The following characters are not permitted: " + allowedGroupChars.flip());
 		}
-		if (beginsWithWhitespace(group)) {
+		if (beginsWithTabOrSpace(group)) {
 			throw new IllegalArgumentException("Property \"" + name + "\" has its group set to \"" + group + "\".  This group name begins with one or more whitespace characters, which is not permitted.");
 		}
 	}
@@ -561,30 +566,27 @@ public class VObjectWriter implements Closeable, Flushable {
 		if (!allowedPropertyNameChars.check(name)) {
 			throw new IllegalArgumentException("Property name \"" + name + "\" contains one or more invalid characters.  The following characters are not permitted: " + allowedPropertyNameChars.flip());
 		}
-		if (beginsWithWhitespace(name)) {
+		if (beginsWithTabOrSpace(name)) {
 			throw new IllegalArgumentException("Property name \"" + name + "\" begins with one or more whitespace characters, which is not permitted.");
 		}
 	}
 
-	private void validateParameters(String name, VObjectParameters parameters) {
-		for (Map.Entry<LaciToken, List<String>> parameter : parameters) {
+	private void validateParameters(String propertyName, VObjectParameters parameters) {
+		parameters.forEach((name, values) -> {
 			//validate the parameter name
-			LaciToken parameterName = parameter.getKey();
-			if (parameterName == null && syntaxStyle == SyntaxStyle.MODERN) {
-				throw new IllegalArgumentException("Property \"" + name + "\" has a parameter whose name is null. This is not permitted with modern syntax.");
+			if (name == null && syntaxStyle == SyntaxStyle.MODERN) {
+				throw new IllegalArgumentException("Property \"" + propertyName + "\" has a parameter whose name is null. This is not permitted with modern syntax.");
 			}
-			if (parameterName != null && !allowedParameterNameChars.check(parameterName.toUpperCase())) {
-				throw new IllegalArgumentException("Property \"" + name + "\" has a parameter named \"" + parameterName + "\".  This parameter's name contains one or more invalid characters.  The following characters are not permitted: " + allowedParameterNameChars.flip());
+			if (name != null && !allowedParameterNameChars.check(name.toUpperCase())) {
+				throw new IllegalArgumentException("Property \"" + propertyName + "\" has a parameter named \"" + name + "\".  This parameter's name contains one or more invalid characters.  The following characters are not permitted: " + allowedParameterNameChars.flip());
 			}
 
 			//validate the parameter values
-			List<String> parameterValues = parameter.getValue();
-			for (String parameterValue : parameterValues) {
-				if (!allowedParameterValueChars.check(parameterValue)) {
-					throw new IllegalArgumentException("Property \"" + name + "\" has a parameter named \"" + parameterName + "\" whose value contains one or more invalid characters.  The following characters are not permitted: " + allowedParameterValueChars.flip());
-				}
+			boolean allValuesValid = values.stream().allMatch(allowedParameterValueChars::check);
+			if (!allValuesValid) {
+				throw new IllegalArgumentException("Property \"" + propertyName + "\" has a parameter named \"" + name + "\" whose value contains one or more invalid characters.  The following characters are not permitted: " + allowedParameterValueChars.flip());
 			}
-		}
+		});
 	}
 
 	private String sanitizeValue(CopyOnModify parameters, String value) {
@@ -705,13 +707,7 @@ public class VObjectWriter implements Closeable, Flushable {
 	 * @return true if it contains at least one newline character, false if not
 	 */
 	private boolean containsNewlines(String string) {
-		for (int i = 0; i < string.length(); i++) {
-			char c = string.charAt(i);
-			if (isCROrLF(c)) {
-				return true;
-			}
-		}
-		return false;
+		return string.chars().anyMatch(Utils::isCROrLF);
 	}
 
 	/**
@@ -720,24 +716,15 @@ public class VObjectWriter implements Closeable, Flushable {
 	 * @return true if it should be enclosed in double quotes, false if not
 	 */
 	private boolean shouldQuoteParameterValue(String value) {
-		for (int i = 0; i < value.length(); i++) {
-			char c = value.charAt(i);
-			switch (c) {
-			case ',':
-			case ':':
-			case ';':
-				return true;
-			}
-		}
-		return false;
+		return value.chars().anyMatch(c -> c == ',' || c == ':' || c == ';');
 	}
 
 	/**
-	 * Determines if a string starts with whitespace.
+	 * Determines if a string starts a tab or space.
 	 * @param string the string
-	 * @return true if it starts with whitespace, false if not
+	 * @return true if it starts with a tab or space, false if not
 	 */
-	private boolean beginsWithWhitespace(String string) {
+	private boolean beginsWithTabOrSpace(String string) {
 		if (string.isEmpty()) {
 			return false;
 		}

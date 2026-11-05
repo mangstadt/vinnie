@@ -268,10 +268,7 @@ public class AllowedCharacters {
 		}
 
 		private void setAll(String characters, boolean value) {
-			for (int i = 0; i < characters.length(); i++) {
-				char c = characters.charAt(i);
-				set(c, value);
-			}
+			characters.chars().forEach(c -> set(c, value));
 		}
 
 		private void requireAscii(int i) {

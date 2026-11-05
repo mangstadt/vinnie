@@ -85,11 +85,9 @@ public class FoldedLineWriter extends Writer {
 		if (indent.length() >= lineLength) {
 			throw new IllegalArgumentException("Indent string length must be less than the line length.");
 		}
-		for (int i = 0; i < indent.length(); i++) {
-			char c = indent.charAt(i);
-			if (c != ' ' && c != '\t') {
-				throw new IllegalArgumentException("Indent string can only contain tabs and spaces.");
-			}
+		boolean allTabsAndSpaces = indent.chars().allMatch(c -> c == ' ' || c == '\t');
+		if (!allTabsAndSpaces) {
+			throw new IllegalArgumentException("Indent string can only contain tabs and spaces.");
 		}
 	}
 

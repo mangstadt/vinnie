@@ -34,6 +34,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.function.BiConsumer;
 
 /**
  * A multimap implementation for holding the parameters of a
@@ -65,11 +67,9 @@ public class VObjectParameters implements Iterable<Map.Entry<LaciToken, List<Str
 	 */
 	public VObjectParameters(VObjectParameters original) {
 		this();
-		for (Map.Entry<LaciToken, List<String>> entry : original) {
-			LaciToken name = entry.getKey();
-			List<String> values = entry.getValue();
+		original.forEach((name, values) -> {
 			multimap.put(name, new ArrayList<>(values));
-		}
+		});
 	}
 
 	/**
@@ -250,20 +250,13 @@ public class VObjectParameters implements Iterable<Map.Entry<LaciToken, List<Str
 	 * @return true if the parameter exists, false if not
 	 */
 	public boolean isQuotedPrintable() {
-		for (String key : new String[] { "ENCODING", null }) {
-			List<String> values = get(key);
-			if (values == null) {
-				continue;
-			}
-
-			for (String value : values) {
-				if ("QUOTED-PRINTABLE".equalsIgnoreCase(value)) {
-					return true;
-				}
-			}
-		}
-
-		return false;
+		//@formatter:off
+		return Arrays.stream(new String[] { "ENCODING", null })
+			.map(this::get)
+			.filter(Objects::nonNull)
+			.flatMap(List::stream)
+		.anyMatch("QUOTED-PRINTABLE"::equalsIgnoreCase);
+		//@formatter:on
 	}
 
 	/**
@@ -293,6 +286,10 @@ public class VObjectParameters implements Iterable<Map.Entry<LaciToken, List<Str
 	 */
 	public Iterator<Entry<LaciToken, List<String>>> iterator() {
 		return multimap.entrySet().iterator();
+	}
+
+	public void forEach(BiConsumer<? super LaciToken, ? super List<String>> action) {
+		multimap.forEach(action);
 	}
 
 	@Override

@@ -117,7 +117,7 @@ public final class Utils {
 	 * @param c the character
 	 * @return true if the character is \r or \n, false if not
 	 */
-	public static boolean isCROrLF(char c) {
+	public static boolean isCROrLF(int c) {
 		return c == '\r' || c == '\n';
 	}
 
