@@ -24,6 +24,8 @@
 
 package com.github.mangstadt.vinnie;
 
+import java.util.Objects;
+
 /**
  * Represents a vobject property.
  * @author Michael Angstadt
@@ -147,13 +149,7 @@ public class VObjectProperty {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((group == null) ? 0 : group.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());
-		result = prime * result + ((value == null) ? 0 : value.hashCode());
-		return result;
+		return Objects.hash(group, name, parameters, value);
 	}
 
 	@Override
@@ -162,19 +158,7 @@ public class VObjectProperty {
 		if (obj == null) return false;
 		if (getClass() != obj.getClass()) return false;
 		VObjectProperty other = (VObjectProperty) obj;
-		if (group == null) {
-			if (other.group != null) return false;
-		} else if (!group.equals(other.group)) return false;
-		if (name == null) {
-			if (other.name != null) return false;
-		} else if (!name.equals(other.name)) return false;
-		if (parameters == null) {
-			if (other.parameters != null) return false;
-		} else if (!parameters.equals(other.parameters)) return false;
-		if (value == null) {
-			if (other.value != null) return false;
-		} else if (!value.equals(other.value)) return false;
-		return true;
+		return Objects.equals(group, other.group) && Objects.equals(name, other.name) && Objects.equals(parameters, other.parameters) && Objects.equals(value, other.value);
 	}
 
 	@Override
