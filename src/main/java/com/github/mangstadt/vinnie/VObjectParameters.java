@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.stream.Stream;
 
 /**
  * A multimap implementation for holding the parameters of a
@@ -251,7 +252,7 @@ public class VObjectParameters implements Iterable<Map.Entry<LaciToken, List<Str
 	 */
 	public boolean isQuotedPrintable() {
 		//@formatter:off
-		return Arrays.stream(new String[] { "ENCODING", null })
+		return Stream.of("ENCODING", null)
 			.map(this::get)
 			.filter(Objects::nonNull)
 			.flatMap(List::stream)
