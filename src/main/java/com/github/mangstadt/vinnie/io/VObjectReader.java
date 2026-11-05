@@ -39,6 +39,7 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.github.mangstadt.vinnie.LaciToken;
 import com.github.mangstadt.vinnie.SyntaxStyle;
@@ -291,10 +292,7 @@ public class VObjectReader implements Closeable {
 	 * null)
 	 */
 	public void setDefaultQuotedPrintableCharset(Charset charset) {
-		if (charset == null) {
-			throw new NullPointerException();
-		}
-		defaultQuotedPrintableCharset = charset;
+		defaultQuotedPrintableCharset = Objects.requireNonNull(charset);
 	}
 
 	/**
