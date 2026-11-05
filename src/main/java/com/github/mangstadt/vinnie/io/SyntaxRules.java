@@ -97,12 +97,7 @@ public class SyntaxRules {
 	 * the given value, and under the given component, is encountered
 	 */
 	public void addRule(LaciToken component, String version, SyntaxStyle syntaxStyle) {
-		Map<String, SyntaxStyle> rules = syntaxRules.get(component);
-		if (rules == null) {
-			rules = new HashMap<>();
-			syntaxRules.put(component, rules);
-		}
-
+		Map<String, SyntaxStyle> rules = syntaxRules.computeIfAbsent(component, k -> new HashMap<>());
 		rules.put(version, syntaxStyle);
 	}
 

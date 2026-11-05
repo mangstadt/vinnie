@@ -90,6 +90,10 @@ public class VObjectParameters implements Iterable<Map.Entry<LaciToken, List<Str
 		return multimap.get(key);
 	}
 
+	private List<String> computeIfAbsent(LaciToken key) {
+		return multimap.computeIfAbsent(key, k -> new ArrayList<>());
+	}
+
 	/**
 	 * Inserts a value.
 	 * @param key the key or null for nameless values
@@ -105,12 +109,7 @@ public class VObjectParameters implements Iterable<Map.Entry<LaciToken, List<Str
 	 * @param value the value to add
 	 */
 	public void put(LaciToken key, String value) {
-		List<String> list = get(key);
-		if (list == null) {
-			list = new ArrayList<>();
-			multimap.put(key, list);
-		}
-		list.add(value);
+		computeIfAbsent(key).add(value);
 	}
 
 	/**
@@ -132,12 +131,7 @@ public class VObjectParameters implements Iterable<Map.Entry<LaciToken, List<Str
 			return;
 		}
 
-		List<String> list = get(key);
-		if (list == null) {
-			list = new ArrayList<>();
-			multimap.put(key, list);
-		}
-		list.addAll(Arrays.asList(values));
+		computeIfAbsent(key).addAll(Arrays.asList(values));
 	}
 
 	/**
