@@ -40,7 +40,7 @@ import java.util.Locale;
  * </p>
  * @author Michael Angstadt
  * @see String#toLowerCase(Locale)
- * @see "https://github.com/mangstadt/ez-vcard/pull/166"
+ * @see "https://github.com/mangstadt/vinnie/pull/5"
  */
 public class LaciToken implements CharSequence, Comparable<LaciToken> {
 	private final String upper;
