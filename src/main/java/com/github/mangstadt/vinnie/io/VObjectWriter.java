@@ -34,6 +34,7 @@ import java.io.Flushable;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -619,7 +620,7 @@ public class VObjectWriter implements Closeable, Flushable {
 		}
 
 		if (charset == null) {
-			charset = Charset.forName("UTF-8");
+			charset = StandardCharsets.UTF_8;
 			parameters.modify().replace("CHARSET", charset.name());
 		}
 
