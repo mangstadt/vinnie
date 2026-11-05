@@ -12,12 +12,6 @@
 	</organization>
 	<description>A lightweight Java library that reads and writes "vobject" data (vCard and iCalendar).</description>
 
-	<parent>
-		<groupId>org.sonatype.oss</groupId>
-		<artifactId>oss-parent</artifactId>
-		<version>7</version>
-	</parent>
-
 	<licenses>
 		<license>
 			<name>MIT License</name>
@@ -44,7 +38,8 @@
 	</scm>
 
 	<properties>
-		<java.version>1.6</java.version>
+		<java.version>1.8</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<dependencies>
@@ -65,7 +60,7 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>2.28.2</version>
+			<version>4.11.0</version> <!-- Latest version to support Java 8 -->
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -80,12 +75,12 @@
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
-				<version>2.4.0</version>
+				<version>5.1.9</version> <!-- Latest version to support Java 8 -->
 				<extensions>true</extensions>
 			</plugin>
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.4.3</version>
+				<version>3.5.0</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
 				</configuration>
@@ -93,13 +88,18 @@
 
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
+				<version>3.16.0</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.6.0</version>
+      </plugin>
 
 			<!--
 			Adds the module descriptor to META-INF/versions/9 of the JAR, so it still runs on Java 6.
@@ -131,7 +131,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>2.1.2</version>
+				<version>3.4.0</version>
 				<executions>
 					<execution>
 						<goals>
@@ -145,7 +145,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.12.0</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
 					<linksource>true</linksource>
@@ -187,14 +187,14 @@
 			</plugin>
 			
 			<!--
-			FindBugs plugin
-			To run: mvn findbugs:findbugs
-			To view the results: mvn findbugs:gui
+			SpotBugs plugin
+			To run: mvn spotbugs:spotbugs
+			To view the results: mvn spotbugs:gui
 			-->
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>findbugs-maven-plugin</artifactId>
-				<version>3.0.4</version>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>4.8.6.8</version> <!-- Latest version to support Java 8 -->
 			</plugin>
 
 			<!--
@@ -205,7 +205,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-pmd-plugin</artifactId>
-				<version>3.6</version>
+				<version>3.28.0</version>
 				<configuration>
 					<targetJdk>${java.version}</targetJdk>
 				</configuration>
@@ -218,7 +218,7 @@
 			<plugin>
 				<groupId>org.pitest</groupId>
 				<artifactId>pitest-maven</artifactId>
-				<version>1.1.10</version>
+				<version>1.17.4</version> <!-- Latest version to support Java 8 -->
 				<configuration>
 					<targetClasses>
 						<param>com.github.mangstadt.vinnie.*</param>
@@ -239,7 +239,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.6</version>
+				<version>0.8.15</version>
 				<executions>
 					<execution>
 						<goals>
@@ -254,6 +254,55 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+
+			<!--
+			For publishing to Maven Central
+			https://central.sonatype.org/publish/publish-portal-maven/
+			-->
+			<plugin>
+				<groupId>org.sonatype.central</groupId>
+				<artifactId>central-publishing-maven-plugin</artifactId>
+				<version>0.12.0</version>
+				<extensions>true</extensions>
+				<configuration>
+					<publishingServerId>central</publishingServerId>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>3.6.3</version>
+				<executions>
+					<execution>
+						<id>enforce-maven</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireMavenVersion>
+									<version>3.6.3</version>
+								</requireMavenVersion>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!--
+			To release: mvn release:prepare release:perform
+			The "release" property activates the signing profile below.
+			-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>3.3.1</version>
+				<configuration>
+					<arguments>-Drelease=true</arguments>
+					<tagNameFormat>@{project.version}</tagNameFormat>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
@@ -276,7 +325,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.4</version>
+						<version>3.2.8</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>
