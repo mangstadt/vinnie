@@ -389,7 +389,7 @@ public class VObjectWriterTest {
 				writer.setCaretEncodingEnabled(caretEncoding);
 
 				VObjectParameters parameters = new VObjectParameters();
-				parameters.getMap().put(new LaciToken("PARAM"), new ArrayList<String>());
+				parameters.getMap().put(new LaciToken("PARAM"), new ArrayList<>());
 				writer.writeProperty(null, "PROP", parameters, "");
 
 				String actual = sw.toString();
@@ -406,7 +406,7 @@ public class VObjectWriterTest {
 
 	@Test
 	public void parameters_multivalued() throws Exception {
-		List<VObjectParameters> list = new ArrayList<VObjectParameters>();
+		List<VObjectParameters> list = new ArrayList<>();
 
 		VObjectParameters parameters = new VObjectParameters();
 		parameters.put("SINGLE", "one");
@@ -472,7 +472,7 @@ public class VObjectWriterTest {
 
 	@Test
 	public void parameters_nameless() throws Exception {
-		List<VObjectParameters> list = new ArrayList<VObjectParameters>();
+		List<VObjectParameters> list = new ArrayList<>();
 
 		VObjectParameters parameters = new VObjectParameters();
 		parameters.put((String) null, "one");

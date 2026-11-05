@@ -76,7 +76,7 @@ public class VObjectParametersTest {
 		assertEquals(Arrays.asList("value1"), parameters.replace("name1", "value2"));
 		assertNull(parameters.replace("name2", "value3"));
 
-		Map<LaciToken, List<String>> expected = new HashMap<LaciToken, List<String>>();
+		Map<LaciToken, List<String>> expected = new HashMap<>();
 		expected.put(new LaciToken("NAME1"), Arrays.asList("value2"));
 		expected.put(new LaciToken("NAME2"), Arrays.asList("value3"));
 		assertEquals(expected, parameters.getMap());
@@ -90,14 +90,14 @@ public class VObjectParametersTest {
 		assertEquals(Arrays.asList("value1"), parameters.replaceAll("name1", "value2", "value3"));
 		assertNull(parameters.replaceAll("name2", "value4", "value5"));
 
-		Map<LaciToken, List<String>> expected = new HashMap<LaciToken, List<String>>();
+		Map<LaciToken, List<String>> expected = new HashMap<>();
 		expected.put(new LaciToken("NAME1"), Arrays.asList("value2", "value3"));
 		expected.put(new LaciToken("NAME2"), Arrays.asList("value4", "value5"));
 		assertEquals(expected, parameters.getMap());
 
 		assertEquals(Arrays.asList("value2", "value3"), parameters.replaceAll("name1"));
 
-		expected = new HashMap<LaciToken, List<String>>();
+		expected = new HashMap<>();
 		expected.put(new LaciToken("NAME2"), Arrays.asList("value4", "value5"));
 		assertEquals(expected, parameters.getMap());
 	}
@@ -114,7 +114,7 @@ public class VObjectParametersTest {
 		assertFalse(parameters.remove("name3", "value1"));
 		assertTrue(parameters.remove("name2", "value1"));
 
-		Map<LaciToken, List<String>> expected = new HashMap<LaciToken, List<String>>();
+		Map<LaciToken, List<String>> expected = new HashMap<>();
 		expected.put(new LaciToken("NAME1"), Arrays.<String> asList());
 		expected.put(new LaciToken("NAME2"), Arrays.asList("value2"));
 		assertEquals(expected, parameters.getMap());
@@ -128,7 +128,7 @@ public class VObjectParametersTest {
 		assertEquals(Arrays.asList("value1", "value2"), parameters.removeAll("name1"));
 		assertNull(parameters.removeAll("name1"));
 
-		Map<String, List<String>> expected = new HashMap<String, List<String>>();
+		Map<String, List<String>> expected = new HashMap<>();
 		assertEquals(expected, parameters.getMap());
 	}
 

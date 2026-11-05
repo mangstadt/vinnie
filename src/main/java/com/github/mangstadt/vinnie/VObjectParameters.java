@@ -47,7 +47,7 @@ public class VObjectParameters implements Iterable<Map.Entry<LaciToken, List<Str
 	 * Creates an empty list of parameters.
 	 */
 	public VObjectParameters() {
-		multimap = new LinkedHashMap<LaciToken, List<String>>(); //preserve insertion order of keys
+		multimap = new LinkedHashMap<>(); //preserve insertion order of keys
 	}
 
 	/**
@@ -68,7 +68,7 @@ public class VObjectParameters implements Iterable<Map.Entry<LaciToken, List<Str
 		for (Map.Entry<LaciToken, List<String>> entry : original) {
 			LaciToken name = entry.getKey();
 			List<String> values = entry.getValue();
-			multimap.put(name, new ArrayList<String>(values));
+			multimap.put(name, new ArrayList<>(values));
 		}
 	}
 
@@ -107,7 +107,7 @@ public class VObjectParameters implements Iterable<Map.Entry<LaciToken, List<Str
 	public void put(LaciToken key, String value) {
 		List<String> list = get(key);
 		if (list == null) {
-			list = new ArrayList<String>();
+			list = new ArrayList<>();
 			multimap.put(key, list);
 		}
 		list.add(value);
@@ -134,7 +134,7 @@ public class VObjectParameters implements Iterable<Map.Entry<LaciToken, List<Str
 
 		List<String> list = get(key);
 		if (list == null) {
-			list = new ArrayList<String>();
+			list = new ArrayList<>();
 			multimap.put(key, list);
 		}
 		list.addAll(Arrays.asList(values));

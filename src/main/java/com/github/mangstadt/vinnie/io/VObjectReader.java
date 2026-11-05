@@ -887,7 +887,7 @@ public class VObjectReader implements Closeable {
 		/**
 		 * The hierarchy of components the parser is currently inside of.
 		 */
-		private final List<LaciToken> names = new ArrayList<LaciToken>();
+		private final List<LaciToken> names = new ArrayList<>();
 
 		/**
 		 * <p>
@@ -900,7 +900,7 @@ public class VObjectReader implements Closeable {
 		 * are not inside of a component, should there happen to be any).
 		 * </p>
 		 */
-		private final List<SyntaxStyle> syntax = new ArrayList<SyntaxStyle>();
+		private final List<SyntaxStyle> syntax = new ArrayList<>();
 
 		/**
 		 * Creates a new stack.

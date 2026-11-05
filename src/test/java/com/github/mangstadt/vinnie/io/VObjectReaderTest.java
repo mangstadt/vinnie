@@ -778,7 +778,7 @@ public class VObjectReaderTest {
 		"PROP;PARAM=\"a;b:c,d\":value";
 		//@formatter:on
 
-		Map<SyntaxStyle, VObjectProperty> styleToProperty = new HashMap<SyntaxStyle, VObjectProperty>();
+		Map<SyntaxStyle, VObjectProperty> styleToProperty = new HashMap<>();
 		styleToProperty.put(SyntaxStyle.LEGACY, property().name("PROP").param("PARAM", "\"a").param(null, "b").value("c,d\":value").build());
 		styleToProperty.put(SyntaxStyle.MODERN, property().name("PROP").param("PARAM", "a;b:c,d").value("value").build());
 
@@ -858,7 +858,7 @@ public class VObjectReaderTest {
 			"PROP;PARAM=1\\ 2^^ 3^n 4^N 5\\n 7^' 8\\\\ 9^ :";
 			//@formatter:on
 
-			Map<Boolean, String> expectedParamValues = new HashMap<Boolean, String>();
+			Map<Boolean, String> expectedParamValues = new HashMap<>();
 			expectedParamValues.put(false, "1\\ 2^^ 3^n 4^N 5\\n 7^' 8\\\\ 9^ ");
 			expectedParamValues.put(true, "1\\ 2^ 3" + NEWLINE + " 4^N 5\\n 7\" 8\\\\ 9^ ");
 
@@ -1555,7 +1555,7 @@ public class VObjectReaderTest {
 	 * @return the object
 	 */
 	private static Context context(List<String> components, String unfoldedLine, int lineNumber) {
-		List<LaciToken> componentsLaci = new ArrayList<LaciToken>();
+		List<LaciToken> componentsLaci = new ArrayList<>();
 		for (String component : components) {
 			componentsLaci.add(new LaciToken(component));
 		}
@@ -1634,7 +1634,7 @@ public class VObjectReaderTest {
 		 * time they are called.
 		 * @see "http://stackoverflow.com/q/38779862/13379"
 		 */
-		private final List<Context> contexts = new ArrayList<Context>();
+		private final List<Context> contexts = new ArrayList<>();
 
 		public void onComponentBegin(LaciToken name, Context context) {
 			addCopy(context);
@@ -1657,7 +1657,7 @@ public class VObjectReaderTest {
 		}
 
 		private void addCopy(Context orig) {
-			Context copy = new Context(new ArrayList<LaciToken>(orig.parentComponents));
+			Context copy = new Context(new ArrayList<>(orig.parentComponents));
 			copy.unfoldedLine.append(orig.getUnfoldedLine());
 			copy.lineNumber = orig.lineNumber;
 			contexts.add(copy);

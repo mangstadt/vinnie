@@ -57,14 +57,14 @@ import com.github.mangstadt.vinnie.SyntaxStyle;
  * @author Michael Angstadt
  */
 public class VObjectValidator {
-	private static final Map<SyntaxStyle, Map<Boolean, AllowedCharacters>> propertyName = new EnumMap<SyntaxStyle, Map<Boolean, AllowedCharacters>>(SyntaxStyle.class);
+	private static final Map<SyntaxStyle, Map<Boolean, AllowedCharacters>> propertyName = new EnumMap<>(SyntaxStyle.class);
 	static {
 		boolean strict;
 		SyntaxStyle syntax;
 
 		syntax = SyntaxStyle.LEGACY;
 		{
-			Map<Boolean, AllowedCharacters> map = new HashMap<Boolean, AllowedCharacters>();
+			Map<Boolean, AllowedCharacters> map = new HashMap<>();
 			strict = false;
 			{
 				//@formatter:off
@@ -106,7 +106,7 @@ public class VObjectValidator {
 
 		syntax = SyntaxStyle.MODERN;
 		{
-			Map<Boolean, AllowedCharacters> map = new HashMap<Boolean, AllowedCharacters>();
+			Map<Boolean, AllowedCharacters> map = new HashMap<>();
 			strict = false;
 			{
 				//same as legacy syntax
@@ -131,14 +131,14 @@ public class VObjectValidator {
 
 	private static final Map<SyntaxStyle, Map<Boolean, AllowedCharacters>> group = propertyName;
 
-	private static final Map<SyntaxStyle, Map<Boolean, AllowedCharacters>> parameterName = new EnumMap<SyntaxStyle, Map<Boolean, AllowedCharacters>>(SyntaxStyle.class);
+	private static final Map<SyntaxStyle, Map<Boolean, AllowedCharacters>> parameterName = new EnumMap<>(SyntaxStyle.class);
 	static {
 		boolean strict;
 		SyntaxStyle syntax;
 
 		syntax = SyntaxStyle.LEGACY;
 		{
-			Map<Boolean, AllowedCharacters> map = new HashMap<Boolean, AllowedCharacters>();
+			Map<Boolean, AllowedCharacters> map = new HashMap<>();
 			strict = false;
 			{
 				//@formatter:off
@@ -160,7 +160,7 @@ public class VObjectValidator {
 
 		syntax = SyntaxStyle.MODERN;
 		{
-			Map<Boolean, AllowedCharacters> map = new HashMap<Boolean, AllowedCharacters>();
+			Map<Boolean, AllowedCharacters> map = new HashMap<>();
 			strict = false;
 			{
 				//same as legacy syntax
@@ -177,7 +177,7 @@ public class VObjectValidator {
 		}
 	}
 
-	private static final Map<SyntaxStyle, Map<Boolean, Map<Boolean, AllowedCharacters>>> parameterValue = new EnumMap<SyntaxStyle, Map<Boolean, Map<Boolean, AllowedCharacters>>>(SyntaxStyle.class);
+	private static final Map<SyntaxStyle, Map<Boolean, Map<Boolean, AllowedCharacters>>> parameterValue = new EnumMap<>(SyntaxStyle.class);
 	static {
 		boolean strict;
 		boolean caretEncoding;
@@ -185,10 +185,10 @@ public class VObjectValidator {
 
 		syntax = SyntaxStyle.LEGACY;
 		{
-			Map<Boolean, Map<Boolean, AllowedCharacters>> map = new HashMap<Boolean, Map<Boolean, AllowedCharacters>>();
+			Map<Boolean, Map<Boolean, AllowedCharacters>> map = new HashMap<>();
 			caretEncoding = false;
 			{
-				Map<Boolean, AllowedCharacters> map2 = new HashMap<Boolean, AllowedCharacters>();
+				Map<Boolean, AllowedCharacters> map2 = new HashMap<>();
 				strict = false;
 				{
 					//@formatter:off
@@ -226,10 +226,10 @@ public class VObjectValidator {
 
 		syntax = SyntaxStyle.MODERN;
 		{
-			Map<Boolean, Map<Boolean, AllowedCharacters>> map = new HashMap<Boolean, Map<Boolean, AllowedCharacters>>();
+			Map<Boolean, Map<Boolean, AllowedCharacters>> map = new HashMap<>();
 			caretEncoding = false;
 			{
-				Map<Boolean, AllowedCharacters> map2 = new HashMap<Boolean, AllowedCharacters>();
+				Map<Boolean, AllowedCharacters> map2 = new HashMap<>();
 				strict = false;
 				{
 					//@formatter:off
@@ -257,7 +257,7 @@ public class VObjectValidator {
 
 			caretEncoding = true;
 			{
-				Map<Boolean, AllowedCharacters> map2 = new HashMap<Boolean, AllowedCharacters>();
+				Map<Boolean, AllowedCharacters> map2 = new HashMap<>();
 				strict = false;
 				{
 					//@formatter:off

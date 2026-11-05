@@ -401,11 +401,11 @@ public final class VObjectPropertyValues {
 	 */
 	public static List<List<String>> parseStructured(String value) {
 		if (value.isEmpty()) {
-			return new ArrayList<List<String>>(0); //return a mutable list
+			return new ArrayList<>(0); //return a mutable list
 		}
 
-		List<List<String>> components = new ArrayList<List<String>>();
-		List<String> curComponent = new ArrayList<String>();
+		List<List<String>> components = new ArrayList<>();
+		List<String> curComponent = new ArrayList<>();
 		components.add(curComponent);
 
 		boolean escaped = false;
@@ -429,7 +429,7 @@ public final class VObjectPropertyValues {
 					curComponent.add(v);
 				}
 
-				curComponent = new ArrayList<String>();
+				curComponent = new ArrayList<>();
 				components.add(curComponent);
 				cursor = i + 1;
 				continue;
@@ -556,7 +556,7 @@ public final class VObjectPropertyValues {
 	 */
 	public static Map<LaciToken, List<String>> parseMultimap(String value) {
 		if (value.isEmpty()) {
-			return new HashMap<LaciToken, List<String>>(0); //return a mutable map
+			return new HashMap<>(0); //return a mutable map
 		}
 
 		return new MultimapParser(value).parse();
@@ -564,9 +564,9 @@ public final class VObjectPropertyValues {
 
 	private static class MultimapParser {
 		private final String value;
-		private final Map<LaciToken, List<String>> multimap = new LinkedHashMap<LaciToken, List<String>>();
+		private final Map<LaciToken, List<String>> multimap = new LinkedHashMap<>();
 		private LaciToken curName = null;
-		private List<String> curValues = new ArrayList<String>();
+		private List<String> curValues = new ArrayList<>();
 		private boolean escaped = false;
 		private int cursor = 0;
 
@@ -608,7 +608,7 @@ public final class VObjectPropertyValues {
 			handleEndValue(i);
 
 			curName = null;
-			curValues = new ArrayList<String>();
+			curValues = new ArrayList<>();
 			cursor = i + 1;
 		}
 
@@ -750,10 +750,10 @@ public final class VObjectPropertyValues {
 	 */
 	private static List<String> split(String string, char delimiter, int limit) {
 		if (string.isEmpty()) {
-			return new ArrayList<String>(0); //return a mutable list
+			return new ArrayList<>(0); //return a mutable list
 		}
 
-		List<String> list = (limit < 1) ? new ArrayList<String>() : new ArrayList<String>(limit);
+		List<String> list = (limit < 1) ? new ArrayList<>() : new ArrayList<>(limit);
 
 		if (limit == 1) {
 			String value = unescape(string);
@@ -892,7 +892,7 @@ public final class VObjectPropertyValues {
 	 * </pre>
 	 */
 	public static class SemiStructuredValueBuilder {
-		private final List<Object> values = new ArrayList<Object>();
+		private final List<Object> values = new ArrayList<>();
 
 		/**
 		 * Appends a value to the semi-structured value. The value's
@@ -993,7 +993,7 @@ public final class VObjectPropertyValues {
 		 */
 		public List<String> nextComponent() {
 			if (!hasNext()) {
-				return new ArrayList<String>(0); //should be mutable
+				return new ArrayList<>(0); //should be mutable
 			}
 
 			return it.next();
@@ -1027,7 +1027,7 @@ public final class VObjectPropertyValues {
 	 * </pre>
 	 */
 	public static class StructuredValueBuilder {
-		private final List<List<?>> components = new ArrayList<List<?>>();
+		private final List<List<?>> components = new ArrayList<>();
 
 		/**
 		 * Appends a single-valued component. The value's {@code toString()}

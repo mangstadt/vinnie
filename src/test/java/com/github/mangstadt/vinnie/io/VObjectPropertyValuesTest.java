@@ -229,7 +229,7 @@ public class VObjectPropertyValuesTest {
 			expected = "one;two,,3,null;;four\\,five\\;six";
 			assertEquals(expected, actual);
 
-			actual = VObjectPropertyValues.writeStructured(new ArrayList<List<String>>(), includeTrailingSemicolons);
+			actual = VObjectPropertyValues.writeStructured(new ArrayList<>(), includeTrailingSemicolons);
 			expected = "";
 			assertEquals(expected, actual);
 		}
@@ -258,7 +258,7 @@ public class VObjectPropertyValuesTest {
 	@Test
 	public void parseMultimap() {
 		Map<LaciToken, List<String>> actual = VObjectPropertyValues.parseMultimap("ONE=two;one=two;;ONE=two;THREE;FOUR=five,six\\,seven\\;eight;NINE=;TEN=eleven=twelve");
-		Map<LaciToken, List<String>> expected = new HashMap<LaciToken, List<String>>();
+		Map<LaciToken, List<String>> expected = new HashMap<>();
 		expected.put(new LaciToken("ONE"), Arrays.asList("two", "two", "two"));
 		expected.put(new LaciToken("THREE"), Arrays.asList(""));
 		expected.put(new LaciToken("FOUR"), Arrays.asList("five", "six,seven;eight"));
@@ -272,7 +272,7 @@ public class VObjectPropertyValuesTest {
 
 	@Test
 	public void writeMultimap() {
-		Map<LaciToken, List<String>> input = new LinkedHashMap<LaciToken, List<String>>();
+		Map<LaciToken, List<String>> input = new LinkedHashMap<>();
 		input.put(new LaciToken("A"), asList("one"));
 		input.put(new LaciToken("B"), asList("two", "three,four;five", null));
 		input.put(new LaciToken("C"), asList(""));
@@ -286,7 +286,7 @@ public class VObjectPropertyValuesTest {
 	
 	@Test
 	public void writeMultimap_empty_value_first() {
-		Map<LaciToken, List<String>> input = new LinkedHashMap<LaciToken, List<String>>();
+		Map<LaciToken, List<String>> input = new LinkedHashMap<>();
 		input.put(new LaciToken("A"), Arrays.<String> asList());
 		input.put(new LaciToken("B"), asList("one"));
 

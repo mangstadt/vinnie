@@ -37,7 +37,7 @@ import com.github.mangstadt.vinnie.SyntaxStyle;
  */
 public class SyntaxRules {
 	private SyntaxStyle defaultSyntaxStyle;
-	private final Map<LaciToken, Map<String, SyntaxStyle>> syntaxRules = new HashMap<LaciToken, Map<String, SyntaxStyle>>();
+	private final Map<LaciToken, Map<String, SyntaxStyle>> syntaxRules = new HashMap<>();
 
 	/**
 	 * Creates a new set of syntax rules.
@@ -99,7 +99,7 @@ public class SyntaxRules {
 	public void addRule(LaciToken component, String version, SyntaxStyle syntaxStyle) {
 		Map<String, SyntaxStyle> rules = syntaxRules.get(component);
 		if (rules == null) {
-			rules = new HashMap<String, SyntaxStyle>();
+			rules = new HashMap<>();
 			syntaxRules.put(component, rules);
 		}
 
