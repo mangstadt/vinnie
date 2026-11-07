@@ -47,6 +47,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -1621,10 +1622,11 @@ public class VObjectReaderTest {
 	 * @return the object
 	 */
 	private static Context context(List<String> components, String unfoldedLine, int lineNumber) {
-		List<LaciToken> componentsLaci = new ArrayList<>();
-		for (String component : components) {
-			componentsLaci.add(new LaciToken(component));
-		}
+		//@formatter:off
+		List<LaciToken> componentsLaci = components.stream()
+			.map(LaciToken::new)
+		.collect(Collectors.toList());
+		//@formatter:on
 
 		Context context = new Context(componentsLaci);
 		context.unfoldedLine.append(unfoldedLine);

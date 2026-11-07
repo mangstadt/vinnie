@@ -35,6 +35,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import org.junit.Test;
 
@@ -603,7 +604,7 @@ public class VObjectWriterTest {
 
 						VObjectParameters parameters = new VObjectParameters();
 						parameters.put("PARAM", c + "");
-						
+
 						//@formatter:off
 						assertThrows(
 							"IllegalArgumentException expected when parameter value contains character " + ch(c) + " and caret encoding is " + caretEncoding + " and style is " + style.name(),
@@ -917,18 +918,13 @@ public class VObjectWriterTest {
 	 */
 	private static String testString(String exclude) {
 		StringBuilder sb = new StringBuilder(128);
-		for (char c = 0; c < 128; c++) {
-			boolean contains = false;
-			for (int i = 0; i < exclude.length(); i++) {
-				if (c == exclude.charAt(i)) {
-					contains = true;
-					break;
-				}
-			}
-			if (!contains) {
-				sb.append(c);
-			}
-		}
+
+		//@formatter:off
+		IntStream.range(0, 128)
+			.filter(i -> exclude.indexOf(i) < 0)
+		.forEach(i -> sb.append((char)i));
+		//@formatter:on
+
 		return sb.toString();
 	}
 
@@ -938,22 +934,20 @@ public class VObjectWriterTest {
 	 * @return true if it's printable, false if not
 	 * @see "http://stackoverflow.com/a/418560/13379"
 	 */
-	private static boolean isPrintableChar(char c) {
+	private static boolean isPrintableChar(int c) {
 		return c > 31 && c < 127;
 	}
 
 	@SuppressWarnings("unused")
 	private static String printable(String string) {
 		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < string.length(); i++) {
-			char c = string.charAt(i);
+		string.chars().forEach(c -> {
 			if (isPrintableChar(c)) {
-				sb.append(c);
+				sb.append((char) c);
 			} else {
-				int code = (int) c;
-				sb.append('(').append(code).append(')');
+				sb.append('(').append(c).append(')');
 			}
-		}
+		});
 		return sb.toString();
 	}
 }
