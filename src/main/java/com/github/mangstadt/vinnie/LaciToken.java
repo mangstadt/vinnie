@@ -48,7 +48,7 @@ public class LaciToken implements CharSequence, Comparable<LaciToken> {
 	/**
 	 * Creates a LaciToken or returns null if the given string is null.
 	 * @param string the string to use
-	 * @return the LaciString or null if the given string is null
+	 * @return the LaciToken or null if the given string is null
 	 */
 	public static LaciToken create(String string) {
 		return (string == null) ? null : new LaciToken(string);
