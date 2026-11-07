@@ -80,6 +80,8 @@ public class VObjectReaderTest {
 		"END:COMP1";
 		//@formatter:on
 
+		String[] lines = string.split("\r\n");
+
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
 			try (VObjectReader reader = reader(string, style)) {
@@ -97,7 +99,6 @@ public class VObjectReaderTest {
 			inorder.verify(listener).onComponentEnd(eq(component("COMP1")), any(Context.class));
 
 			//@formatter:off
-			String lines[] = string.split("\r\n");
 			int line = 0;
 			assertContexts(listener,
 				context(lines[line], ++line),
@@ -127,6 +128,8 @@ public class VObjectReaderTest {
 		"END:COMP1\r\n";
 		//@formatter:on
 
+		String[] lines = string.split("\r\n");
+
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
 			try (VObjectReader reader = reader(string, style)) {
@@ -140,7 +143,6 @@ public class VObjectReaderTest {
 			inorder.verify(listener).onComponentEnd(eq(component("COMP1")), any(Context.class));
 
 			//@formatter:off
-			String lines[] = string.split("\r\n");
 			int line = 0;
 			assertContexts(listener,
 				context(lines[line], ++line),
@@ -168,6 +170,8 @@ public class VObjectReaderTest {
 		"END:COMP2\r\n";
 		//@formatter:on
 
+		String[] lines = string.split("\r\n");
+
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
 			try (VObjectReader reader = reader(string, style)) {
@@ -191,7 +195,6 @@ public class VObjectReaderTest {
 			inorder.verify(listener).onWarning(eq(Warning.UNMATCHED_END), isNull(VObjectProperty.class), isNull(Exception.class), any(Context.class));
 
 			//@formatter:off
-			String lines[] = string.split("\r\n");
 			int line = 0;
 			assertContexts(listener,
 				context(lines[line], ++line),
@@ -220,6 +223,8 @@ public class VObjectReaderTest {
 		"PROP2:value2\r\n";
 		//@formatter:on
 
+		String[] lines = string.split("\r\n");
+
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
 			try (VObjectReader reader = reader(string, style)) {
@@ -233,7 +238,6 @@ public class VObjectReaderTest {
 			inorder.verify(listener).onProperty(eq(property().name("PROP2").value("value2").build()), any(Context.class));
 
 			//@formatter:off
-			String lines[] = string.split("\r\n");
 			int line = 0;
 			assertContexts(listener,
 				context(lines[line], ++line),
@@ -259,6 +263,8 @@ public class VObjectReaderTest {
 		"END: \r\n";
 		//@formatter:on
 
+		String[] lines = string.split("\r\n");
+
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
 			try (VObjectReader reader = reader(string, style)) {
@@ -271,7 +277,6 @@ public class VObjectReaderTest {
 			inorder.verify(listener, times(2)).onWarning(eq(Warning.EMPTY_END), isNull(VObjectProperty.class), isNull(Exception.class), any(Context.class));
 
 			//@formatter:off
-			String lines[] = string.split("\r\n");
 			int line = 0;
 			assertContexts(listener,
 				context(lines[line], ++line),
@@ -298,6 +303,8 @@ public class VObjectReaderTest {
 		"end:COMP2";
 		//@formatter:on
 
+		String[] lines = string.split("\r\n");
+
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
 			try (VObjectReader reader = reader(string, style)) {
@@ -312,7 +319,6 @@ public class VObjectReaderTest {
 			inorder.verify(listener).onComponentEnd(eq(component("COMP2")), any(Context.class));
 
 			//@formatter:off
-			String lines[] = string.split("\r\n");
 			int line = 0;
 			assertContexts(listener,
 				context(lines[line], ++line),
@@ -341,6 +347,8 @@ public class VObjectReaderTest {
 		"END\t:\tCOMP1\t";
 		//@formatter:on
 
+		String[] lines = string.split("\r\n");
+
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
 			try (VObjectReader reader = reader(string, style)) {
@@ -354,7 +362,6 @@ public class VObjectReaderTest {
 			inorder.verify(listener).onComponentEnd(eq(component("COMP1")), any(Context.class));
 
 			//@formatter:off
-			String lines[] = string.split("\r\n");
 			int line = 0;
 			assertContexts(listener,
 				context(lines[line], ++line),
@@ -450,6 +457,8 @@ public class VObjectReaderTest {
 		"M=two:value";
 		//@formatter:on
 
+		String[] lines = string.split("\r\n");
+
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
 			try (VObjectReader reader = reader(string, style)) {
@@ -461,7 +470,6 @@ public class VObjectReaderTest {
 			inorder.verify(listener).onProperty(eq(property().name("M=two").value("value").build()), any(Context.class));
 
 			//@formatter:off
-			String lines[] = string.split("\r\n");
 			int line = 0;
 			assertContexts(listener,
 				context(lines[line], ++line),
@@ -481,6 +489,8 @@ public class VObjectReaderTest {
 		"PROP;PARAM=one;PARA";
 		//@formatter:on
 
+		String[] lines = string.split("\r\n");
+
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
 			try (VObjectReader reader = reader(string, style)) {
@@ -491,7 +501,6 @@ public class VObjectReaderTest {
 			inorder.verify(listener).onWarning(eq(Warning.MALFORMED_LINE), isNull(VObjectProperty.class), isNull(Exception.class), any(Context.class));
 
 			//@formatter:off
-			String lines[] = string.split("\r\n");
 			int line = 0;
 			assertContexts(listener,
 				context(lines[line], ++line)
@@ -513,6 +522,8 @@ public class VObjectReaderTest {
 		".PROP:value";
 		//@formatter:on
 
+		String[] lines = string.split("\r\n");
+
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
 			try (VObjectReader reader = reader(string, style)) {
@@ -526,7 +537,6 @@ public class VObjectReaderTest {
 			inorder.verify(listener).onProperty(eq(property().group("").name("PROP").value("value").build()), any(Context.class));
 
 			//@formatter:off
-			String lines[] = string.split("\r\n");
 			int line = 0;
 			assertContexts(listener,
 				context(lines[line], ++line),
@@ -549,6 +559,8 @@ public class VObjectReaderTest {
 		"one\\\\two^^three.four\\\\five^^six;seven\\\\eight^^nine=ten:";
 		//@formatter:on
 
+		String[] lines = string.split("\r\n");
+
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			for (boolean caretDecodingEnabled : new boolean[] { false, true }) {
 				VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
@@ -561,7 +573,6 @@ public class VObjectReaderTest {
 				inorder.verify(listener).onProperty(eq(property().group("one\\\\two^^three").name("four\\\\five^^six").param("seven\\\\eight^^nine", "ten").value("").build()), any(Context.class));
 
 				//@formatter:off
-				String lines[] = string.split("\r\n");
 				int line = 0;
 				assertContexts(listener,
 					context(lines[line], ++line)
@@ -581,6 +592,8 @@ public class VObjectReaderTest {
 		"g=,\"roup.P.=,\"ROP:value";
 		//@formatter:on
 
+		String[] lines = string.split("\r\n");
+
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
 			try (VObjectReader reader = reader(string, style)) {
@@ -591,7 +604,6 @@ public class VObjectReaderTest {
 			inorder.verify(listener).onProperty(eq(new VObjectProperty("g=,\"roup", "P.=,\"ROP", "value")), any(Context.class));
 
 			//@formatter:off
-			String lines[] = string.split("\r\n");
 			int line = 0;
 			assertContexts(listener,
 				context(lines[line], ++line)
@@ -610,6 +622,8 @@ public class VObjectReaderTest {
 		"PROP;=value:value";
 		//@formatter:on
 
+		String[] lines = string.split("\r\n");
+
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
 			try (VObjectReader reader = reader(string, style)) {
@@ -620,7 +634,6 @@ public class VObjectReaderTest {
 			inorder.verify(listener).onProperty(eq(property().name("PROP").param("", "value").value("value").build()), any(Context.class));
 
 			//@formatter:off
-			String lines[] = string.split("\r\n");
 			int line = 0;
 			assertContexts(listener,
 				context(lines[line], ++line)
@@ -639,6 +652,8 @@ public class VObjectReaderTest {
 		"PROP;HOME;WORK:value";
 		//@formatter:on
 
+		String[] lines = string.split("\r\n");
+
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
 			try (VObjectReader reader = reader(string, style)) {
@@ -649,7 +664,6 @@ public class VObjectReaderTest {
 			inorder.verify(listener).onProperty(eq(property().name("PROP").param(null, "HOME", "WORK").value("value").build()), any(Context.class));
 
 			//@formatter:off
-			String lines[] = string.split("\r\n");
 			int line = 0;
 			assertContexts(listener,
 				context(lines[line], ++line)
@@ -668,6 +682,8 @@ public class VObjectReaderTest {
 		"PROP;P,.\"ARAM=value:value";
 		//@formatter:on
 
+		String[] lines = string.split("\r\n");
+
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
 			try (VObjectReader reader = reader(string, style)) {
@@ -678,7 +694,6 @@ public class VObjectReaderTest {
 			inorder.verify(listener).onProperty(eq(property().name("PROP").param("P,.\"ARAM", "value").value("value").build()), any(Context.class));
 
 			//@formatter:off
-			String lines[] = string.split("\r\n");
 			int line = 0;
 			assertContexts(listener,
 				context(lines[line], ++line)
@@ -699,6 +714,8 @@ public class VObjectReaderTest {
 		"PROP;PARAM = value:value";
 		//@formatter:on
 
+		String[] lines = string.split("\r\n");
+
 		SyntaxStyle style = SyntaxStyle.LEGACY;
 		{
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
@@ -710,7 +727,6 @@ public class VObjectReaderTest {
 			inorder.verify(listener).onProperty(eq(property().name("PROP").param("PARAM", "value").value("value").build()), any(Context.class));
 
 			//@formatter:off
-			String lines[] = string.split("\r\n");
 			int line = 0;
 			assertContexts(listener,
 				context(lines[line], ++line)
@@ -729,7 +745,6 @@ public class VObjectReaderTest {
 			inorder.verify(listener).onProperty(eq(property().name("PROP").param("PARAM ", " value").value("value").build()), any(Context.class));
 
 			//@formatter:off
-			String lines[] = string.split("\r\n");
 			int line = 0;
 			assertContexts(listener,
 				context(lines[line], ++line)
@@ -748,6 +763,8 @@ public class VObjectReaderTest {
 		"PROP;PARAM=value1,value2:value";
 		//@formatter:on
 
+		String[] lines = string.split("\r\n");
+
 		SyntaxStyle style = SyntaxStyle.LEGACY;
 		{
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
@@ -759,7 +776,6 @@ public class VObjectReaderTest {
 			inorder.verify(listener).onProperty(eq(property().name("PROP").param("PARAM", "value1,value2").value("value").build()), any(Context.class));
 
 			//@formatter:off
-			String lines[] = string.split("\r\n");
 			int line = 0;
 			assertContexts(listener,
 				context(lines[line], ++line)
@@ -778,7 +794,6 @@ public class VObjectReaderTest {
 			inorder.verify(listener).onProperty(eq(property().name("PROP").param("PARAM", "value1", "value2").value("value").build()), any(Context.class));
 
 			//@formatter:off
-			String lines[] = string.split("\r\n");
 			int line = 0;
 			assertContexts(listener,
 				context(lines[line], ++line)
@@ -799,6 +814,8 @@ public class VObjectReaderTest {
 		"PROP;PARAM=\"a;b:c,d\":value";
 		//@formatter:on
 
+		String[] lines = string.split("\r\n");
+
 		Map<SyntaxStyle, VObjectProperty> styleToProperty = new HashMap<>();
 		styleToProperty.put(SyntaxStyle.LEGACY, property().name("PROP").param("PARAM", "\"a").param(null, "b").value("c,d\":value").build());
 		styleToProperty.put(SyntaxStyle.MODERN, property().name("PROP").param("PARAM", "a;b:c,d").value("value").build());
@@ -815,7 +832,6 @@ public class VObjectReaderTest {
 			inorder.verify(listener).onProperty(eq(expectedProperty), any(Context.class));
 
 			//@formatter:off
-			String lines[] = string.split("\r\n");
 			int line = 0;
 			assertContexts(listener,
 				context(lines[line], ++line)
@@ -845,6 +861,8 @@ public class VObjectReaderTest {
 			"PROP;PARAM=1\\ 2^^ 3^n 4^N 5^' 6^ 7\\; 8\" 9\\\\:";
 			//@formatter:on
 
+			String[] lines = string.split("\r\n");
+
 			for (boolean caretDecodingEnabled : new boolean[] { false, true }) { //caret decoding has no effect in legacy syntax				
 				VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
 				try (VObjectReader reader = reader(string, style)) {
@@ -856,7 +874,6 @@ public class VObjectReaderTest {
 				inorder.verify(listener).onProperty(eq(property().name("PROP").param("PARAM", "1\\ 2^^ 3^n 4^N 5^' 6^ 7; 8\" 9\\").value("").build()), any(Context.class));
 
 				//@formatter:off
-				String lines[] = string.split("\r\n");
 				int line = 0;
 				assertContexts(listener,
 					context(lines[line], ++line)
@@ -881,6 +898,8 @@ public class VObjectReaderTest {
 			"PROP;PARAM=1\\ 2^^ 3^n 4^N 5\\n 7^' 8\\\\ 9^ :";
 			//@formatter:on
 
+			String[] lines = string.split("\r\n");
+
 			Map<Boolean, String> expectedParamValues = new HashMap<>();
 			expectedParamValues.put(false, "1\\ 2^^ 3^n 4^N 5\\n 7^' 8\\\\ 9^ ");
 			expectedParamValues.put(true, "1\\ 2^ 3" + NEWLINE + " 4^N 5\\n 7\" 8\\\\ 9^ ");
@@ -898,7 +917,6 @@ public class VObjectReaderTest {
 				inorder.verify(listener).onProperty(eq(property().name("PROP").param("PARAM", expectedParamValue).value("").build()), any(Context.class));
 
 				//@formatter:off
-				String lines[] = string.split("\r\n");
 				int line = 0;
 				assertContexts(listener,
 					context(lines[line], ++line)
@@ -1004,8 +1022,9 @@ public class VObjectReaderTest {
 
 	@Test(expected = NullPointerException.class)
 	public void setDefaultQuotedPrintableCharset_null() throws Exception {
-		VObjectReader reader = reader("", SyntaxStyle.LEGACY);
-		reader.setDefaultQuotedPrintableCharset(null);
+		try (VObjectReader reader = reader("", SyntaxStyle.LEGACY)) {
+			reader.setDefaultQuotedPrintableCharset(null);
+		}
 	}
 
 	/**
@@ -1024,6 +1043,8 @@ public class VObjectReaderTest {
 		"PROP;ENCODING=QUOTED-PRINTABLE;CHARSET=invalid:one=0D=0Atwo\r\n" +
 		"PROP;ENCODING=QUOTED-PRINTABLE;CHARSET=illegal name:one=0D=0Atwo";
 		//@formatter:on
+
+		String[] lines = string.split("\r\n");
 
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
@@ -1052,7 +1073,6 @@ public class VObjectReaderTest {
 			inorder.verify(listener).onProperty(eq(illegalName), any(Context.class));
 
 			//@formatter:off
-			String lines[] = string.split("\r\n");
 			int line = 0;
 			assertContexts(listener,
 				context(lines[line], ++line),
@@ -1097,6 +1117,8 @@ public class VObjectReaderTest {
 			"PROP;QUOTED-PRINTABLE:" + encoded + "\r\n";
 			//@formatter:on
 
+			String[] lines = string.split("\r\n");
+
 			for (SyntaxStyle style : SyntaxStyle.values()) {
 				VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
 				try (VObjectReader reader = reader(string, style)) {
@@ -1108,7 +1130,6 @@ public class VObjectReaderTest {
 				inorder.verify(listener).onProperty(eq(invalidCharset), any(Context.class));
 
 				//@formatter:off
-				String lines[] = string.split("\r\n");
 				int line = 0;
 				assertContexts(listener,
 					context(lines[line], ++line)
@@ -1130,6 +1151,8 @@ public class VObjectReaderTest {
 			"PROP;QUOTED-PRINTABLE:" + encoded + "\r\n";
 			//@formatter:on
 
+			String[] lines = string.split("\r\n");
+
 			for (SyntaxStyle style : SyntaxStyle.values()) {
 				VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
 				try (
@@ -1144,7 +1167,6 @@ public class VObjectReaderTest {
 				inorder.verify(listener).onProperty(eq(invalidCharset), any(Context.class));
 
 				//@formatter:off
-				String lines[] = string.split("\r\n");
 				int line = 0;
 				assertContexts(listener,
 					context(lines[line], ++line)
@@ -1165,6 +1187,8 @@ public class VObjectReaderTest {
 			"PROP;QUOTED-PRINTABLE:" + encoded + "\r\n";
 			//@formatter:on
 
+			String[] lines = string.split("\r\n");
+
 			for (SyntaxStyle style : SyntaxStyle.values()) {
 				VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
 				try (
@@ -1180,7 +1204,6 @@ public class VObjectReaderTest {
 				inorder.verify(listener).onProperty(eq(invalidCharset), any(Context.class));
 
 				//@formatter:off
-				String lines[] = string.split("\r\n");
 				int line = 0;
 				assertContexts(listener,
 					context(lines[line], ++line)
@@ -1222,6 +1245,8 @@ public class VObjectReaderTest {
 			"PROP;PARAM=\"value\":\r\n" + //syntax returns
 		"END:COMP2\r\n";
 		//@formatter:on
+
+		String[] lines = string.split("\r\n");
 
 		SyntaxRules rules = new SyntaxRules(SyntaxStyle.LEGACY);
 		rules.addRule(new LaciToken("COMP2"), "1", SyntaxStyle.LEGACY);
@@ -1269,7 +1294,6 @@ public class VObjectReaderTest {
 		//@formatter:on
 
 		//@formatter:off
-		String lines[] = string.split("\r\n");
 		int line = 0;
 		assertContexts(listener,
 			context(lines[line], ++line),
@@ -1326,6 +1350,8 @@ public class VObjectReaderTest {
 		"END:VCALENDAR\r\n";
 		//@formatter:on
 
+		String[] lines = string.split("\r\n");
+
 		VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
 		try (VObjectReader reader = new VObjectReader(new StringReader(string), SyntaxRules.iCalendar())) {
 			reader.parse(listener);
@@ -1359,7 +1385,6 @@ public class VObjectReaderTest {
 		//@formatter:on
 
 		//@formatter:off
-		String lines[] = string.split("\r\n");
 		int line = 0;
 		assertContexts(listener,
 			context(lines[line], ++line),
@@ -1410,6 +1435,8 @@ public class VObjectReaderTest {
 		"END:VCARD";
 		//@formatter:on
 
+		String[] lines = string.split("\r\n");
+
 		VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
 		try (VObjectReader reader = new VObjectReader(new StringReader(string), SyntaxRules.vcard())) {
 			reader.parse(listener);
@@ -1448,7 +1475,6 @@ public class VObjectReaderTest {
 		//@formatter:on
 
 		//@formatter:off
-		String lines[] = string.split("\r\n");
 		int line = 0;
 		assertContexts(listener,
 			context(lines[line], ++line),
@@ -1492,6 +1518,8 @@ public class VObjectReaderTest {
 		"PROP2:value\r\n" +
 		"PROP:value";
 		//@formatter:on
+
+		String[] lines = string.split("\r\n");
 
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock() {
@@ -1545,7 +1573,6 @@ public class VObjectReaderTest {
 			}
 
 			//@formatter:off
-			String lines[] = string.split("\r\n");
 			int line = 0;
 			assertContexts(listener,
 				context(lines[line], ++line),
