@@ -29,8 +29,6 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.github.mangstadt.vinnie.io.Buffer;
-
 /**
  * @author Michael Angstadt
  */

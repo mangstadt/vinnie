@@ -193,7 +193,6 @@ public class VObjectPropertyValuesTest {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void parseStructured() {
 		List<List<String>> actual = VObjectPropertyValues.parseStructured("one;two,,three;;four\\,five\\;six");
@@ -212,7 +211,6 @@ public class VObjectPropertyValuesTest {
 		assertEquals(expected, actual);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void writeStructured() {
 		String actual, expected;
@@ -283,7 +281,7 @@ public class VObjectPropertyValuesTest {
 		String actual = VObjectPropertyValues.writeMultimap(input);
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void writeMultimap_empty_value_first() {
 		Map<LaciToken, List<String>> input = new LinkedHashMap<>();
