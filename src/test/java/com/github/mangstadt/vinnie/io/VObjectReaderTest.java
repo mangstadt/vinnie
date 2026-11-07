@@ -43,6 +43,7 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -816,7 +817,7 @@ public class VObjectReaderTest {
 
 		String[] lines = string.split("\r\n");
 
-		Map<SyntaxStyle, VObjectProperty> styleToProperty = new HashMap<>();
+		Map<SyntaxStyle, VObjectProperty> styleToProperty = new EnumMap<>(SyntaxStyle.class);
 		styleToProperty.put(SyntaxStyle.LEGACY, property().name("PROP").param("PARAM", "\"a").param(null, "b").value("c,d\":value").build());
 		styleToProperty.put(SyntaxStyle.MODERN, property().name("PROP").param("PARAM", "a;b:c,d").value("value").build());
 
