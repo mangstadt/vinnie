@@ -26,8 +26,8 @@ package com.github.mangstadt.vinnie.io;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -54,18 +54,8 @@ public class VObjectWriterTest {
 			try (VObjectWriter writer = new VObjectWriter(sw, style)) {
 				writer.writeBeginComponent("COMP");
 				writer.writeBeginComponent(" ");
-				try {
-					writer.writeBeginComponent("");
-					fail();
-				} catch (IllegalArgumentException e) {
-					//expected
-				}
-				try {
-					writer.writeBeginComponent(null);
-					fail();
-				} catch (IllegalArgumentException e) {
-					//expected
-				}
+				assertThrows(IllegalArgumentException.class, () -> writer.writeBeginComponent(""));
+				assertThrows(IllegalArgumentException.class, () -> writer.writeBeginComponent(null));
 			}
 
 			String actual = sw.toString();
@@ -87,18 +77,8 @@ public class VObjectWriterTest {
 			try (VObjectWriter writer = new VObjectWriter(sw, style)) {
 				writer.writeEndComponent("COMP");
 				writer.writeEndComponent(" ");
-				try {
-					writer.writeEndComponent("");
-					fail();
-				} catch (IllegalArgumentException e) {
-					//expected
-				}
-				try {
-					writer.writeEndComponent(null);
-					fail();
-				} catch (IllegalArgumentException e) {
-					//expected
-				}
+				assertThrows(IllegalArgumentException.class, () -> writer.writeEndComponent(""));
+				assertThrows(IllegalArgumentException.class, () -> writer.writeEndComponent(null));
 			}
 
 			String actual = sw.toString();
@@ -120,18 +100,8 @@ public class VObjectWriterTest {
 			try (VObjectWriter writer = new VObjectWriter(sw, style)) {
 				writer.writeVersion("1");
 				writer.writeVersion(" ");
-				try {
-					writer.writeVersion("");
-					fail();
-				} catch (IllegalArgumentException e) {
-					//expected
-				}
-				try {
-					writer.writeVersion(null);
-					fail();
-				} catch (IllegalArgumentException e) {
-					//expected
-				}
+				assertThrows(IllegalArgumentException.class, () -> writer.writeVersion(""));
+				assertThrows(IllegalArgumentException.class, () -> writer.writeVersion(null));
 			}
 
 			String actual = sw.toString();
@@ -247,12 +217,13 @@ public class VObjectWriterTest {
 			try (VObjectWriter writer = new VObjectWriter(sw, style)) {
 				VObjectParameters parameters = new VObjectParameters();
 				for (char c : ".;:\n\r".toCharArray()) {
-					try {
-						writer.writeProperty(c + "", "PROP", parameters, "");
-						fail("IllegalArgumentException expected when group name contains character " + ch(c) + " and style is " + style.name());
-					} catch (IllegalArgumentException e) {
-						//expected
-					}
+					//@formatter:off
+					assertThrows(
+						"IllegalArgumentException expected when group name contains character " + ch(c) + " and style is " + style.name(),
+						IllegalArgumentException.class,
+						() -> writer.writeProperty(c + "", "PROP", parameters, "")
+					);
+					//@formatter:on
 				}
 			}
 
@@ -274,12 +245,13 @@ public class VObjectWriterTest {
 			try (VObjectWriter writer = new VObjectWriter(sw, style)) {
 				VObjectParameters parameters = new VObjectParameters();
 				for (char c : " \t".toCharArray()) {
-					try {
-						writer.writeProperty(c + "", "PROP", parameters, "");
-						fail("IllegalArgumentException expected when group name starts with character " + ch(c) + " and style is " + style.name());
-					} catch (IllegalArgumentException e) {
-						//expected
-					}
+					//@formatter:off
+					assertThrows(
+						"IllegalArgumentException expected when group name starts with character " + ch(c) + " and style is " + style.name(),
+						IllegalArgumentException.class,
+						() -> writer.writeProperty(c + "", "PROP", parameters, "")
+					);
+					//@formatter:on
 				}
 
 				String actual = sw.toString();
@@ -302,19 +274,18 @@ public class VObjectWriterTest {
 				VObjectParameters parameters = new VObjectParameters();
 				writer.writeProperty(null, "PROP", parameters, "");
 
-				try {
-					writer.writeProperty(null, "", parameters, "");
-					fail("IllegalArgumentException expected when property name is empty and style is " + style.name());
-				} catch (IllegalArgumentException e) {
-					//expected
-				}
-
-				try {
-					writer.writeProperty(null, null, parameters, "");
-					fail("NullPointerException expected when property name is null and style is " + style.name());
-				} catch (NullPointerException e) {
-					//expected
-				}
+				//@formatter:off
+				assertThrows(
+					"IllegalArgumentException expected when property name is empty and style is " + style.name(),
+					IllegalArgumentException.class,
+					() -> writer.writeProperty(null, "", parameters, "")
+				);
+				assertThrows(
+					"NullPointerException expected when property name is null and style is " + style.name(),
+					NullPointerException.class,
+					() -> writer.writeProperty(null, null, parameters, "")
+				);
+				//@formatter:on
 			}
 
 			String actual = sw.toString();
@@ -335,12 +306,13 @@ public class VObjectWriterTest {
 			try (VObjectWriter writer = new VObjectWriter(sw, style)) {
 				VObjectParameters parameters = new VObjectParameters();
 				for (char c : ".;:\n\r".toCharArray()) {
-					try {
-						writer.writeProperty(null, c + "", parameters, "");
-						fail("IllegalArgumentException expected when property name contains character " + ch(c) + " and style is " + style.name());
-					} catch (IllegalArgumentException e) {
-						//expected
-					}
+					//@formatter:off
+					assertThrows(
+						"IllegalArgumentException expected when property name contains character " + ch(c) + " and style is " + style.name(),
+						IllegalArgumentException.class,
+						() -> writer.writeProperty(null, c + "", parameters, "")
+					);
+					//@formatter:on
 				}
 
 				String actual = sw.toString();
@@ -362,12 +334,13 @@ public class VObjectWriterTest {
 			try (VObjectWriter writer = new VObjectWriter(sw, style)) {
 				VObjectParameters parameters = new VObjectParameters();
 				for (char c : " \t".toCharArray()) {
-					try {
-						writer.writeProperty(null, c + "", parameters, "");
-						fail("IllegalArgumentException expected when property name starts with character " + ch(c) + " and style is " + style.name());
-					} catch (IllegalArgumentException e) {
-						//expected
-					}
+					//@formatter:off
+					assertThrows(
+						"IllegalArgumentException expected when property name starts with character " + ch(c) + " and style is " + style.name(),
+						IllegalArgumentException.class,
+						() -> writer.writeProperty(null, c + "", parameters, "")
+					);
+					//@formatter:on
 
 					writer.writeProperty(null, "PROP" + c, parameters, "");
 				}
@@ -527,12 +500,13 @@ public class VObjectWriterTest {
 				try (VObjectWriter writer = new VObjectWriter(sw, style)) {
 					writer.setCaretEncodingEnabled(caretEncoding);
 					for (VObjectParameters p : list) {
-						try {
-							writer.writeProperty(null, "PROP", p, "");
-							fail("IllegalArgumentException expected when property name contains nameless parameter and style is " + style.name());
-						} catch (IllegalArgumentException e) {
-							//expected
-						}
+						//@formatter:off
+						assertThrows(
+							"IllegalArgumentException expected when property name contains nameless parameter and style is " + style.name(),
+							IllegalArgumentException.class,
+							() -> writer.writeProperty(null, "PROP", p, "")
+						);
+						//@formatter:on
 					}
 				}
 
@@ -558,12 +532,14 @@ public class VObjectWriterTest {
 					for (char c : ";:=\n\r".toCharArray()) {
 						VObjectParameters parameters = new VObjectParameters();
 						parameters.put(c + "", "");
-						try {
-							writer.writeProperty(null, "PROP", parameters, "");
-							fail("IllegalArgumentException expected when parameter name contains character " + ch(c) + " and style is " + style.name());
-						} catch (IllegalArgumentException e) {
-							//expected
-						}
+
+						//@formatter:off
+						assertThrows(
+							"IllegalArgumentException expected when parameter name contains character " + ch(c) + " and style is " + style.name(),
+							IllegalArgumentException.class,
+							() -> writer.writeProperty(null, "PROP", parameters, "")
+						);
+						//@formatter:on
 					}
 
 					String actual = sw.toString();
@@ -595,12 +571,13 @@ public class VObjectWriterTest {
 						VObjectParameters parameters = new VObjectParameters();
 						parameters.put("PARAM", c + "");
 
-						try {
-							writer.writeProperty(null, "PROP", parameters, "");
-							fail("IllegalArgumentException expected when parameter value contains character " + ch(c) + " and caret encoding is " + caretEncoding + " and style is " + style.name());
-						} catch (IllegalArgumentException e) {
-							//expected
-						}
+						//@formatter:off
+						assertThrows(
+							"IllegalArgumentException expected when parameter value contains character " + ch(c) + " and caret encoding is " + caretEncoding + " and style is " + style.name(),
+							IllegalArgumentException.class,
+							() -> writer.writeProperty(null, "PROP", parameters, "")
+						);
+						//@formatter:on
 					}
 
 					String actual = sw.toString();
@@ -626,12 +603,14 @@ public class VObjectWriterTest {
 
 						VObjectParameters parameters = new VObjectParameters();
 						parameters.put("PARAM", c + "");
-						try {
-							writer.writeProperty(null, "PROP", parameters, "");
-							fail("IllegalArgumentException expected when parameter value contains character " + ch(c) + " and caret encoding is " + caretEncoding + " and style is " + style.name());
-						} catch (IllegalArgumentException e) {
-							//expected
-						}
+						
+						//@formatter:off
+						assertThrows(
+							"IllegalArgumentException expected when parameter value contains character " + ch(c) + " and caret encoding is " + caretEncoding + " and style is " + style.name(),
+							IllegalArgumentException.class,
+							() -> writer.writeProperty(null, "PROP", parameters, "")
+						);
+						//@formatter:on
 					}
 
 					String actual = sw.toString();

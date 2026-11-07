@@ -29,8 +29,8 @@ import static com.github.mangstadt.vinnie.TestUtils.assertEqualsMethodEssentials
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
@@ -184,21 +184,11 @@ public class VObjectParametersTest {
 		assertNull(parameters.getCharset());
 
 		parameters.put("CHARSET", "unknown");
-		try {
-			parameters.getCharset();
-			fail();
-		} catch (UnsupportedCharsetException e) {
-			//expected
-		}
+		assertThrows(UnsupportedCharsetException.class, () -> parameters.getCharset());
 
 		parameters.clear();
 		parameters.put("CHARSET", "illegal name");
-		try {
-			parameters.getCharset();
-			fail();
-		} catch (IllegalCharsetNameException e) {
-			//expected
-		}
+		assertThrows(IllegalCharsetNameException.class, () -> parameters.getCharset());
 
 		parameters.clear();
 		parameters.put("CHARSET", "utf-8");
