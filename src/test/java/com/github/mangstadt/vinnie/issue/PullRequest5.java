@@ -62,10 +62,10 @@ public class PullRequest5 {
 	@Test
 	public void component_names_with_i() throws Exception {
 		String input = "begin:x-item\r\nend:x-item\r\n";
-		VObjectReader reader = new VObjectReader(new StringReader(input), SyntaxRules.vcard());
 		VObjectDataListener listener = mock(VObjectDataListener.class);
-		reader.parse(listener);
-		reader.close();
+		try (VObjectReader reader = new VObjectReader(new StringReader(input), SyntaxRules.vcard())) {
+			reader.parse(listener);
+		}
 
 		verify(listener).onComponentBegin(eq(new LaciToken("X-ITEM")), any(Context.class));
 		verify(listener).onComponentEnd(eq(new LaciToken("X-ITEM")), any(Context.class));
@@ -73,15 +73,14 @@ public class PullRequest5 {
 
 	@Test
 	public void lowercase_encoding_parameter_is_encoded() throws Exception {
-		StringWriter sw = new StringWriter();
-		VObjectWriter writer = new VObjectWriter(sw, SyntaxStyle.MODERN);
-
 		VObjectParameters parameters = new VObjectParameters();
 		parameters.put("encoding", "QUOTED-PRINTABLE");
 		assertTrue(parameters.isQuotedPrintable());
 
-		writer.writeProperty(null, "NAME", parameters, "¡Hola, mundo!");
-		writer.close();
+		StringWriter sw = new StringWriter();
+		try (VObjectWriter writer = new VObjectWriter(sw, SyntaxStyle.MODERN)) {
+			writer.writeProperty(null, "NAME", parameters, "¡Hola, mundo!");
+		}
 
 		String expected = "NAME;ENCODING=QUOTED-PRINTABLE;CHARSET=UTF-8:=C2=A1Hola, mundo!\r\n";
 		String actual = sw.toString();
@@ -91,7 +90,6 @@ public class PullRequest5 {
 	@Test
 	public void lowercase_encoding_parameter_is_decoded() throws Exception {
 		String input = "NOTE;encoding=QUOTED-PRINTABLE;CHARSET=UTF-8:=C2=A1Hola, mundo!\r\n";
-		VObjectReader reader = new VObjectReader(new StringReader(input), SyntaxRules.vcard());
 		VObjectDataAdapter adapter = spy(new VObjectDataAdapter() {
 			@Override
 			public void onProperty(VObjectProperty property, Context context) {
@@ -99,8 +97,9 @@ public class PullRequest5 {
 				assertEquals("¡Hola, mundo!", property.getValue());
 			}
 		});
-		reader.parse(adapter);
-		reader.close();
+		try (VObjectReader reader = new VObjectReader(new StringReader(input), SyntaxRules.vcard())) {
+			reader.parse(adapter);
+		}
 
 		verify(adapter).onProperty(any(VObjectProperty.class), any(Context.class));
 	}

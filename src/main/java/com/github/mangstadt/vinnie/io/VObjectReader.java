@@ -58,9 +58,9 @@ import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
  * <pre class="brush:java">
  * Reader reader = ...
  * SyntaxRules rules = SyntaxRules.vcard();
- * VObjectReader vobjectReader = new VObjectReader(reader, rules);
- * vobjectReader.parse(new VObjectDataListener(){ ... });
- * vobjectReader.close();
+ * try (VObjectReader vobjectReader = new VObjectReader(reader, rules)) {
+ *   vobjectReader.parse(new VObjectDataListener(){ ... });
+ * }
  * </pre>
  * 
  * <p>
@@ -77,15 +77,15 @@ import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
  * 
  * <pre class="brush:java">
  * Reader reader = new StringReader("NOTE;ENCODING=QUOTED-PRINTABLE;CHARSET=UTF-8:=C2=A1Hola, mundo!");
- * VObjectReader vobjectReader = new VObjectReader(reader, ...);
- * vobjectReader.parse(new VObjectDataAdapter() {
- *   public void onProperty(VObjectProperty property, Context context) {
- *     assertEquals("¡Hola, mundo!", property.getValue());
- *     assertEquals("QUOTED-PRINTABLE", property.getParameters().first("ENCODING"));
- *     assertEquals("UTF-8", property.getParameters().first("CHARSET"));
- *   }
- * });
- * vobjectReader.close();
+ * try (VObjectReader vobjectReader = new VObjectReader(reader, ...)) {
+ *   vobjectReader.parse(new VObjectDataAdapter() {
+ *     public void onProperty(VObjectProperty property, Context context) {
+ *       assertEquals("¡Hola, mundo!", property.getValue());
+ *       assertEquals("QUOTED-PRINTABLE", property.getParameters().first("ENCODING"));
+ *       assertEquals("UTF-8", property.getParameters().first("CHARSET"));
+ *     }
+ *   });
+ * }
  * </pre>
  * 
  * <p>
@@ -98,16 +98,16 @@ import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
  * 
  * <pre class="brush:java">
  * Reader reader = new StringReader("NOTE;ENCODING=QUOTED-PRINTABLE:=A1Hola, mundo!");
- * VObjectReader vobjectReader = new VObjectReader(reader, ...);
- * vobjectReader.setDefaultQuotedPrintableCharset(Charset.forName("Windows-1252"));
- * vobjectReader.parse(new VObjectDataAdapter() {
- *   public void onProperty(VObjectProperty property, Context context) {
- *     assertEquals("¡Hola, mundo!", property.getValue());
- *     assertEquals("QUOTED-PRINTABLE", property.getParameters().first("ENCODING"));
- *     assertNull(property.getParameters().first("CHARSET"));
- *   }
- * });
- * vobjectReader.close();
+ * try (VObjectReader vobjectReader = new VObjectReader(reader, ...)) {
+ *   vobjectReader.setDefaultQuotedPrintableCharset(Charset.forName("Windows-1252"));
+ *   vobjectReader.parse(new VObjectDataAdapter() {
+ *     public void onProperty(VObjectProperty property, Context context) {
+ *       assertEquals("¡Hola, mundo!", property.getValue());
+ *       assertEquals("QUOTED-PRINTABLE", property.getParameters().first("ENCODING"));
+ *       assertNull(property.getParameters().first("CHARSET"));
+ *     }
+ *   });
+ * }
  * </pre>
  * <p>
  * Nameless ENCODING parameters are also recognized for backwards compatibility
@@ -125,16 +125,16 @@ import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
  * 
  * <pre class="brush:java">
  * Reader reader = new StringReader("NOTE;ENCODING=QUOTED-PRINTABLE;CHARSET=UTF-8:=ZZ invalid");
- * VObjectReader vobjectReader = new VObjectReader(reader, ...);
- * vobjectReader.parse(new VObjectDataAdapter() {
- *   public void onProperty(VObjectProperty property, Context context) {
- *     assertEquals("=ZZ invalid", property.getValue());
- *   }
- *   public void onWarning(Warning warning, VObjectProperty property, Exception thrown, Context context) {
- *     assertEquals(Warning.QUOTED_PRINTABLE_ERROR, warning);
- *   }
- * });
- * vobjectReader.close();
+ * try (VObjectReader vobjectReader = new VObjectReader(reader, ...)) {
+ *   vobjectReader.parse(new VObjectDataAdapter() {
+ *     public void onProperty(VObjectProperty property, Context context) {
+ *       assertEquals("=ZZ invalid", property.getValue());
+ *     }
+ *     public void onWarning(Warning warning, VObjectProperty property, Exception thrown, Context context) {
+ *       assertEquals(Warning.QUOTED_PRINTABLE_ERROR, warning);
+ *     }
+ *   });
+ * }
  * </pre>
  * 
  * <p>
@@ -149,13 +149,13 @@ import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
  * 
  * <pre class="brush:java">
  * Reader reader = new StringReader("NOTE;X-AUTHOR=Fox ^'Spooky^' Mulder:The truth is out there.");
- * VObjectReader vobjectReader = new VObjectReader(reader, new SyntaxRules(SyntaxStyle.NEW));
- * vobjectReader.parse(new VObjectDataAdapter() {
- *   public void onProperty(VObjectProperty property, Context context) {
- *     assertEquals("Fox \"Spooky\" Mulder", property.getParameters().first("X-AUTHOR"));
- *   }
- * });
- * vobjectReader.close();
+ * try (VObjectReader vobjectReader = new VObjectReader(reader, new SyntaxRules(SyntaxStyle.NEW))) {
+ *   vobjectReader.parse(new VObjectDataAdapter() {
+ *     public void onProperty(VObjectProperty property, Context context) {
+ * 	     assertEquals("Fox \"Spooky\" Mulder", property.getParameters().first("X-AUTHOR"));
+ * 	   }
+ *   });
+ * }
  * </pre>
  * 
  * <p>
@@ -166,14 +166,14 @@ import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
  * 
  * <pre class="brush:java">
  * Reader reader = new StringReader("NOTE;X-EMOTE=^_^:Good morning!");
- * VObjectReader vobjectReader = new VObjectReader(reader, new SyntaxRules(SyntaxStyle.NEW));
- * vobjectReader.setCaretDecodingEnabled(false);
- * vobjectReader.parse(new VObjectDataAdapter() {
- *   public void onProperty(VObjectProperty property, Context context) {
- *     assertEquals("^_^", property.getParameters().first("X-EMOTE"));
- *   }
- * });
- * vobjectReader.close();
+ * try (VObjectReader vobjectReader = new VObjectReader(reader, new SyntaxRules(SyntaxStyle.NEW))) {
+ *   vobjectReader.setCaretDecodingEnabled(false);
+ *   vobjectReader.parse(new VObjectDataAdapter() {
+ * 	   public void onProperty(VObjectProperty property, Context context) {
+ *       assertEquals("^_^", property.getParameters().first("X-EMOTE"));
+ * 	   }
+ *   });
+ * }
  * </pre>
  * 
  * <p>
@@ -188,13 +188,13 @@ import com.github.mangstadt.vinnie.codec.QuotedPrintableCodec;
  * "NOTE:Lorem ipsum dolor sit amet\\, consectetur adipiscing elit. Vestibulum u\r\n" +
  * " ltricies tempor orci ac dignissim.";
  * Reader reader = new StringReader(string);
- * VObjectReader vobjectReader = new VObjectReader(reader, ...);
- * vobjectReader.parse(new VObjectDataAdapter() {
- *   public void onProperty(VObjectProperty property, Context context) {
- *     assertEquals("Lorem ipsum dolor sit amet\\, consectetur adipiscing elit. Vestibulum ultricies tempor orci ac dignissim.", property.getValue());
- *   }
- * });
- * vobjectReader.close();
+ * try (VObjectReader vobjectReader = new VObjectReader(reader, ...)) {
+ *   vobjectReader.parse(new VObjectDataAdapter() {
+ *     public void onProperty(VObjectProperty property, Context context) {
+ *       assertEquals("Lorem ipsum dolor sit amet\\, consectetur adipiscing elit. Vestibulum ultricies tempor orci ac dignissim.", property.getValue());
+ *     }
+ *   });
+ * }
  * </pre>
  * 
  * @author Michael Angstadt

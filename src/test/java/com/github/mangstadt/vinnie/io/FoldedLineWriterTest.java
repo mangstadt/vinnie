@@ -46,13 +46,12 @@ public class FoldedLineWriterTest {
 	@Test
 	public void default_settings() throws Exception {
 		StringWriter sw = new StringWriter();
-		FoldedLineWriter writer = new FoldedLineWriter(sw);
+		try (FoldedLineWriter writer = new FoldedLineWriter(sw)) {
+			assertEquals(75, writer.getLineLength());
+			assertEquals(" ", writer.getIndent());
 
-		assertEquals(75, writer.getLineLength());
-		assertEquals(" ", writer.getIndent());
-
-		writer.write("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
-		writer.close();
+			writer.write("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+		}
 
 		String actual = sw.toString();
 
@@ -71,10 +70,9 @@ public class FoldedLineWriterTest {
 	@Test
 	public void line_length() throws Exception {
 		StringWriter sw = new StringWriter();
-		FoldedLineWriter writer = new FoldedLineWriter(sw, 10, " ");
-
-		writer.write("Lorem ipsum dolor sit amet");
-		writer.close();
+		try (FoldedLineWriter writer = new FoldedLineWriter(sw, 10, " ")) {
+			writer.write("Lorem ipsum dolor sit amet");
+		}
 
 		String actual = sw.toString();
 
@@ -96,10 +94,9 @@ public class FoldedLineWriterTest {
 	@Test
 	public void line_length_reset_on_newline() throws Exception {
 		StringWriter sw = new StringWriter();
-		FoldedLineWriter writer = new FoldedLineWriter(sw, 10, " ");
-
-		writer.write("Lorem\r\nipsum dolor sit\ramet, consectetur\nadipiscing elit");
-		writer.close();
+		try (FoldedLineWriter writer = new FoldedLineWriter(sw, 10, " ")) {
+			writer.write("Lorem\r\nipsum dolor sit\ramet, consectetur\nadipiscing elit");
+		}
 
 		String actual = sw.toString();
 
@@ -134,10 +131,9 @@ public class FoldedLineWriterTest {
 	@Test
 	public void exceed_max_line_length_when_space_encountered() throws Exception {
 		StringWriter sw = new StringWriter();
-		FoldedLineWriter writer = new FoldedLineWriter(sw, 5, " ");
-
-		writer.write("Lorem ipsum dolor");
-		writer.close();
+		try (FoldedLineWriter writer = new FoldedLineWriter(sw, 5, " ")) {
+			writer.write("Lorem ipsum dolor");
+		}
 
 		String actual = sw.toString();
 
@@ -159,10 +155,9 @@ public class FoldedLineWriterTest {
 	@Test
 	public void exceed_max_line_length_when_space_encountered_end_of_string() throws Exception {
 		StringWriter sw = new StringWriter();
-		FoldedLineWriter writer = new FoldedLineWriter(sw, 5, " ");
-
-		writer.write("Lorem ");
-		writer.close();
+		try (FoldedLineWriter writer = new FoldedLineWriter(sw, 5, " ")) {
+			writer.write("Lorem ");
+		}
 
 		String actual = sw.toString();
 
@@ -175,17 +170,17 @@ public class FoldedLineWriterTest {
 	}
 
 	/**
-	 * Same as {@link #exceed_max_line_length_when_space_encountered_end_of_string} test, but
-	 * with one more character after the space.
+	 * Same as
+	 * {@link #exceed_max_line_length_when_space_encountered_end_of_string}
+	 * test, but with one more character after the space.
 	 * @author ChatGPT
 	 */
 	@Test
 	public void exceed_max_line_length_when_space_encountered_second_last_char() throws Exception {
 		StringWriter sw = new StringWriter();
-		FoldedLineWriter writer = new FoldedLineWriter(sw, 5, " ");
-
-		writer.write("Lorem a");
-		writer.close();
+		try (FoldedLineWriter writer = new FoldedLineWriter(sw, 5, " ")) {
+			writer.write("Lorem a");
+		}
 
 		String actual = sw.toString();
 
@@ -204,10 +199,9 @@ public class FoldedLineWriterTest {
 	@Test
 	public void indent() throws Exception {
 		StringWriter sw = new StringWriter();
-		FoldedLineWriter writer = new FoldedLineWriter(sw, 75, "\t");
-
-		writer.write("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
-		writer.close();
+		try (FoldedLineWriter writer = new FoldedLineWriter(sw, 75, "\t")) {
+			writer.write("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+		}
 
 		String actual = sw.toString();
 
@@ -238,11 +232,10 @@ public class FoldedLineWriterTest {
 		String encoded = codec.encode(input);
 
 		StringWriter sw = new StringWriter();
-		FoldedLineWriter writer = new FoldedLineWriter(sw, 10, " ");
-
-		writer.writeQuotedPrintable(encoded);
-		writer.write("\r\nthis line should be indented");
-		writer.close();
+		try (FoldedLineWriter writer = new FoldedLineWriter(sw, 10, " ")) {
+			writer.writeQuotedPrintable(encoded);
+			writer.write("\r\nthis line should be indented");
+		}
 
 		String actual = sw.toString();
 
@@ -267,10 +260,9 @@ public class FoldedLineWriterTest {
 	@Test
 	public void quoted_printable_encoded_char_ends_the_string() throws Exception {
 		StringWriter sw = new StringWriter();
-		FoldedLineWriter writer = new FoldedLineWriter(sw, 6, " ");
-
-		writer.writeQuotedPrintable("test=0A");
-		writer.close();
+		try (FoldedLineWriter writer = new FoldedLineWriter(sw, 6, " ")) {
+			writer.writeQuotedPrintable("test=0A");
+		}
 
 		String actual = sw.toString();
 
@@ -285,10 +277,9 @@ public class FoldedLineWriterTest {
 	@Test
 	public void quoted_printable_encoded_char_not_split_between_lines() throws Exception {
 		StringWriter sw = new StringWriter();
-		FoldedLineWriter writer = new FoldedLineWriter(sw, 4, " ");
-
-		writer.writeQuotedPrintable("ab=41cd=42=43");
-		writer.close();
+		try (FoldedLineWriter writer = new FoldedLineWriter(sw, 4, " ")) {
+			writer.writeQuotedPrintable("ab=41cd=42=43");
+		}
 
 		String actual = sw.toString();
 
@@ -308,10 +299,9 @@ public class FoldedLineWriterTest {
 	@Test
 	public void surrogate_pair() throws Exception {
 		StringWriter sw = new StringWriter();
-		FoldedLineWriter writer = new FoldedLineWriter(sw, 5, " ");
-
-		writer.write("test\uD83D\uDCF0test"); // should not be split
-		writer.close();
+		try (FoldedLineWriter writer = new FoldedLineWriter(sw, 5, " ")) {
+			writer.write("test\uD83D\uDCF0test"); // should not be split
+		}
 
 		String actual = sw.toString();
 
@@ -331,10 +321,9 @@ public class FoldedLineWriterTest {
 	@Test
 	public void surrogate_pair_ends_the_string() throws Exception {
 		StringWriter sw = new StringWriter();
-		FoldedLineWriter writer = new FoldedLineWriter(sw, 5, " ");
-
-		writer.write("test\uD83D\uDCF0"); // should not be split
-		writer.close();
+		try (FoldedLineWriter writer = new FoldedLineWriter(sw, 5, " ")) {
+			writer.write("test\uD83D\uDCF0"); // should not be split
+		}
 
 		String actual = sw.toString();
 
@@ -352,10 +341,9 @@ public class FoldedLineWriterTest {
 	@Test
 	public void write_sub_array() throws Exception {
 		StringWriter sw = new StringWriter();
-		FoldedLineWriter writer = new FoldedLineWriter(sw, 10, " ");
-
-		writer.write("This line should be folded.", 5, 14);
-		writer.close();
+		try (FoldedLineWriter writer = new FoldedLineWriter(sw, 10, " ")) {
+			writer.write("This line should be folded.", 5, 14);
+		}
 
 		String actual = sw.toString();
 
@@ -371,48 +359,55 @@ public class FoldedLineWriterTest {
 	@Test
 	public void getLineLength() throws Exception {
 		StringWriter sw = new StringWriter();
-		FoldedLineWriter writer = new FoldedLineWriter(sw, 10, " ");
-		assertEquals(10, writer.getLineLength());
-		writer.close();
+		try (FoldedLineWriter writer = new FoldedLineWriter(sw, 10, " ")) {
+			assertEquals(10, writer.getLineLength());
+		}
 	}
 
 	@Test
 	public void getIndent() throws Exception {
 		StringWriter sw = new StringWriter();
-		FoldedLineWriter writer = new FoldedLineWriter(sw, 75, "  ");
-		assertEquals("  ", writer.getIndent());
+		try (FoldedLineWriter writer = new FoldedLineWriter(sw, 75, "  ")) {
+			assertEquals("  ", writer.getIndent());
+		}
 	}
 
+	@SuppressWarnings("resource")
 	@Test(expected = IllegalArgumentException.class)
 	public void lineLength_too_small() throws Exception {
 		StringWriter sw = new StringWriter();
 		new FoldedLineWriter(sw, 3, " ");
 	}
 
+	@SuppressWarnings("resource")
 	@Test(expected = IllegalArgumentException.class)
 	public void lineLength_shorter_than_indent_length() throws Exception {
 		StringWriter sw = new StringWriter();
 		new FoldedLineWriter(sw, 4, " \t \t ");
 	}
 
+	@SuppressWarnings("resource")
 	@Test(expected = IllegalArgumentException.class)
 	public void lineLength_equal_to_indent_length() throws Exception {
 		StringWriter sw = new StringWriter();
 		new FoldedLineWriter(sw, 5, " \t \t ");
 	}
 
+	@SuppressWarnings("resource")
 	@Test(expected = NullPointerException.class)
 	public void indent_null() throws Exception {
 		StringWriter sw = new StringWriter();
 		new FoldedLineWriter(sw, 75, null);
 	}
 
+	@SuppressWarnings("resource")
 	@Test(expected = IllegalArgumentException.class)
 	public void indent_empty() throws Exception {
 		StringWriter sw = new StringWriter();
 		new FoldedLineWriter(sw, 75, "");
 	}
 
+	@SuppressWarnings("resource")
 	@Test(expected = IllegalArgumentException.class)
 	public void indent_invalid_characters() throws Exception {
 		StringWriter sw = new StringWriter();
@@ -422,30 +417,26 @@ public class FoldedLineWriterTest {
 	@Test
 	public void getWriter() throws Exception {
 		StringWriter sw = new StringWriter();
-		FoldedLineWriter writer = new FoldedLineWriter(sw);
-
-		assertSame(sw, writer.getWriter());
-
-		writer.close();
+		try (FoldedLineWriter writer = new FoldedLineWriter(sw)) {
+			assertSame(sw, writer.getWriter());
+		}
 	}
 
 	@Test
-	public void close() throws Exception {
+	public void close_wrapped_writer() throws Exception {
 		Writer w = mock(Writer.class);
-		FoldedLineWriter writer = new FoldedLineWriter(w);
-		writer.close();
+		try (FoldedLineWriter writer = new FoldedLineWriter(w)) {
+		}
 
 		verify(w).close();
 	}
 
 	@Test
-	public void flush() throws Exception {
+	public void flush_wrapped_writer() throws Exception {
 		Writer w = mock(Writer.class);
-		FoldedLineWriter writer = new FoldedLineWriter(w);
-		writer.flush();
-
-		verify(w).flush();
-
-		writer.close();
+		try (FoldedLineWriter writer = new FoldedLineWriter(w)) {
+			writer.flush();
+			verify(w).flush();
+		}
 	}
 }

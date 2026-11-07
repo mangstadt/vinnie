@@ -81,9 +81,10 @@ public class VObjectReaderTest {
 		//@formatter:on
 
 		for (SyntaxStyle style : SyntaxStyle.values()) {
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-			reader.parse(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				reader.parse(listener);
+			}
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener).onProperty(eq(property().name("PROP1").value("value1").build()), any(Context.class));
@@ -127,9 +128,10 @@ public class VObjectReaderTest {
 		//@formatter:on
 
 		for (SyntaxStyle style : SyntaxStyle.values()) {
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-			reader.parse(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				reader.parse(listener);
+			}
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener).onComponentBegin(eq(component("COMP1")), any(Context.class));
@@ -167,9 +169,10 @@ public class VObjectReaderTest {
 		//@formatter:on
 
 		for (SyntaxStyle style : SyntaxStyle.values()) {
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-			reader.parse(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				reader.parse(listener);
+			}
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener).onComponentBegin(eq(component("COMP1")), any(Context.class));
@@ -218,9 +221,10 @@ public class VObjectReaderTest {
 		//@formatter:on
 
 		for (SyntaxStyle style : SyntaxStyle.values()) {
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-			reader.parse(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				reader.parse(listener);
+			}
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener).onComponentBegin(eq(component("COMP1")), any(Context.class));
@@ -256,9 +260,10 @@ public class VObjectReaderTest {
 		//@formatter:on
 
 		for (SyntaxStyle style : SyntaxStyle.values()) {
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-			reader.parse(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				reader.parse(listener);
+			}
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener, times(2)).onWarning(eq(Warning.EMPTY_BEGIN), isNull(VObjectProperty.class), isNull(Exception.class), any(Context.class));
@@ -294,9 +299,10 @@ public class VObjectReaderTest {
 		//@formatter:on
 
 		for (SyntaxStyle style : SyntaxStyle.values()) {
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-			reader.parse(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				reader.parse(listener);
+			}
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener).onComponentBegin(eq(component("COMP1")), any(Context.class));
@@ -336,9 +342,10 @@ public class VObjectReaderTest {
 		//@formatter:on
 
 		for (SyntaxStyle style : SyntaxStyle.values()) {
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-			reader.parse(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				reader.parse(listener);
+			}
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener).onComponentBegin(eq(component("COMP1")), any(Context.class));
@@ -372,9 +379,10 @@ public class VObjectReaderTest {
 		//@formatter:on
 
 		for (SyntaxStyle style : SyntaxStyle.values()) {
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-			reader.parse(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				reader.parse(listener);
+			}
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener).onProperty(eq(property().name("PROP1").value("value1").build()), any(Context.class));
@@ -410,9 +418,10 @@ public class VObjectReaderTest {
 		//@formatter:on
 
 		for (SyntaxStyle style : SyntaxStyle.values()) {
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-			reader.parse(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				reader.parse(listener);
+			}
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener).onProperty(eq(property().name("PROP1").value("value1").build()), any(Context.class));
@@ -442,9 +451,10 @@ public class VObjectReaderTest {
 		//@formatter:on
 
 		for (SyntaxStyle style : SyntaxStyle.values()) {
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-			reader.parse(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				reader.parse(listener);
+			}
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener).onWarning(eq(Warning.MALFORMED_LINE), isNull(VObjectProperty.class), isNull(Exception.class), any(Context.class));
@@ -472,9 +482,10 @@ public class VObjectReaderTest {
 		//@formatter:on
 
 		for (SyntaxStyle style : SyntaxStyle.values()) {
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-			reader.parse(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				reader.parse(listener);
+			}
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener).onWarning(eq(Warning.MALFORMED_LINE), isNull(VObjectProperty.class), isNull(Exception.class), any(Context.class));
@@ -503,9 +514,10 @@ public class VObjectReaderTest {
 		//@formatter:on
 
 		for (SyntaxStyle style : SyntaxStyle.values()) {
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-			reader.parse(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				reader.parse(listener);
+			}
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener).onProperty(eq(property().name("").value("value").build()), any(Context.class));
@@ -539,10 +551,11 @@ public class VObjectReaderTest {
 
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			for (boolean caretDecodingEnabled : new boolean[] { false, true }) {
-				VObjectReader reader = reader(string, style);
-				reader.setCaretDecodingEnabled(caretDecodingEnabled);
 				VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-				reader.parse(listener);
+				try (VObjectReader reader = reader(string, style)) {
+					reader.setCaretDecodingEnabled(caretDecodingEnabled);
+					reader.parse(listener);
+				}
 
 				InOrder inorder = inOrder(listener);
 				inorder.verify(listener).onProperty(eq(property().group("one\\\\two^^three").name("four\\\\five^^six").param("seven\\\\eight^^nine", "ten").value("").build()), any(Context.class));
@@ -569,9 +582,10 @@ public class VObjectReaderTest {
 		//@formatter:on
 
 		for (SyntaxStyle style : SyntaxStyle.values()) {
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-			reader.parse(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				reader.parse(listener);
+			}
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener).onProperty(eq(new VObjectProperty("g=,\"roup", "P.=,\"ROP", "value")), any(Context.class));
@@ -597,9 +611,10 @@ public class VObjectReaderTest {
 		//@formatter:on
 
 		for (SyntaxStyle style : SyntaxStyle.values()) {
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-			reader.parse(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				reader.parse(listener);
+			}
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener).onProperty(eq(property().name("PROP").param("", "value").value("value").build()), any(Context.class));
@@ -625,9 +640,10 @@ public class VObjectReaderTest {
 		//@formatter:on
 
 		for (SyntaxStyle style : SyntaxStyle.values()) {
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-			reader.parse(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				reader.parse(listener);
+			}
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener).onProperty(eq(property().name("PROP").param(null, "HOME", "WORK").value("value").build()), any(Context.class));
@@ -653,9 +669,10 @@ public class VObjectReaderTest {
 		//@formatter:on
 
 		for (SyntaxStyle style : SyntaxStyle.values()) {
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-			reader.parse(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				reader.parse(listener);
+			}
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener).onProperty(eq(property().name("PROP").param("P,.\"ARAM", "value").value("value").build()), any(Context.class));
@@ -684,9 +701,10 @@ public class VObjectReaderTest {
 
 		SyntaxStyle style = SyntaxStyle.LEGACY;
 		{
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-			reader.parse(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				reader.parse(listener);
+			}
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener).onProperty(eq(property().name("PROP").param("PARAM", "value").value("value").build()), any(Context.class));
@@ -702,9 +720,10 @@ public class VObjectReaderTest {
 
 		style = SyntaxStyle.MODERN;
 		{
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-			reader.parse(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				reader.parse(listener);
+			}
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener).onProperty(eq(property().name("PROP").param("PARAM ", " value").value("value").build()), any(Context.class));
@@ -731,9 +750,10 @@ public class VObjectReaderTest {
 
 		SyntaxStyle style = SyntaxStyle.LEGACY;
 		{
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-			reader.parse(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				reader.parse(listener);
+			}
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener).onProperty(eq(property().name("PROP").param("PARAM", "value1,value2").value("value").build()), any(Context.class));
@@ -749,9 +769,10 @@ public class VObjectReaderTest {
 
 		style = SyntaxStyle.MODERN;
 		{
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-			reader.parse(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				reader.parse(listener);
+			}
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener).onProperty(eq(property().name("PROP").param("PARAM", "value1", "value2").value("value").build()), any(Context.class));
@@ -785,9 +806,10 @@ public class VObjectReaderTest {
 		for (SyntaxStyle style : styleToProperty.keySet()) {
 			VObjectProperty expectedProperty = styleToProperty.get(style);
 
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-			reader.parse(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				reader.parse(listener);
+			}
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener).onProperty(eq(expectedProperty), any(Context.class));
@@ -823,11 +845,12 @@ public class VObjectReaderTest {
 			"PROP;PARAM=1\\ 2^^ 3^n 4^N 5^' 6^ 7\\; 8\" 9\\\\:";
 			//@formatter:on
 
-			for (boolean caretDecodingEnabled : new boolean[] { false, true }) { //caret decoding has no effect in legacy syntax
-				VObjectReader reader = reader(string, style);
-				reader.setCaretDecodingEnabled(caretDecodingEnabled);
+			for (boolean caretDecodingEnabled : new boolean[] { false, true }) { //caret decoding has no effect in legacy syntax				
 				VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-				reader.parse(listener);
+				try (VObjectReader reader = reader(string, style)) {
+					reader.setCaretDecodingEnabled(caretDecodingEnabled);
+					reader.parse(listener);
+				}
 
 				InOrder inorder = inOrder(listener);
 				inorder.verify(listener).onProperty(eq(property().name("PROP").param("PARAM", "1\\ 2^^ 3^n 4^N 5^' 6^ 7; 8\" 9\\").value("").build()), any(Context.class));
@@ -865,10 +888,11 @@ public class VObjectReaderTest {
 			for (Boolean caretDecodingEnabled : expectedParamValues.keySet()) {
 				String expectedParamValue = expectedParamValues.get(caretDecodingEnabled);
 
-				VObjectReader reader = reader(string, style);
-				reader.setCaretDecodingEnabled(caretDecodingEnabled);
 				VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-				reader.parse(listener);
+				try (VObjectReader reader = reader(string, style)) {
+					reader.setCaretDecodingEnabled(caretDecodingEnabled);
+					reader.parse(listener);
+				}
 
 				InOrder inorder = inOrder(listener);
 				inorder.verify(listener).onProperty(eq(property().name("PROP").param("PARAM", expectedParamValue).value("").build()), any(Context.class));
@@ -915,9 +939,10 @@ public class VObjectReaderTest {
 
 		SyntaxStyle style = SyntaxStyle.LEGACY;
 		{
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-			reader.parse(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				reader.parse(listener);
+			}
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener, times(5)).onProperty(eq(property().name("PROP").value("folded").build()), any(Context.class));
@@ -945,9 +970,10 @@ public class VObjectReaderTest {
 
 		style = SyntaxStyle.MODERN;
 		{
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-			reader.parse(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				reader.parse(listener);
+			}
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener, times(3)).onProperty(eq(property().name("PROP").value("folded").build()), any(Context.class));
@@ -1000,9 +1026,10 @@ public class VObjectReaderTest {
 		//@formatter:on
 
 		for (SyntaxStyle style : SyntaxStyle.values()) {
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-			reader.parse(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				reader.parse(listener);
+			}
 
 			InOrder inorder = inOrder(listener);
 			inorder.verify(listener).onProperty(eq(property().name("PROP").param(null, "QUOTED-PRINTABLE").value("one\r\ntwo").build()), any(Context.class));
@@ -1071,9 +1098,10 @@ public class VObjectReaderTest {
 			//@formatter:on
 
 			for (SyntaxStyle style : SyntaxStyle.values()) {
-				VObjectReader reader = reader(string, style);
 				VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-				reader.parse(listener);
+				try (VObjectReader reader = reader(string, style)) {
+					reader.parse(listener);
+				}
 
 				InOrder inorder = inOrder(listener);
 				VObjectProperty invalidCharset = property().name("PROP").param(null, "QUOTED-PRINTABLE").value(decoded).build();
@@ -1103,10 +1131,13 @@ public class VObjectReaderTest {
 			//@formatter:on
 
 			for (SyntaxStyle style : SyntaxStyle.values()) {
-				Reader r = new InputStreamReader(new ByteArrayInputStream(string.getBytes(charset)), charset);
-				VObjectReader reader = new VObjectReader(r, new SyntaxRules(style));
 				VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-				reader.parse(listener);
+				try (
+					Reader r = new InputStreamReader(new ByteArrayInputStream(string.getBytes(charset)), charset);
+					VObjectReader reader = new VObjectReader(r, new SyntaxRules(style))
+				) {
+					reader.parse(listener);
+				}
 
 				InOrder inorder = inOrder(listener);
 				VObjectProperty invalidCharset = property().name("PROP").param(null, "QUOTED-PRINTABLE").value(decoded).build();
@@ -1135,11 +1166,14 @@ public class VObjectReaderTest {
 			//@formatter:on
 
 			for (SyntaxStyle style : SyntaxStyle.values()) {
-				Reader r = new StringReader(string);
-				VObjectReader reader = new VObjectReader(r, new SyntaxRules(style));
-				reader.setDefaultQuotedPrintableCharset(charset);
 				VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-				reader.parse(listener);
+				try (
+					Reader r = new StringReader(string);
+					VObjectReader reader = new VObjectReader(r, new SyntaxRules(style))
+				) {
+					reader.setDefaultQuotedPrintableCharset(charset);
+					reader.parse(listener);
+				}
 
 				InOrder inorder = inOrder(listener);
 				VObjectProperty invalidCharset = property().name("PROP").param(null, "QUOTED-PRINTABLE").value(decoded).build();
@@ -1193,9 +1227,10 @@ public class VObjectReaderTest {
 		rules.addRule(new LaciToken("COMP2"), "1", SyntaxStyle.LEGACY);
 		rules.addRule(new LaciToken("COMP2"), "2", SyntaxStyle.MODERN);
 
-		VObjectReader reader = new VObjectReader(new StringReader(string), rules);
 		VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-		reader.parse(listener);
+		try (VObjectReader reader = new VObjectReader(new StringReader(string), rules)) {
+			reader.parse(listener);
+		}
 
 		VObjectProperty legacyProp = property().name("PROP").param("PARAM", "\"value\"").value("").build();
 		VObjectProperty modernProp = property().name("PROP").param("PARAM", "value").value("").build();
@@ -1291,9 +1326,10 @@ public class VObjectReaderTest {
 		"END:VCALENDAR\r\n";
 		//@formatter:on
 
-		VObjectReader reader = new VObjectReader(new StringReader(string), SyntaxRules.iCalendar());
 		VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-		reader.parse(listener);
+		try (VObjectReader reader = new VObjectReader(new StringReader(string), SyntaxRules.iCalendar())) {
+			reader.parse(listener);
+		}
 
 		VObjectProperty legacyProp = property().name("PROP").param("PARAM", "\"value\"").value("").build();
 		VObjectProperty modernProp = property().name("PROP").param("PARAM", "value").value("").build();
@@ -1374,9 +1410,10 @@ public class VObjectReaderTest {
 		"END:VCARD";
 		//@formatter:on
 
-		VObjectReader reader = new VObjectReader(new StringReader(string), SyntaxRules.vcard());
 		VObjectDataListenerMock listener = spy(new VObjectDataListenerMock());
-		reader.parse(listener);
+		try (VObjectReader reader = new VObjectReader(new StringReader(string), SyntaxRules.vcard())) {
+			reader.parse(listener);
+		}
 
 		VObjectProperty legacyProp = property().name("PROP").param("PARAM", "\"value\"").value("").build();
 		VObjectProperty modernProp = property().name("PROP").param("PARAM", "value").value("").build();
@@ -1457,7 +1494,6 @@ public class VObjectReaderTest {
 		//@formatter:on
 
 		for (SyntaxStyle style : SyntaxStyle.values()) {
-			VObjectReader reader = reader(string, style);
 			VObjectDataListenerMock listener = spy(new VObjectDataListenerMock() {
 				@Override
 				public void onComponentBegin(LaciToken name, Context context) {
@@ -1484,27 +1520,29 @@ public class VObjectReaderTest {
 				}
 			});
 
-			InOrder inorder = inOrder(listener);
+			try (VObjectReader reader = reader(string, style)) {
+				InOrder inorder = inOrder(listener);
 
-			reader.parse(listener);
-			inorder.verify(listener).onComponentBegin(eq(component("COMP1")), any(Context.class));
-			inorder.verifyNoMoreInteractions();
+				reader.parse(listener);
+				inorder.verify(listener).onComponentBegin(eq(component("COMP1")), any(Context.class));
+				inorder.verifyNoMoreInteractions();
 
-			reader.parse(listener);
-			inorder.verify(listener).onProperty(eq(property().name("PROP").value("value").build()), any(Context.class));
-			inorder.verify(listener).onComponentEnd(eq(component("COMP1")), any(Context.class));
-			inorder.verify(listener).onComponentBegin(eq(component("COMP2")), any(Context.class));
-			inorder.verify(listener).onProperty(eq(property().name("PROP").value("value").build()), any(Context.class));
-			inorder.verify(listener).onComponentEnd(eq(component("COMP2")), any(Context.class));
-			inorder.verifyNoMoreInteractions();
+				reader.parse(listener);
+				inorder.verify(listener).onProperty(eq(property().name("PROP").value("value").build()), any(Context.class));
+				inorder.verify(listener).onComponentEnd(eq(component("COMP1")), any(Context.class));
+				inorder.verify(listener).onComponentBegin(eq(component("COMP2")), any(Context.class));
+				inorder.verify(listener).onProperty(eq(property().name("PROP").value("value").build()), any(Context.class));
+				inorder.verify(listener).onComponentEnd(eq(component("COMP2")), any(Context.class));
+				inorder.verifyNoMoreInteractions();
 
-			reader.parse(listener);
-			inorder.verify(listener).onProperty(eq(property().name("PROP2").value("value").build()), any(Context.class));
-			inorder.verifyNoMoreInteractions();
+				reader.parse(listener);
+				inorder.verify(listener).onProperty(eq(property().name("PROP2").value("value").build()), any(Context.class));
+				inorder.verifyNoMoreInteractions();
 
-			reader.parse(listener);
-			inorder.verify(listener).onProperty(eq(property().name("PROP").value("value").build()), any(Context.class));
-			inorder.verifyNoMoreInteractions();
+				reader.parse(listener);
+				inorder.verify(listener).onProperty(eq(property().name("PROP").value("value").build()), any(Context.class));
+				inorder.verifyNoMoreInteractions();
+			}
 
 			//@formatter:off
 			String lines[] = string.split("\r\n");

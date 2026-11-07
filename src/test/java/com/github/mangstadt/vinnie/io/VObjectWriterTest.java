@@ -51,21 +51,21 @@ public class VObjectWriterTest {
 	public void writeBeginComponent() throws Exception {
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			StringWriter sw = new StringWriter();
-			VObjectWriter writer = new VObjectWriter(sw, style);
-
-			writer.writeBeginComponent("COMP");
-			writer.writeBeginComponent(" ");
-			try {
-				writer.writeBeginComponent("");
-				fail();
-			} catch (IllegalArgumentException e) {
-				//expected
-			}
-			try {
-				writer.writeBeginComponent(null);
-				fail();
-			} catch (IllegalArgumentException e) {
-				//expected
+			try (VObjectWriter writer = new VObjectWriter(sw, style)) {
+				writer.writeBeginComponent("COMP");
+				writer.writeBeginComponent(" ");
+				try {
+					writer.writeBeginComponent("");
+					fail();
+				} catch (IllegalArgumentException e) {
+					//expected
+				}
+				try {
+					writer.writeBeginComponent(null);
+					fail();
+				} catch (IllegalArgumentException e) {
+					//expected
+				}
 			}
 
 			String actual = sw.toString();
@@ -84,21 +84,21 @@ public class VObjectWriterTest {
 	public void writeEndComponent() throws Exception {
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			StringWriter sw = new StringWriter();
-			VObjectWriter writer = new VObjectWriter(sw, style);
-
-			writer.writeEndComponent("COMP");
-			writer.writeEndComponent(" ");
-			try {
-				writer.writeEndComponent("");
-				fail();
-			} catch (IllegalArgumentException e) {
-				//expected
-			}
-			try {
-				writer.writeEndComponent(null);
-				fail();
-			} catch (IllegalArgumentException e) {
-				//expected
+			try (VObjectWriter writer = new VObjectWriter(sw, style)) {
+				writer.writeEndComponent("COMP");
+				writer.writeEndComponent(" ");
+				try {
+					writer.writeEndComponent("");
+					fail();
+				} catch (IllegalArgumentException e) {
+					//expected
+				}
+				try {
+					writer.writeEndComponent(null);
+					fail();
+				} catch (IllegalArgumentException e) {
+					//expected
+				}
 			}
 
 			String actual = sw.toString();
@@ -117,21 +117,21 @@ public class VObjectWriterTest {
 	public void writeVersion() throws Exception {
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			StringWriter sw = new StringWriter();
-			VObjectWriter writer = new VObjectWriter(sw, style);
-
-			writer.writeVersion("1");
-			writer.writeVersion(" ");
-			try {
-				writer.writeVersion("");
-				fail();
-			} catch (IllegalArgumentException e) {
-				//expected
-			}
-			try {
-				writer.writeVersion(null);
-				fail();
-			} catch (IllegalArgumentException e) {
-				//expected
+			try (VObjectWriter writer = new VObjectWriter(sw, style)) {
+				writer.writeVersion("1");
+				writer.writeVersion(" ");
+				try {
+					writer.writeVersion("");
+					fail();
+				} catch (IllegalArgumentException e) {
+					//expected
+				}
+				try {
+					writer.writeVersion(null);
+					fail();
+				} catch (IllegalArgumentException e) {
+					//expected
+				}
 			}
 
 			String actual = sw.toString();
@@ -150,15 +150,15 @@ public class VObjectWriterTest {
 	public void write_VObjectProperty() throws Exception {
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			StringWriter sw = new StringWriter();
-			VObjectWriter writer = new VObjectWriter(sw, style);
+			try (VObjectWriter writer = new VObjectWriter(sw, style)) {
+				VObjectProperty property = new VObjectProperty();
+				property.setGroup("group");
+				property.setName("PROP");
+				property.getParameters().put("PARAM", "pvalue");
+				property.setValue("value");
 
-			VObjectProperty property = new VObjectProperty();
-			property.setGroup("group");
-			property.setName("PROP");
-			property.getParameters().put("PARAM", "pvalue");
-			property.setValue("value");
-
-			writer.writeProperty(property);
+				writer.writeProperty(property);
+			}
 
 			String actual = sw.toString();
 
@@ -172,45 +172,46 @@ public class VObjectWriterTest {
 	}
 
 	@Test
-	public void setCaretDecoding() {
+	public void setCaretDecoding() throws Exception {
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			StringWriter sw = new StringWriter();
-			VObjectWriter writer = new VObjectWriter(sw, style);
-
-			assertFalse(writer.isCaretEncodingEnabled());
-			writer.setCaretEncodingEnabled(true);
-			assertTrue(writer.isCaretEncodingEnabled());
-		}
-	}
-
-	@Test
-	public void setSyntaxStyle() {
-		for (SyntaxStyle style : SyntaxStyle.values()) {
-			StringWriter sw = new StringWriter();
-			VObjectWriter writer = new VObjectWriter(sw, style);
-
-			assertEquals(style, writer.getSyntaxStyle());
-			for (SyntaxStyle style2 : SyntaxStyle.values()) {
-				writer.setSyntaxStyle(style2);
-				assertEquals(style2, writer.getSyntaxStyle());
+			try (VObjectWriter writer = new VObjectWriter(sw, style)) {
+				assertFalse(writer.isCaretEncodingEnabled());
+				writer.setCaretEncodingEnabled(true);
+				assertTrue(writer.isCaretEncodingEnabled());
 			}
 		}
 	}
 
 	@Test
-	public void close() throws Exception {
+	public void setSyntaxStyle() throws Exception {
+		for (SyntaxStyle style : SyntaxStyle.values()) {
+			StringWriter sw = new StringWriter();
+			try (VObjectWriter writer = new VObjectWriter(sw, style)) {
+				assertEquals(style, writer.getSyntaxStyle());
+				for (SyntaxStyle style2 : SyntaxStyle.values()) {
+					writer.setSyntaxStyle(style2);
+					assertEquals(style2, writer.getSyntaxStyle());
+				}
+			}
+		}
+	}
+
+	@Test
+	public void close_wrapped_writer() throws Exception {
 		Writer w = mock(Writer.class);
-		VObjectWriter writer = new VObjectWriter(w, SyntaxStyle.LEGACY);
-		writer.close();
+		try (VObjectWriter writer = new VObjectWriter(w, SyntaxStyle.LEGACY)) {
+		}
 
 		verify(w).close();
 	}
 
 	@Test
-	public void flush() throws Exception {
+	public void flush_wrapped_writer() throws Exception {
 		Writer w = mock(Writer.class);
-		VObjectWriter writer = new VObjectWriter(w, SyntaxStyle.LEGACY);
-		writer.flush();
+		try (VObjectWriter writer = new VObjectWriter(w, SyntaxStyle.LEGACY)) {
+			writer.flush();
+		}
 
 		verify(w).flush();
 	}
@@ -219,11 +220,12 @@ public class VObjectWriterTest {
 	public void group() throws Exception {
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			StringWriter sw = new StringWriter();
-			VObjectWriter writer = new VObjectWriter(sw, style);
-
-			writer.writeProperty("group", "PROP", new VObjectParameters(), "value");
-			writer.writeProperty("", "PROP", new VObjectParameters(), "value");
-			writer.writeProperty(null, "PROP", new VObjectParameters(), "value");
+			try (VObjectWriter writer = new VObjectWriter(sw, style)) {
+				VObjectParameters parameters = new VObjectParameters();
+				writer.writeProperty("group", "PROP", parameters, "value");
+				writer.writeProperty("", "PROP", parameters, "value");
+				writer.writeProperty(null, "PROP", parameters, "value");
+			}
 
 			String actual = sw.toString();
 
@@ -242,13 +244,15 @@ public class VObjectWriterTest {
 	public void group_invalid_characters() throws Exception {
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			StringWriter sw = new StringWriter();
-			VObjectWriter writer = new VObjectWriter(sw, style);
-			for (char c : ".;:\n\r".toCharArray()) {
-				try {
-					writer.writeProperty(c + "", "PROP", new VObjectParameters(), "");
-					fail("IllegalArgumentException expected when group name contains character " + ch(c) + " and style is " + style.name());
-				} catch (IllegalArgumentException e) {
-					//expected
+			try (VObjectWriter writer = new VObjectWriter(sw, style)) {
+				VObjectParameters parameters = new VObjectParameters();
+				for (char c : ".;:\n\r".toCharArray()) {
+					try {
+						writer.writeProperty(c + "", "PROP", parameters, "");
+						fail("IllegalArgumentException expected when group name contains character " + ch(c) + " and style is " + style.name());
+					} catch (IllegalArgumentException e) {
+						//expected
+					}
 				}
 			}
 
@@ -267,13 +271,15 @@ public class VObjectWriterTest {
 	public void group_starts_with_whitespace() throws Exception {
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			StringWriter sw = new StringWriter();
-			VObjectWriter writer = new VObjectWriter(sw, style);
-			for (char c : " \t".toCharArray()) {
-				try {
-					writer.writeProperty(c + "", "PROP", new VObjectParameters(), "");
-					fail("IllegalArgumentException expected when group name starts with character " + ch(c) + " and style is " + style.name());
-				} catch (IllegalArgumentException e) {
-					//expected
+			try (VObjectWriter writer = new VObjectWriter(sw, style)) {
+				VObjectParameters parameters = new VObjectParameters();
+				for (char c : " \t".toCharArray()) {
+					try {
+						writer.writeProperty(c + "", "PROP", parameters, "");
+						fail("IllegalArgumentException expected when group name starts with character " + ch(c) + " and style is " + style.name());
+					} catch (IllegalArgumentException e) {
+						//expected
+					}
 				}
 
 				String actual = sw.toString();
@@ -292,22 +298,23 @@ public class VObjectWriterTest {
 	public void property_name() throws Exception {
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			StringWriter sw = new StringWriter();
-			VObjectWriter writer = new VObjectWriter(sw, style);
+			try (VObjectWriter writer = new VObjectWriter(sw, style)) {
+				VObjectParameters parameters = new VObjectParameters();
+				writer.writeProperty(null, "PROP", parameters, "");
 
-			writer.writeProperty(null, "PROP", new VObjectParameters(), "");
+				try {
+					writer.writeProperty(null, "", parameters, "");
+					fail("IllegalArgumentException expected when property name is empty and style is " + style.name());
+				} catch (IllegalArgumentException e) {
+					//expected
+				}
 
-			try {
-				writer.writeProperty(null, "", new VObjectParameters(), "");
-				fail("IllegalArgumentException expected when property name is empty and style is " + style.name());
-			} catch (IllegalArgumentException e) {
-				//expected
-			}
-
-			try {
-				writer.writeProperty(null, null, new VObjectParameters(), "");
-				fail("NullPointerException expected when property name is null and style is " + style.name());
-			} catch (NullPointerException e) {
-				//expected
+				try {
+					writer.writeProperty(null, null, parameters, "");
+					fail("NullPointerException expected when property name is null and style is " + style.name());
+				} catch (NullPointerException e) {
+					//expected
+				}
 			}
 
 			String actual = sw.toString();
@@ -325,13 +332,15 @@ public class VObjectWriterTest {
 	public void property_name_invalid_characters() throws Exception {
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			StringWriter sw = new StringWriter();
-			VObjectWriter writer = new VObjectWriter(sw, style);
-			for (char c : ".;:\n\r".toCharArray()) {
-				try {
-					writer.writeProperty(null, c + "", new VObjectParameters(), "");
-					fail("IllegalArgumentException expected when property name contains character " + ch(c) + " and style is " + style.name());
-				} catch (IllegalArgumentException e) {
-					//expected
+			try (VObjectWriter writer = new VObjectWriter(sw, style)) {
+				VObjectParameters parameters = new VObjectParameters();
+				for (char c : ".;:\n\r".toCharArray()) {
+					try {
+						writer.writeProperty(null, c + "", parameters, "");
+						fail("IllegalArgumentException expected when property name contains character " + ch(c) + " and style is " + style.name());
+					} catch (IllegalArgumentException e) {
+						//expected
+					}
 				}
 
 				String actual = sw.toString();
@@ -350,16 +359,18 @@ public class VObjectWriterTest {
 	public void property_name_starts_with_whitespace() throws Exception {
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			StringWriter sw = new StringWriter();
-			VObjectWriter writer = new VObjectWriter(sw, style);
-			for (char c : " \t".toCharArray()) {
-				try {
-					writer.writeProperty(null, c + "", new VObjectParameters(), "");
-					fail("IllegalArgumentException expected when property name starts with character " + ch(c) + " and style is " + style.name());
-				} catch (IllegalArgumentException e) {
-					//expected
-				}
+			try (VObjectWriter writer = new VObjectWriter(sw, style)) {
+				VObjectParameters parameters = new VObjectParameters();
+				for (char c : " \t".toCharArray()) {
+					try {
+						writer.writeProperty(null, c + "", parameters, "");
+						fail("IllegalArgumentException expected when property name starts with character " + ch(c) + " and style is " + style.name());
+					} catch (IllegalArgumentException e) {
+						//expected
+					}
 
-				writer.writeProperty(null, "PROP" + c, new VObjectParameters(), "");
+					writer.writeProperty(null, "PROP" + c, parameters, "");
+				}
 			}
 
 			String actual = sw.toString();
@@ -385,12 +396,13 @@ public class VObjectWriterTest {
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			for (boolean caretEncoding : new boolean[] { false, true }) {
 				StringWriter sw = new StringWriter();
-				VObjectWriter writer = new VObjectWriter(sw, style);
-				writer.setCaretEncodingEnabled(caretEncoding);
+				try (VObjectWriter writer = new VObjectWriter(sw, style)) {
+					writer.setCaretEncodingEnabled(caretEncoding);
 
-				VObjectParameters parameters = new VObjectParameters();
-				parameters.getMap().put(new LaciToken("PARAM"), new ArrayList<>());
-				writer.writeProperty(null, "PROP", parameters, "");
+					VObjectParameters parameters = new VObjectParameters();
+					parameters.getMap().put(new LaciToken("PARAM"), new ArrayList<>());
+					writer.writeProperty(null, "PROP", parameters, "");
+				}
 
 				String actual = sw.toString();
 
@@ -427,10 +439,11 @@ public class VObjectWriterTest {
 		{
 			for (boolean caretEncoding : new boolean[] { false, true }) {
 				StringWriter sw = new StringWriter();
-				VObjectWriter writer = new VObjectWriter(sw, style);
-				writer.setCaretEncodingEnabled(caretEncoding);
-				for (VObjectParameters p : list) {
-					writer.writeProperty(null, "PROP", p, "");
+				try (VObjectWriter writer = new VObjectWriter(sw, style)) {
+					writer.setCaretEncodingEnabled(caretEncoding);
+					for (VObjectParameters p : list) {
+						writer.writeProperty(null, "PROP", p, "");
+					}
 				}
 
 				String actual = sw.toString();
@@ -450,10 +463,11 @@ public class VObjectWriterTest {
 		{
 			for (boolean caretEncoding : new boolean[] { false, true }) {
 				StringWriter sw = new StringWriter();
-				VObjectWriter writer = new VObjectWriter(sw, style);
-				writer.setCaretEncodingEnabled(caretEncoding);
-				for (VObjectParameters p : list) {
-					writer.writeProperty(null, "PROP", p, "");
+				try (VObjectWriter writer = new VObjectWriter(sw, style)) {
+					writer.setCaretEncodingEnabled(caretEncoding);
+					for (VObjectParameters p : list) {
+						writer.writeProperty(null, "PROP", p, "");
+					}
 				}
 
 				String actual = sw.toString();
@@ -487,10 +501,11 @@ public class VObjectWriterTest {
 		{
 			for (boolean caretEncoding : new boolean[] { false, true }) {
 				StringWriter sw = new StringWriter();
-				VObjectWriter writer = new VObjectWriter(sw, style);
-				writer.setCaretEncodingEnabled(caretEncoding);
-				for (VObjectParameters p : list) {
-					writer.writeProperty(null, "PROP", p, "");
+				try (VObjectWriter writer = new VObjectWriter(sw, style)) {
+					writer.setCaretEncodingEnabled(caretEncoding);
+					for (VObjectParameters p : list) {
+						writer.writeProperty(null, "PROP", p, "");
+					}
 				}
 
 				String actual = sw.toString();
@@ -509,14 +524,15 @@ public class VObjectWriterTest {
 		{
 			for (boolean caretEncoding : new boolean[] { false, true }) {
 				StringWriter sw = new StringWriter();
-				VObjectWriter writer = new VObjectWriter(sw, style);
-				writer.setCaretEncodingEnabled(caretEncoding);
-				for (VObjectParameters p : list) {
-					try {
-						writer.writeProperty(null, "PROP", p, "");
-						fail("IllegalArgumentException expected when property name contains nameless parameter and style is " + style.name());
-					} catch (IllegalArgumentException e) {
-						//expected
+				try (VObjectWriter writer = new VObjectWriter(sw, style)) {
+					writer.setCaretEncodingEnabled(caretEncoding);
+					for (VObjectParameters p : list) {
+						try {
+							writer.writeProperty(null, "PROP", p, "");
+							fail("IllegalArgumentException expected when property name contains nameless parameter and style is " + style.name());
+						} catch (IllegalArgumentException e) {
+							//expected
+						}
 					}
 				}
 
@@ -537,16 +553,17 @@ public class VObjectWriterTest {
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			for (boolean caretEncoding : new boolean[] { false, true }) {
 				StringWriter sw = new StringWriter();
-				VObjectWriter writer = new VObjectWriter(sw, style);
-				writer.setCaretEncodingEnabled(caretEncoding);
-				for (char c : ";:=\n\r".toCharArray()) {
-					VObjectParameters parameters = new VObjectParameters();
-					parameters.put(c + "", "");
-					try {
-						writer.writeProperty(null, "PROP", parameters, "");
-						fail("IllegalArgumentException expected when parameter name contains character " + ch(c) + " and style is " + style.name());
-					} catch (IllegalArgumentException e) {
-						//expected
+				try (VObjectWriter writer = new VObjectWriter(sw, style)) {
+					writer.setCaretEncodingEnabled(caretEncoding);
+					for (char c : ";:=\n\r".toCharArray()) {
+						VObjectParameters parameters = new VObjectParameters();
+						parameters.put(c + "", "");
+						try {
+							writer.writeProperty(null, "PROP", parameters, "");
+							fail("IllegalArgumentException expected when parameter name contains character " + ch(c) + " and style is " + style.name());
+						} catch (IllegalArgumentException e) {
+							//expected
+						}
 					}
 
 					String actual = sw.toString();
@@ -572,17 +589,18 @@ public class VObjectWriterTest {
 			for (boolean caretEncoding : new boolean[] { false, true }) {
 				for (char c : ":\n\r".toCharArray()) {
 					StringWriter sw = new StringWriter();
-					VObjectWriter writer = new VObjectWriter(sw, style);
-					writer.setCaretEncodingEnabled(caretEncoding);
+					try (VObjectWriter writer = new VObjectWriter(sw, style)) {
+						writer.setCaretEncodingEnabled(caretEncoding);
 
-					VObjectParameters parameters = new VObjectParameters();
-					parameters.put("PARAM", c + "");
+						VObjectParameters parameters = new VObjectParameters();
+						parameters.put("PARAM", c + "");
 
-					try {
-						writer.writeProperty(null, "PROP", parameters, "");
-						fail("IllegalArgumentException expected when parameter value contains character " + ch(c) + " and caret encoding is " + caretEncoding + " and style is " + style.name());
-					} catch (IllegalArgumentException e) {
-						//expected
+						try {
+							writer.writeProperty(null, "PROP", parameters, "");
+							fail("IllegalArgumentException expected when parameter value contains character " + ch(c) + " and caret encoding is " + caretEncoding + " and style is " + style.name());
+						} catch (IllegalArgumentException e) {
+							//expected
+						}
 					}
 
 					String actual = sw.toString();
@@ -603,16 +621,17 @@ public class VObjectWriterTest {
 			{
 				for (char c : "\"\n\r".toCharArray()) {
 					StringWriter sw = new StringWriter();
-					VObjectWriter writer = new VObjectWriter(sw, style);
-					writer.setCaretEncodingEnabled(caretEncoding);
+					try (VObjectWriter writer = new VObjectWriter(sw, style)) {
+						writer.setCaretEncodingEnabled(caretEncoding);
 
-					VObjectParameters parameters = new VObjectParameters();
-					parameters.put("PARAM", c + "");
-					try {
-						writer.writeProperty(null, "PROP", parameters, "");
-						fail("IllegalArgumentException expected when parameter value contains character " + ch(c) + " and caret encoding is " + caretEncoding + " and style is " + style.name());
-					} catch (IllegalArgumentException e) {
-						//expected
+						VObjectParameters parameters = new VObjectParameters();
+						parameters.put("PARAM", c + "");
+						try {
+							writer.writeProperty(null, "PROP", parameters, "");
+							fail("IllegalArgumentException expected when parameter value contains character " + ch(c) + " and caret encoding is " + caretEncoding + " and style is " + style.name());
+						} catch (IllegalArgumentException e) {
+							//expected
+						}
 					}
 
 					String actual = sw.toString();
@@ -644,16 +663,17 @@ public class VObjectWriterTest {
 		SyntaxStyle style = SyntaxStyle.LEGACY;
 		{
 			for (boolean caretEncoding : new boolean[] { false, true }) {
-				StringWriter sw = new StringWriter();
-				VObjectWriter writer = VObjectWriter.withoutLineFolding(sw, style);
-				writer.setCaretEncodingEnabled(caretEncoding);
-
 				String input = testString(":\r\n");
 				String expectedOutput = input.replace("\\", "\\\\").replace(";", "\\;");
 
-				VObjectParameters parameters = new VObjectParameters();
-				parameters.put("PARAM", input);
-				writer.writeProperty(null, "PROP", parameters, "");
+				StringWriter sw = new StringWriter();
+				try (VObjectWriter writer = VObjectWriter.withoutLineFolding(sw, style)) {
+					writer.setCaretEncodingEnabled(caretEncoding);
+
+					VObjectParameters parameters = new VObjectParameters();
+					parameters.put("PARAM", input);
+					writer.writeProperty(null, "PROP", parameters, "");
+				}
 
 				String actual = sw.toString();
 
@@ -672,16 +692,17 @@ public class VObjectWriterTest {
 			//surrounds in double quotes, since it contains , ; or :
 			boolean caretEncoding = false;
 			{
-				StringWriter sw = new StringWriter();
-				VObjectWriter writer = VObjectWriter.withoutLineFolding(sw, style);
-				writer.setCaretEncodingEnabled(caretEncoding);
-
 				String input = testString("\"\r\n");
 				String expectedOutput = input;
 
-				VObjectParameters parameters = new VObjectParameters();
-				parameters.put("PARAM", input);
-				writer.writeProperty(null, "PROP", parameters, "");
+				StringWriter sw = new StringWriter();
+				try (VObjectWriter writer = VObjectWriter.withoutLineFolding(sw, style)) {
+					writer.setCaretEncodingEnabled(caretEncoding);
+
+					VObjectParameters parameters = new VObjectParameters();
+					parameters.put("PARAM", input);
+					writer.writeProperty(null, "PROP", parameters, "");
+				}
 
 				String actual = sw.toString();
 
@@ -700,16 +721,17 @@ public class VObjectWriterTest {
 			//surrounds in double quotes, since it contains , ; or :
 			caretEncoding = true;
 			{
-				StringWriter sw = new StringWriter();
-				VObjectWriter writer = VObjectWriter.withoutLineFolding(sw, style);
-				writer.setCaretEncodingEnabled(caretEncoding);
-
 				String input = testString("\r\n") + "\r\n\n\r"; //make sure all three kinds of newline sequences are handled
 				String expectedOutput = input.replace("^", "^^").replace("\"", "^'").replace("\r\n", "^n").replace("\r", "^n").replace("\n", "^n");
 
-				VObjectParameters parameters = new VObjectParameters();
-				parameters.put("PARAM", input);
-				writer.writeProperty(null, "PROP", parameters, "");
+				StringWriter sw = new StringWriter();
+				try (VObjectWriter writer = VObjectWriter.withoutLineFolding(sw, style)) {
+					writer.setCaretEncodingEnabled(caretEncoding);
+
+					VObjectParameters parameters = new VObjectParameters();
+					parameters.put("PARAM", input);
+					writer.writeProperty(null, "PROP", parameters, "");
+				}
 
 				String actual = sw.toString();
 
@@ -731,8 +753,9 @@ public class VObjectWriterTest {
 	public void property_value_null() throws Exception {
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			StringWriter sw = new StringWriter();
-			VObjectWriter writer = new VObjectWriter(sw, style);
-			writer.writeProperty(null, "PROP", new VObjectParameters(), null);
+			try (VObjectWriter writer = new VObjectWriter(sw, style)) {
+				writer.writeProperty(null, "PROP", new VObjectParameters(), null);
+			}
 
 			String actual = sw.toString();
 
@@ -755,40 +778,40 @@ public class VObjectWriterTest {
 		SyntaxStyle style = SyntaxStyle.LEGACY;
 		{
 			StringWriter sw = new StringWriter();
-			VObjectWriter writer = VObjectWriter.withoutLineFolding(sw, style);
+			try (VObjectWriter writer = VObjectWriter.withoutLineFolding(sw, style)) {
+				VObjectParameters parameters = new VObjectParameters();
+				VObjectParameters expectedParams = new VObjectParameters(parameters);
+				writer.writeProperty(null, "PROP", parameters, "one\r\ntwo");
+				assertEquals(expectedParams, parameters); //nothing should be added to the parameters object that was passed into the method
 
-			VObjectParameters parameters = new VObjectParameters();
-			VObjectParameters expectedParams = new VObjectParameters(parameters);
-			writer.writeProperty(null, "PROP", parameters, "one\r\ntwo");
-			assertEquals(expectedParams, parameters); //nothing should be added to the parameters object that was passed into the method
+				parameters = new VObjectParameters();
+				expectedParams = new VObjectParameters(parameters);
+				writer.writeProperty(null, "PROP", parameters, "one\rtwo");
+				assertEquals(expectedParams, parameters);
 
-			parameters = new VObjectParameters();
-			expectedParams = new VObjectParameters(parameters);
-			writer.writeProperty(null, "PROP", parameters, "one\rtwo");
-			assertEquals(expectedParams, parameters);
+				parameters = new VObjectParameters();
+				expectedParams = new VObjectParameters(parameters);
+				writer.writeProperty(null, "PROP", parameters, "one\ntwo");
+				assertEquals(expectedParams, parameters);
 
-			parameters = new VObjectParameters();
-			expectedParams = new VObjectParameters(parameters);
-			writer.writeProperty(null, "PROP", parameters, "one\ntwo");
-			assertEquals(expectedParams, parameters);
+				parameters = new VObjectParameters();
+				parameters.put((String) null, "QUOTED-PRINTABLE");
+				expectedParams = new VObjectParameters(parameters);
+				writer.writeProperty(null, "PROP", parameters, "one\r\ntwo");
+				assertEquals(expectedParams, parameters);
 
-			parameters = new VObjectParameters();
-			parameters.put((String) null, "QUOTED-PRINTABLE");
-			expectedParams = new VObjectParameters(parameters);
-			writer.writeProperty(null, "PROP", parameters, "one\r\ntwo");
-			assertEquals(expectedParams, parameters);
+				parameters = new VObjectParameters();
+				parameters.put("ENCODING", "QUOTED-PRINTABLE");
+				expectedParams = new VObjectParameters(parameters);
+				writer.writeProperty(null, "PROP", parameters, "one\r\ntwo");
+				assertEquals(expectedParams, parameters);
 
-			parameters = new VObjectParameters();
-			parameters.put("ENCODING", "QUOTED-PRINTABLE");
-			expectedParams = new VObjectParameters(parameters);
-			writer.writeProperty(null, "PROP", parameters, "one\r\ntwo");
-			assertEquals(expectedParams, parameters);
-
-			parameters = new VObjectParameters();
-			parameters.put("CHARSET", "UTF-16");
-			expectedParams = new VObjectParameters(parameters);
-			writer.writeProperty(null, "PROP", parameters, "one\r\ntwo");
-			assertEquals(expectedParams, parameters);
+				parameters = new VObjectParameters();
+				parameters.put("CHARSET", "UTF-16");
+				expectedParams = new VObjectParameters(parameters);
+				writer.writeProperty(null, "PROP", parameters, "one\r\ntwo");
+				assertEquals(expectedParams, parameters);
+			}
 
 			String actual = sw.toString();
 
@@ -808,10 +831,11 @@ public class VObjectWriterTest {
 		style = SyntaxStyle.MODERN;
 		{
 			StringWriter sw = new StringWriter();
-			VObjectWriter writer = new VObjectWriter(sw, style);
-			writer.writeProperty(null, "PROP", new VObjectParameters(), "one\r\ntwo");
-			writer.writeProperty(null, "PROP", new VObjectParameters(), "one\rtwo");
-			writer.writeProperty(null, "PROP", new VObjectParameters(), "one\ntwo");
+			try (VObjectWriter writer = new VObjectWriter(sw, style)) {
+				writer.writeProperty(null, "PROP", new VObjectParameters(), "one\r\ntwo");
+				writer.writeProperty(null, "PROP", new VObjectParameters(), "one\rtwo");
+				writer.writeProperty(null, "PROP", new VObjectParameters(), "one\ntwo");
+			}
 
 			String actual = sw.toString();
 
@@ -836,34 +860,34 @@ public class VObjectWriterTest {
 
 		for (SyntaxStyle style : SyntaxStyle.values()) {
 			StringWriter sw = new StringWriter();
-			VObjectWriter writer = VObjectWriter.withoutLineFolding(sw, style);
+			try (VObjectWriter writer = VObjectWriter.withoutLineFolding(sw, style)) {
+				//no parameters
+				VObjectParameters parameters = new VObjectParameters();
+				writer.writeProperty(null, "PROP", parameters, propValue);
 
-			//no parameters
-			VObjectParameters parameters = new VObjectParameters();
-			writer.writeProperty(null, "PROP", parameters, propValue);
+				//no charset
+				parameters = new VObjectParameters();
+				parameters.put("ENCODING", "QUOTED-PRINTABLE");
+				writer.writeProperty(null, "PROP", parameters, propValue);
 
-			//no charset
-			parameters = new VObjectParameters();
-			parameters.put("ENCODING", "QUOTED-PRINTABLE");
-			writer.writeProperty(null, "PROP", parameters, propValue);
+				//UTF-8
+				parameters = new VObjectParameters();
+				parameters.put("ENCODING", "QUOTED-PRINTABLE");
+				parameters.put("CHARSET", "UTF-8");
+				writer.writeProperty(null, "PROP", parameters, propValue);
 
-			//UTF-8
-			parameters = new VObjectParameters();
-			parameters.put("ENCODING", "QUOTED-PRINTABLE");
-			parameters.put("CHARSET", "UTF-8");
-			writer.writeProperty(null, "PROP", parameters, propValue);
+				//UTF-16
+				parameters = new VObjectParameters();
+				parameters.put("ENCODING", "QUOTED-PRINTABLE");
+				parameters.put("CHARSET", "UTF-16");
+				writer.writeProperty(null, "PROP", parameters, propValue);
 
-			//UTF-16
-			parameters = new VObjectParameters();
-			parameters.put("ENCODING", "QUOTED-PRINTABLE");
-			parameters.put("CHARSET", "UTF-16");
-			writer.writeProperty(null, "PROP", parameters, propValue);
-
-			//invalid
-			parameters = new VObjectParameters();
-			parameters.put("ENCODING", "QUOTED-PRINTABLE");
-			parameters.put("CHARSET", "invalid");
-			writer.writeProperty(null, "PROP", parameters, propValue);
+				//invalid
+				parameters = new VObjectParameters();
+				parameters.put("ENCODING", "QUOTED-PRINTABLE");
+				parameters.put("CHARSET", "invalid");
+				writer.writeProperty(null, "PROP", parameters, propValue);
+			}
 
 			String actual = sw.toString();
 

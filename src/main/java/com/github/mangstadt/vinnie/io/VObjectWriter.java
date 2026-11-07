@@ -57,12 +57,12 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * 
  * <pre class="brush:java">
  * Writer writer = ...
- * VObjectWriter vobjectWriter = new VObjectWriter(writer, SyntaxStyle.NEW);
- * vobjectWriter.writeBeginComponent("VCARD");
- * vobjectWriter.writeVersion("4.0");
- * vobjectWriter.writeProperty("FN", "John Doe");
- * vobjectWriter.writeEndComponent("VCARD");
- * vobjectWriter.close();
+ * try (VObjectWriter vobjectWriter = new VObjectWriter(writer, SyntaxStyle.NEW)) {
+ *   vobjectWriter.writeBeginComponent("VCARD");
+ *   vobjectWriter.writeVersion("4.0");
+ *   vobjectWriter.writeProperty("FN", "John Doe");
+ *   vobjectWriter.writeEndComponent("VCARD");
+ * }
  * </pre>
  * 
  * <p>
@@ -99,9 +99,9 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * 
  * <pre class="brush:java">
  * StringWriter sw = new StringWriter();
- * VObjectWriter vobjectWriter = new VObjectWriter(sw, SyntaxStyle.OLD);
- * vobjectWriter.writeProperty("NOTE", "one\r\ntwo");
- * vobjectWriter.close();
+ * try (VObjectWriter vobjectWriter = new VObjectWriter(sw, SyntaxStyle.OLD)) {
+ *   vobjectWriter.writeProperty("NOTE", "one\r\ntwo");
+ * }
  * 
  * assertEquals("NOTE;ENCODING=QUOTED-PRINTABLE;CHARSET=UTF-8:one=0D=0Atwo\r\n", sw.toString());
  * </pre>
@@ -114,9 +114,9 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * 
  * <pre class="brush:java">
  * StringWriter sw = new StringWriter();
- * VObjectWriter vobjectWriter = new VObjectWriter(sw, SyntaxStyle.NEW);
- * vobjectWriter.writeProperty("NOTE", "one\r\ntwo");
- * vobjectWriter.close();
+ * try (VObjectWriter vobjectWriter = new VObjectWriter(sw, SyntaxStyle.NEW)) {
+ *   vobjectWriter.writeProperty("NOTE", "one\r\ntwo");
+ * }
  * 
  * assertEquals("NOTE:one\\ntwo\r\n", sw.toString());
  * </pre>
@@ -132,12 +132,11 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * 
  * <pre class="brush:java">
  * StringWriter sw = new StringWriter();
- * VObjectWriter vobjectWriter = new VObjectWriter(sw, ...);
- * 
- * VObjectProperty note = new VObjectProperty("NOTE", "¡Hola, mundo!");
- * note.getParameters().put("ENCODING", "QUOTED-PRINTABLE");
- * vobjectWriter.writeProperty(note);
- * vobjectWriter.close();
+ * try (VObjectWriter vobjectWriter = new VObjectWriter(sw, ...)) {
+ *   VObjectProperty note = new VObjectProperty("NOTE", "¡Hola, mundo!");
+ *   note.getParameters().put("ENCODING", "QUOTED-PRINTABLE");
+ *   vobjectWriter.writeProperty(note);
+ * }
  * 
  * assertEquals("NOTE;ENCODING=QUOTED-PRINTABLE;CHARSET=UTF-8:=C2=A1Hola, mundo!\r\n", sw.toString());
  * </pre>
@@ -147,9 +146,12 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * </p>
  * 
  * <pre class="brush:java">
- * VObjectProperty note = new VObjectProperty("NOTE", "¡Hola, mundo!");
- * note.getParameters().put(null, "QUOTED-PRINTABLE");
- * vobjectWriter.writeProperty(note);
+ * StringWriter sw = new StringWriter();
+ * try (VObjectWriter vobjectWriter = new VObjectWriter(sw, ...)) {
+ *   VObjectProperty note = new VObjectProperty("NOTE", "¡Hola, mundo!");
+ *   note.getParameters().put(null, "QUOTED-PRINTABLE");
+ *   vobjectWriter.writeProperty(note);
+ * }
  * </pre>
  * <p>
  * By default, the property value is encoded under the UTF-8 character set when
@@ -160,13 +162,12 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * 
  * <pre class="brush:java">
  * StringWriter sw = new StringWriter();
- * VObjectWriter vobjectWriter = new VObjectWriter(sw, ...);
- * 
- * VObjectProperty note = new VObjectProperty("NOTE", "¡Hola, mundo!");
- * note.getParameters().put("ENCODING", "QUOTED-PRINTABLE");
- * note.getParameters().put("CHARSET", "Windows-1252");
- * vobjectWriter.writeProperty(note);
- * vobjectWriter.close();
+ * try (VObjectWriter vobjectWriter = new VObjectWriter(sw, ...)) {
+ *   VObjectProperty note = new VObjectProperty("NOTE", "¡Hola, mundo!");
+ *   note.getParameters().put("ENCODING", "QUOTED-PRINTABLE");
+ *   note.getParameters().put("CHARSET", "Windows-1252");
+ *   vobjectWriter.writeProperty(note);
+ * }
  * 
  * assertEquals("NOTE;ENCODING=QUOTED-PRINTABLE;CHARSET=Windows-1252:=A1Hola, mundo!\r\n", sw.toString());
  * </pre>
@@ -187,13 +188,12 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * 
  * <pre class="brush:java">
  * StringWriter sw = new StringWriter();
- * VObjectWriter vobjectWriter = new VObjectWriter(sw, SyntaxStyle.NEW);
- * vobjectWriter.setCaretEncodingEnabled(true);
- * 
- * VObjectProperty note = new VObjectProperty("NOTE", "The truth is out there.");
- * note.getParameters().put("X-AUTHOR", "Fox \"Spooky\" Mulder");
- * vobjectWriter.writeProperty(note);
- * vobjectWriter.close();
+ * try (VObjectWriter vobjectWriter = new VObjectWriter(sw, SyntaxStyle.NEW)) {
+ *   vobjectWriter.setCaretEncodingEnabled(true);
+ *   VObjectProperty note = new VObjectProperty("NOTE", "The truth is out there.");
+ *   note.getParameters().put("X-AUTHOR", "Fox \"Spooky\" Mulder");
+ *   vobjectWriter.writeProperty(note);
+ * }
  * 
  * assertEquals("NOTE;X-AUTHOR=Fox ^'Spooky^' Mulder:The truth is out there.\r\n", sw.toString());
  * </pre>
@@ -208,10 +208,9 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * 
  * <pre class="brush:java">
  * StringWriter sw = new StringWriter();
- * VObjectWriter vobjectWriter = new VObjectWriter(sw, ...);
- * 
- * vobjectWriter.writeProperty("NOTE", "Lorem ipsum dolor sit amet\, consectetur adipiscing elit. Vestibulum ultricies tempor orci ac dignissim.");
- * vobjectWriter.close();
+ * try (VObjectWriter vobjectWriter = new VObjectWriter(sw, ...)) {
+ *   vobjectWriter.writeProperty("NOTE", "Lorem ipsum dolor sit amet\, consectetur adipiscing elit. Vestibulum ultricies tempor orci ac dignissim.");
+ * }
  * 
  * assertEquals(
  * "NOTE:Lorem ipsum dolor sit amet\\, consectetur adipiscing elit. Vestibulum u\r\n" +
@@ -224,10 +223,9 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * 
  * <pre class="brush:java">
  * StringWriter sw = new StringWriter();
- * VObjectWriter vobjectWriter = VObjectWriter.withoutLineFolding(sw, ...);
- * 
- * vobjectWriter.writeProperty("NOTE", "Lorem ipsum dolor sit amet\, consectetur adipiscing elit. Vestibulum ultricies tempor orci ac dignissim.");
- * vobjectWriter.close();
+ * try (VObjectWriter vobjectWriter = VObjectWriter.withoutLineFolding(sw, ...)) {
+ *   vobjectWriter.writeProperty("NOTE", "Lorem ipsum dolor sit amet\, consectetur adipiscing elit. Vestibulum ultricies tempor orci ac dignissim.");
+ * }
  * 
  * assertEquals("NOTE:Lorem ipsum dolor sit amet\\, consectetur adipiscing elit. Vestibulum ultricies tempor orci ac dignissim.\r\n", sw.toString());
  * </pre>
@@ -241,11 +239,12 @@ import com.github.mangstadt.vinnie.validate.VObjectValidator;
  * 
  * <pre class="brush:java">
  * StringWriter sw = new StringWriter();
- * FoldedLineWriter flw = new FoldedLineWriter(sw, 75, "\t");
- * VObjectWriter vobjectWriter = new VObjectWriter(flw, ...);
- * 
- * vobjectWriter.writeProperty("NOTE", "Lorem ipsum dolor sit amet\, consectetur adipiscing elit. Vestibulum ultricies tempor orci ac dignissim.");
- * vobjectWriter.close();
+ * try (
+ *   FoldedLineWriter flw = new FoldedLineWriter(sw, 75, "\t");
+ *   VObjectWriter vobjectWriter = new VObjectWriter(flw, ...)
+ * ) {
+ *   vobjectWriter.writeProperty("NOTE", "Lorem ipsum dolor sit amet\, consectetur adipiscing elit. Vestibulum ultricies tempor orci ac dignissim.");
+ * }
  * 
  * assertEquals(
  * "NOTE:Lorem ipsum dolor sit amet\\, consectetur adipiscing elit. Vestibulum u\r\n" +
