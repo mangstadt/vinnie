@@ -1,10 +1,5 @@
 # vinnie
 
-|     |     |
-| --- | --- |
-| Maven Central: | https://central.sonatype.com/artifact/com.github.mangstadt/vinnie |
-| License: | [![MIT License](https://img.shields.io/badge/License-MIT-red.svg)](https://github.com/mangstadt/vinnie/blob/master/LICENSES) |
-
 vinnie is a lightweight Java library that reads and writes "vobject" data (vCard and iCalendar).  It is used by the [ez-vcard](https://github.com/mangstadt/ez-vcard) and [biweekly](https://github.com/mangstadt/biweekly) projects.
 
 <p align="center"><strong><a href="https://github.com/mangstadt/vinnie/wiki/Downloads">Downloads</a> |
@@ -100,7 +95,6 @@ END:VCARD
 
 # Maven/Gradle
 
-
 **Maven**
 
 ```xml
@@ -117,6 +111,8 @@ END:VCARD
 compile 'com.github.mangstadt:vinnie:3.0.0'
 ```
 
+[Maven Central artifact page](https://central.sonatype.com/artifact/com.github.mangstadt/vinnie)
+
 # Build Instructions
 
 vinnie uses [Maven](http://maven.apache.org/) as its build tool, and adheres to its conventions.
@@ -124,6 +120,10 @@ vinnie uses [Maven](http://maven.apache.org/) as its build tool, and adheres to 
 To build the project: `mvn compile`  
 To run the unit tests: `mvn test`  
 To build a JAR: `mvn package`
+
+# License
+
+MIT License: https://github.com/mangstadt/vinnie/blob/master/LICENSES
 
 # Questions / Feedback
 
