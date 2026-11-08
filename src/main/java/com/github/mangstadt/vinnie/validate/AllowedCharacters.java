@@ -25,6 +25,9 @@
 package com.github.mangstadt.vinnie.validate;
 
 import java.util.BitSet;
+import java.util.function.IntPredicate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Validates whether or not strings contain only certain characters.
@@ -62,20 +65,8 @@ public class AllowedCharacters {
 	 * @return true if the string only contains allowed characters, false if not
 	 */
 	public boolean check(String string) {
-		for (int i = 0; i < string.length(); i++) {
-			char c = string.charAt(i);
-			if (c >= LENGTH) {
-				if (!allowNonAscii) {
-					return false;
-				}
-				continue;
-			}
-
-			if (!bitSet.get(c)) {
-				return false;
-			}
-		}
-		return true;
+		IntPredicate predicate = allowNonAscii ? (c -> c >= LENGTH || bitSet.get(c)) : bitSet::get;
+		return string.chars().allMatch(predicate);
 	}
 
 	/**
@@ -107,21 +98,11 @@ public class AllowedCharacters {
 	 * @return the string
 	 */
 	public String toString(boolean printableOnly) {
-		StringBuilder sb = new StringBuilder();
-		sb.append('[');
-		for (int i = 0; i < LENGTH; i++) {
-			if (!bitSet.get(i)) {
-				continue;
-			}
-
-			if (printableOnly && !isPrintableChar(i)) {
-				continue;
-			}
-
-			sb.append(' ').append(makeHumanReadable(i));
+		IntStream stream = bitSet.stream();
+		if (printableOnly) {
+			stream = stream.filter(this::isPrintableChar);
 		}
-		sb.append(" ]");
-		return sb.toString();
+		return stream.mapToObj(this::makeHumanReadable).collect(Collectors.joining(" ", "[ ", " ]"));
 	}
 
 	private boolean isPrintableChar(int i) {
