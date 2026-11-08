@@ -2,9 +2,7 @@
 
 |     |     |
 | --- | --- |
-| Continuous Integration: | [![](https://travis-ci.org/mangstadt/vinnie.svg?branch=master)](https://travis-ci.org/mangstadt/vinnie) |
-| Code Coverage: | [![codecov.io](http://codecov.io/github/mangstadt/vinnie/coverage.svg?branch=master)](http://codecov.io/github/mangstadt/vinnie?branch=master) |
-| Maven Central: | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.mangstadt/vinnie/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.mangstadt/vinnie) |
+| Maven Central: | https://central.sonatype.com/artifact/com.github.mangstadt/vinnie |
 | License: | [![MIT License](https://img.shields.io/badge/License-MIT-red.svg)](https://github.com/mangstadt/vinnie/blob/master/LICENSES) |
 
 vinnie is a lightweight Java library that reads and writes "vobject" data (vCard and iCalendar).  It is used by the [ez-vcard](https://github.com/mangstadt/ez-vcard) and [biweekly](https://github.com/mangstadt/biweekly) projects.
