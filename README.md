@@ -29,30 +29,30 @@ String str =
 
 Reader reader = new StringReader(str);
 SyntaxRules rules = SyntaxRules.vcard();
-VObjectReader vobjectReader = new VObjectReader(reader, rules);
-vobjectReader.parse(new VObjectDataAdapter() {
-	private boolean inVCard = false;
+try (VObjectReader vobjectReader = new VObjectReader(reader, rules)){
+	vobjectReader.parse(new VObjectDataAdapter() {
+		private boolean inVCard = false;
 
-	public void onComponentBegin(LaciToken name, Context context) {
-		if (context.getParentComponents().isEmpty() && name.equalsIgnoreCase("VCARD")){
-			inVCard = true;
+		public void onComponentBegin(LaciToken name, Context context) {
+			if (context.getParentComponents().isEmpty() && name.equalsIgnoreCase("VCARD")){
+				inVCard = true;
+			}
 		}
-	}
 
-	public void onComponentEnd(LaciToken name, Context context) {
-		if (context.getParentComponents().isEmpty()) {
-			//end of vCard, stop parsing
-			context.stop();
+		public void onComponentEnd(LaciToken name, Context context) {
+			if (context.getParentComponents().isEmpty()) {
+				//end of vCard, stop parsing
+				context.stop();
+			}
 		}
-	}
 
-	public void onProperty(VObjectProperty property, Context context) {
-		if (inVCard) {
-			System.out.println(property.getName() + " = " + property.getValue());
+		public void onProperty(VObjectProperty property, Context context) {
+			if (inVCard) {
+				System.out.println(property.getName() + " = " + property.getValue());
+			}
 		}
-	}
-});
-vobjectReader.close();
+	});
+}
 ```
 
 **Output**
@@ -68,18 +68,17 @@ NOTE = ¡Hola, mundo!
 
 ```java
 Writer writer = new OutputStreamWriter(System.out);
-VObjectWriter vobjectWriter = new VObjectWriter(writer, SyntaxStyle.OLD);
+try (VObjectWriter vobjectWriter = new VObjectWriter(writer, SyntaxStyle.LEGACY)) {
+	vobjectWriter.writeBeginComponent("VCARD");
+	vobjectWriter.writeVersion("2.1");
+	vobjectWriter.writeProperty("FN", "John Doe");
 
-vobjectWriter.writeBeginComponent("VCARD");
-vobjectWriter.writeVersion("2.1");
-vobjectWriter.writeProperty("FN", "John Doe");
+	VObjectProperty note = new VObjectProperty("NOTE", "¡Hola, mundo!");
+	note.getParameters().put((String) null, "QUOTED-PRINTABLE");
+	vobjectWriter.writeProperty(note);
 
-VObjectProperty note = new VObjectProperty("NOTE", "¡Hola, mundo!");
-note.getParameters().put((String) null, "QUOTED-PRINTABLE");
-vobjectWriter.writeProperty(note);
-
-vobjectWriter.writeEndComponent("VCARD");
-vobjectWriter.close();
+	vobjectWriter.writeEndComponent("VCARD");
+}
 ```
 
 **Output**
@@ -98,7 +97,7 @@ END:VCARD
  * Automatic decoding/encoding of quoted-printable data.
  * Streaming API.
  * Extensive unit test coverage.
- * Low Java version requirement (1.6 or above).
+ * Low Java version requirement (1.8 or above).
  * No dependencies on external libraries.
 
 # Maven/Gradle
@@ -110,14 +109,14 @@ END:VCARD
 <dependency>
    <groupId>com.github.mangstadt</groupId>
    <artifactId>vinnie</artifactId>
-   <version>2.0.2</version>
+   <version>3.0.0</version>
 </dependency>
 ```
 
 **Gradle**
 
 ```
-compile 'com.github.mangstadt:vinnie:2.0.2'
+compile 'com.github.mangstadt:vinnie:3.0.0'
 ```
 
 # Build Instructions
@@ -129,8 +128,6 @@ To run the unit tests: `mvn test`
 To build a JAR: `mvn package`
 
 # Questions / Feedback
-
-You have some options:
 
  * Post an [issue](https://github.com/mangstadt/vinnie/issues)
  * Start a [discussion](https://github.com/mangstadt/vinnie/discussions)
