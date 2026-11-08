@@ -430,9 +430,7 @@ public class VObjectWriter implements Closeable, Flushable {
 	 * @throws IOException if there's a problem writing to the data stream
 	 */
 	public void writeBeginComponent(String componentName) throws IOException {
-		if (isNullOrEmpty(componentName)) {
-			throw new IllegalArgumentException("Component name cannot be null or empty.");
-		}
+		requireNonNullNonEmpty(componentName);
 		writeProperty("BEGIN", componentName);
 	}
 
@@ -443,9 +441,7 @@ public class VObjectWriter implements Closeable, Flushable {
 	 * @throws IOException if there's a problem writing to the data stream
 	 */
 	public void writeEndComponent(String componentName) throws IOException {
-		if (isNullOrEmpty(componentName)) {
-			throw new IllegalArgumentException("Component name cannot be null or empty.");
-		}
+		requireNonNullNonEmpty(componentName);
 		writeProperty("END", componentName);
 	}
 
@@ -456,14 +452,14 @@ public class VObjectWriter implements Closeable, Flushable {
 	 * @throws IOException if there's a problem writing to the data stream
 	 */
 	public void writeVersion(String version) throws IOException {
-		if (isNullOrEmpty(version)) {
-			throw new IllegalArgumentException("Version string cannot be null or empty.");
-		}
+		requireNonNullNonEmpty(version);
 		writeProperty("VERSION", version);
 	}
 
-	private static boolean isNullOrEmpty(String s) {
-		return s == null || s.isEmpty();
+	private static void requireNonNullNonEmpty(String s) {
+		if (s == null || s.isEmpty()) {
+			throw new IllegalArgumentException("String cannot be null or empty.");
+		}
 	}
 
 	/**
