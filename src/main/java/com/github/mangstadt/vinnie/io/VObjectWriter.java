@@ -27,6 +27,8 @@ package com.github.mangstadt.vinnie.io;
 import static com.github.mangstadt.vinnie.Utils.CRLF;
 import static com.github.mangstadt.vinnie.Utils.escapeNewlines;
 import static com.github.mangstadt.vinnie.Utils.isCRLF;
+import static com.github.mangstadt.vinnie.Utils.isCROrLF;
+import static com.github.mangstadt.vinnie.Utils.isTabOrSpace;
 
 import java.io.Closeable;
 import java.io.Flushable;
@@ -724,7 +726,7 @@ public class VObjectWriter implements Closeable, Flushable {
 			return false;
 		}
 		char first = string.charAt(0);
-		return (first == ' ' || first == '\t');
+		return isTabOrSpace(first);
 	}
 
 	/**
@@ -806,7 +808,7 @@ public class VObjectWriter implements Closeable, Flushable {
 	}
 
 	private boolean isEscapableCharForCaretEncoding(char c) {
-		return c == '^' || c == '"' || c == '\r' || c == '\n';
+		return c == '^' || c == '"' || isCROrLF(c);
 	}
 
 	private char caretEscape(char c) {

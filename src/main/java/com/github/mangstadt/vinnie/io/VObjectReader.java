@@ -27,6 +27,7 @@ package com.github.mangstadt.vinnie.io;
 import static com.github.mangstadt.vinnie.Utils.NEWLINE;
 import static com.github.mangstadt.vinnie.Utils.isCRLF;
 import static com.github.mangstadt.vinnie.Utils.isCROrLF;
+import static com.github.mangstadt.vinnie.Utils.isTabOrSpace;
 import static com.github.mangstadt.vinnie.Utils.ltrim;
 import static com.github.mangstadt.vinnie.Utils.rtrim;
 
@@ -604,7 +605,7 @@ public class VObjectReader implements Closeable {
 			}
 
 			if (isCROrLF(prevChar) && firstNonNewlineCharHasBeenRead) {
-				if (isSpaceOrTab(ch)) {
+				if (isTabOrSpace(ch)) {
 					/*
 					 * This line is a continuation of the previous line (the
 					 * line is folded).
@@ -630,7 +631,7 @@ public class VObjectReader implements Closeable {
 			}
 
 			if (inFoldedLineWhitespace) {
-				if (isSpaceOrTab(ch) && syntax == SyntaxStyle.LEGACY) {
+				if (isTabOrSpace(ch) && syntax == SyntaxStyle.LEGACY) {
 					/*
 					 * 2.1 allows multiple whitespace characters to be used for
 					 * folding (section 2.1.3).
@@ -866,15 +867,6 @@ public class VObjectReader implements Closeable {
 		}
 
 		return reader.read();
-	}
-
-	/**
-	 * Determines if the given character is a space or a tab.
-	 * @param ch the character
-	 * @return true if it's a space or a tab, false if not
-	 */
-	private static boolean isSpaceOrTab(char ch) {
-		return ch == ' ' || ch == '\t';
 	}
 
 	/**

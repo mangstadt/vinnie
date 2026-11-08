@@ -31,6 +31,8 @@ import static com.github.mangstadt.vinnie.Utils.isCROrLF;
 import java.io.IOException;
 import java.io.Writer;
 
+import com.github.mangstadt.vinnie.Utils;
+
 /**
  * Automatically folds lines as they are written.
  * @author Michael Angstadt
@@ -85,7 +87,7 @@ public class FoldedLineWriter extends Writer {
 		if (indent.length() >= lineLength) {
 			throw new IllegalArgumentException("Indent string length must be less than the line length.");
 		}
-		boolean allTabsAndSpaces = indent.chars().allMatch(c -> c == ' ' || c == '\t');
+		boolean allTabsAndSpaces = indent.chars().allMatch(Utils::isTabOrSpace);
 		if (!allTabsAndSpaces) {
 			throw new IllegalArgumentException("Indent string can only contain tabs and spaces.");
 		}

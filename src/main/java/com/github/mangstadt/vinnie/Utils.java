@@ -121,6 +121,15 @@ public final class Utils {
 		return c == '\r' || c == '\n';
 	}
 
+	/**
+	 * Determines if the given character is a tab or space.
+	 * @param c the character
+	 * @return true if the character is a tab or space, false if not
+	 */
+	public static boolean isTabOrSpace(int c) {
+		return c == '\t' || c == ' ';
+	}
+
 	private Utils() {
 		//hide default constructor
 	}
