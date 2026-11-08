@@ -26,6 +26,7 @@ package com.github.mangstadt.vinnie.io;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -372,46 +373,40 @@ public class FoldedLineWriterTest {
 		}
 	}
 
-	@SuppressWarnings("resource")
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void lineLength_too_small() throws Exception {
 		StringWriter sw = new StringWriter();
-		new FoldedLineWriter(sw, 3, " ");
+		assertThrows(IllegalArgumentException.class, () -> new FoldedLineWriter(sw, 3, " "));
 	}
 
-	@SuppressWarnings("resource")
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void lineLength_shorter_than_indent_length() throws Exception {
 		StringWriter sw = new StringWriter();
-		new FoldedLineWriter(sw, 4, " \t \t ");
+		assertThrows(IllegalArgumentException.class, () -> new FoldedLineWriter(sw, 4, " \t \t "));
 	}
 
-	@SuppressWarnings("resource")
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void lineLength_equal_to_indent_length() throws Exception {
 		StringWriter sw = new StringWriter();
-		new FoldedLineWriter(sw, 5, " \t \t ");
+		assertThrows(IllegalArgumentException.class, () -> new FoldedLineWriter(sw, 5, " \t \t "));
 	}
 
-	@SuppressWarnings("resource")
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void indent_null() throws Exception {
 		StringWriter sw = new StringWriter();
-		new FoldedLineWriter(sw, 75, null);
+		assertThrows(NullPointerException.class, () -> new FoldedLineWriter(sw, 75, null));
 	}
 
-	@SuppressWarnings("resource")
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void indent_empty() throws Exception {
 		StringWriter sw = new StringWriter();
-		new FoldedLineWriter(sw, 75, "");
+		assertThrows(IllegalArgumentException.class, () -> new FoldedLineWriter(sw, 75, ""));
 	}
 
-	@SuppressWarnings("resource")
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void indent_invalid_characters() throws Exception {
 		StringWriter sw = new StringWriter();
-		new FoldedLineWriter(sw, 75, "---");
+		assertThrows(IllegalArgumentException.class, () -> new FoldedLineWriter(sw, 75, "---"));
 	}
 
 	@Test
